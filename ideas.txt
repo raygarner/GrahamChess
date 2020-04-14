@@ -3,3 +3,9 @@ type Position = (Int, Int) -- -1 means off the board
 type Piece = (Char, Bool, Pos) -- (Type of piece, colour of piece, position of the piece)
 
 type Board = [[Piece]] -- input to evaluation function
+
+
+Board stored in text file?
+
+[[('r', False, (0, 0)), ('n', True, (1, 0), ...
+
