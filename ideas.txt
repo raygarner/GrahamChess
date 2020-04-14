@@ -9,3 +9,6 @@ Board stored in text file?
 
 [[('r', False, (0, 0)), ('n', True, (1, 0), ...
 
+C search engine calling haskell evaluator?
+
+
