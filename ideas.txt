@@ -5,10 +5,11 @@ type Piece = (Char, Bool, Pos) -- (Type of piece, colour of piece, position of t
 type Board = [[Piece]] -- input to evaluation function
 
 
+
 Board stored in text file?
 
 [[('r', False, (0, 0)), ('n', True, (1, 0), ...
 
 C search engine calling haskell evaluator?
 
-
+evaluate the strength of a piece instead of using a static material value
