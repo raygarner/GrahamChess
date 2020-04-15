@@ -1,4 +1,5 @@
-import           TypeDefs
+import TypeDefs
+import Init
 
 -- GETTERS
 
@@ -30,6 +31,11 @@ getTarget (a, b) (c, d) = (a+b, c+d)
 findPiece :: Pos -> AllPieces -> [Piece]
 findPiece a b = [x | x <- b, getPos x == a]
 
+-- returns the inversion of a colour
+invertColour :: Colour -> Colour
+invertColour White = Black
+invertColour Black = White
+
 
 
 -- UTILITIES AND RULES
@@ -42,9 +48,15 @@ isEmpty a b = (findPiece a b) == []
 isEnemy :: Piece -> Piece -> Bool
 isEnemy a b = getColour a /= getColour b
 
+isOnBoard :: Piece -> Move -> Bool
+isOnBoard a b = m >= 0 && m <= 7 && n >= 0 && n <= 7
+                where
+                    m = getRow (getTarget (getPos a) b)
+                    n = getColumn (getTarget (getPos a) b)
+
 -- returns whether a square is not occupied by a friendly piece
 isValidTarget :: Piece -> Move -> AllPieces -> Bool
-isValidTarget a b c = (isEmpty (getTarget (getPos a) b) c) && (isEnemy a z)
+isValidTarget a b c = (isEmpty (getTarget (getPos a) b) c) && (isEnemy a z) && isOnBoard a b
                       where z = head (findPiece (getTarget (getPos a) b) c)
 
 -- returns whether a square is occupied by an enemy
@@ -114,6 +126,14 @@ isBishopValidMove a b c | isDiagonal b = isValidTarget a b c && isDiagonalMovePa
 isRookValidMove :: Piece -> Move -> AllPieces -> Bool
 isRookValidMove a b c | isStraightMove b = isValidTarget a b c && isStraightMovePathEmpty (getPos a) b c
                       | otherwise = False
+
+-- returns the position of the enemy king
+
+
+-- returns whether a king move is valid
+validKingMove :: Piece -> Move -> AllPieces -> Bool
+validKingMove a (m,n) b = (abs m >=1 && abs n >=1 ) && isValidTarget a (m,n) b
+
 
 isValidMove :: Piece -> Move -> AllPieces -> Bool
 isValidMove (Pawn, col, pos) x y   = isPawnValidMove (Pawn, col, pos) x y
