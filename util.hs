@@ -1,32 +1,48 @@
 import TypeDefs
 
 -- GETTERS
+
+-- returns the column of a position
 getcolumn :: Pos -> Int
 getcolumn (x,_) = x
 
+-- returns the row of a position
 getrow :: Pos -> Int
 getrow (_,y) = y
 
+-- returns the colour of a piece
 getcolour :: Piece -> Col
 getcolour (_,x,_) = x
 
+-- returns the position of a piece
 getpos :: Piece -> Pos
 getpos (_,_,x) = x
 
+-- returns the starting position of a move
+getStart :: Move -> Pos
+getStart (x,_,_) = getpos x
+
+-- returns the target position for a move
+getTarget :: Move -> Pos
+getTarget (_,y,_) = y
+
+-- returns the piece that is on a square in a list (empty list if no piece there)
+getPiece :: Pos -> AllPieces -> [Piece]
+getPiece a b = [x | x <- b, getpos x == a]
+
+
 
 -- UTILITIES
---returns a list of pieces on a square
-piecesOn :: Pos -> AllPieces -> [Piece]
-piecesOn a b = [x | x <- b, getpos x == a]
 
---returns true if there is no piece on pos
+-- returns true if there is no piece on pos
 isEmpty :: Pos -> AllPieces -> Bool
-isEmpty a b = piecesOn a b == []
+isEmpty a b = (getPiece a b) == []
 
--- RULES
+-- returns true if the two pieces are enemies
+isEnemy :: Piece -> Piece -> Bool
+isEnemy a b = getcolour a /= getcolour b
 
--- goal: returns a list of the valid moves a knight can make
---validN :: Square -> Board -> [Move]
---validN a b = [(a, x, True) | x <- b, (getcolumn (getpos x) == getcolumn (getpos a) + 1) && (getrow (getpos x) == getrow (getpos a) + 2)]
-
+-- returns whether a square is not occupied by a friendly piece
+isValidTarget :: Move -> AllPieces -> Bool
+isValidTarget a b = isEmpty (getTarget a) b || isEnemy (head (getPiece (getStart a) b)) (head (getPiece (getTarget a) b))
 
