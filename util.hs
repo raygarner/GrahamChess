@@ -4,11 +4,11 @@ import TypeDefs
 
 -- returns the column of a position
 getcolumn :: Pos -> Int
-getcolumn (x,_) = x
+getcolumn (_,y) = y
 
 -- returns the row of a position
 getrow :: Pos -> Int
-getrow (_,y) = y
+getrow (x,_) = x
 
 -- returns the colour of a piece
 getcolour :: Piece -> Col
