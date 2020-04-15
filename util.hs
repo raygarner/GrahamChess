@@ -27,8 +27,8 @@ getTarget :: Move -> Pos
 getTarget (_,y,_) = y
 
 -- returns the piece that is on a square in a list (empty list if no piece there)
-getPiece :: Pos -> AllPieces -> [Piece]
-getPiece a b = [x | x <- b, getPos x == a]
+findPiece :: Pos -> AllPieces -> [Piece]
+findPiece a b = [x | x <- b, getPos x == a]
 
 
 
@@ -36,7 +36,7 @@ getPiece a b = [x | x <- b, getPos x == a]
 
 -- returns true if there is no piece on pos
 isEmpty :: Pos -> AllPieces -> Bool
-isEmpty a b = (getPiece a b) == []
+isEmpty a b = (findPiece a b) == []
 
 -- returns true if the two pieces are enemies
 isEnemy :: Piece -> Piece -> Bool
@@ -46,8 +46,8 @@ isEnemy a b = getColour a /= getColour b
 isValidTarget :: Move -> AllPieces -> Bool
 isValidTarget a b = isEmpty (getTarget a) b || isEnemy s t
                     where
-                        s = head (getPiece (getStart a) b)
-                        t = head (getPiece (getTarget a) b)
+                        s = head (findPiece (getStart a) b)
+                        t = head (findPiece (getTarget a) b)
 
 -- returns whether a move is in a straight line or not
 isStraightMove :: Move -> Bool
