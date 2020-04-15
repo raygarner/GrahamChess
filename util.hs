@@ -11,7 +11,7 @@ getRow :: Pos -> Int
 getRow (x,_) = x
 
 -- returns the colour of a piece
-getColour :: Piece -> Col
+getColour :: Piece -> Colour
 getColour (_,x,_) = x
 
 -- returns the position of a piece

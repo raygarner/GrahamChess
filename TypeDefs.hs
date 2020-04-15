@@ -3,11 +3,13 @@ module TypeDefs where
 data PieceType = Pawn | Knight | Bishop | Rook | Queen | King
                  deriving (Eq, Ord)
 
-type Col = Bool
+--type Col = Bool
+data Colour = Black | White
+              deriving (Eq)
 
 type Pos = (Int, Int) -- row, column
 
-type Piece = (PieceType, Col, Pos) -- type, colour of piece on square, position
+type Piece = (PieceType, Colour, Pos) -- type, colour of piece on square, position
 
 type AllPieces = [Piece]
 
