@@ -1,4 +1,5 @@
-import           TypeDefs
+import TypeDefs
+import Init
 
 -- GETTERS
 
@@ -42,9 +43,15 @@ isEmpty a b = (findPiece a b) == []
 isEnemy :: Piece -> Piece -> Bool
 isEnemy a b = getColour a /= getColour b
 
+isOnBoard :: Piece -> Move -> Bool
+isOnBoard a b = m >= 0 && m <= 7 && n >= 0 && n <= 7
+                where
+                    m = getRow (getTarget (getPos a) b)
+                    n = getCol (getTarget (getPos a) b)
+
 -- returns whether a square is not occupied by a friendly piece
 isValidTarget :: Piece -> Move -> AllPieces -> Bool
-isValidTarget a b c = (isEmpty (getTarget (getPos a) b) c) && (isEnemy a z)
+isValidTarget a b c = (isEmpty (getTarget (getPos a) b) c) && (isEnemy a z) && isOnBoard a b
                       where z = head (findPiece (getTarget (getPos a) b) c)
 
 -- returns whether a square is occupied by an enemy
@@ -88,3 +95,7 @@ isLShaped (a,b) = (abs a == 2 && abs b == 1) || (abs a == 1 && abs b == 2)
 isValidMove :: Piece -> Move -> AllPieces -> Bool
 isValidMove (Pawn, col, pos) x y = isValidTarget (Pawn, col, pos) x y && ((isTargetEnemy (Pawn,col,pos) x y && isPawnCapture (Pawn,col,pos) x) || (isEmpty (getTarget pos x) y && isBasicPawnMove (Pawn,col,pos) x))
 isValidMove (Knight, col, pos) x y = isValidTarget (Knight, col, pos) x y && isLShaped x
+
+
+validKingMove :: Piece -> Move -> AllPieces -> Bool
+validKingMove a (m,n) b = (abs m >=1 && abs n >=1) && isValidTarget a (m,n) b

@@ -1,3 +1,5 @@
+module Init where
+
 import TypeDefs
 
 addPawns :: AllPieces
