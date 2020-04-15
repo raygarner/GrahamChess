@@ -44,5 +44,8 @@ isEnemy a b = getcolour a /= getcolour b
 
 -- returns whether a square is not occupied by a friendly piece
 isValidTarget :: Move -> AllPieces -> Bool
-isValidTarget a b = isEmpty (getTarget a) b || isEnemy (head (getPiece (getStart a) b)) (head (getPiece (getTarget a) b))
+isValidTarget a b = isEmpty (getTarget a) b || isEnemy s t
+                    where
+                        s = head (getPiece (getStart a) b)
+                        t = head (getPiece (getTarget a) b)
 
