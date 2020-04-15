@@ -50,3 +50,4 @@ isValidTarget a b c = (isEmpty (getTarget (getPos a) b) c) && (isEnemy a z)
 -- returns whether a move is in a straight line or not
 isStraightMove :: Move -> Bool
 isStraightMove (a,b) = (a == b) || (a == 0 || b == 0)
+
