@@ -113,12 +113,16 @@ isKnightValidMove a b c = isValidTarget a b c && isLShaped b
 isBishopValidMove :: Piece -> Move -> AllPieces -> Bool
 isBishopValidMove a b c = isValidTarget a b c && isDiagonal b && isDiagonalMovePathEmpty (getPos a) b c
 
--- returns the position of the enemy king
-
+-- returns the position of the king
+findKing :: Colour -> AllPieces -> Pos
+findKing a b = head [p | (t, c, p) <- b, t == King, c == a]
 
 -- returns whether a king move is valid
 validKingMove :: Piece -> Move -> AllPieces -> Bool
-validKingMove a (m,n) b = (abs m >=1 && abs n >=1 ) && isValidTarget a (m,n) b
+validKingMove a (m,n) b = (abs m >=1 && abs n >=1 ) && isValidTarget a (m,n) b && x > 1 && y > 1
+                          where
+                              x = abs (getColumn (getPos a)) - (getColumn (findKing (invertColour (getColour a)) b))
+                              y = abs (getRow (getPos a)) - (getRow (findKing (invertColour (getColour a)) b))
 
 
 isValidMove :: Piece -> Move -> AllPieces -> Bool
