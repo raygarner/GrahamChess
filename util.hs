@@ -1,4 +1,4 @@
-import TypeDefs
+import           TypeDefs
 
 -- GETTERS
 
@@ -51,3 +51,8 @@ isValidTarget a b c = (isEmpty (getTarget (getPos a) b) c) && (isEnemy a z)
 isStraightMove :: Move -> Bool
 isStraightMove (a,b) = (a == b) || (a == 0 || b == 0)
 
+isLShaped :: Move -> Bool
+isLShaped (a,b) = (abs a == 2 && abs b == 1) || (abs a == 1 && abs b == 2)
+
+isValidMove :: Piece -> Move -> AllPieces -> Bool
+isValidMove (Knight,col,pos) x y = isValidTarget (Knight,col,pos) x y && isLShaped x
