@@ -11,7 +11,9 @@ type Piece = (PieceType, Col, Pos) -- type, colour of piece on square, position
 
 type AllPieces = [Piece]
 
-type Move = (Piece, Pos, Bool) -- piece, target square, validity
+--type Move = (Piece, Pos, Bool) -- piece, target square, validity
+
+type Move = (Int, Int) -- row difference, column difference
 
 
 
