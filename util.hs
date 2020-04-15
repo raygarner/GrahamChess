@@ -69,22 +69,39 @@ isDiagonalMovePathEmpty a b c = isEmpty (getTarget a b2) c && isDiagonalMovePath
 
 --returns whether a pawn move is a capture
 isPawnCapture :: Piece -> Move -> Bool
-isPawnCapture (_,False,_) (a,b) = b == 1 && abs a == 1
-isPawnCapture(_,True,_) (a,b)   = b == -1 && abs a == 0
+isPawnCapture (_,Black,_) (a,b) = b == 1 && abs a == 1
+isPawnCapture(_,White,_) (a,b)  = b == -1 && abs a == 0
 
 --returns whether a pawn move is a regular pawn move
 isBasicPawnMove :: Piece -> Move -> Bool
-isBasicPawnMove (_,False,_) (a,b) = b == 1 && a == 0
-isBasicPawnMove (_,True,_) (a,b)  = b == -1 && a == 0
+isBasicPawnMove (_,Black,_) (a,b) = b == 1 && a == 0
+isBasicPawnMove (_,White,_) (a,b) = b == -1 && a == 0
 
 -- returns whether a move is in a straight line or not
 isStraightMove :: Move -> Bool
 isStraightMove (a,b) = (a == b) || (a == 0 || b == 0)
 
+-- return whether a move is a diagonal
+isDiagonal :: Move -> Bool
+isDiagonal (a,b) = abs a == abs b
+
 -- returns whether a move is L-shaped.
 isLShaped :: Move -> Bool
 isLShaped (a,b) = (abs a == 2 && abs b == 1) || (abs a == 1 && abs b == 2)
 
+-- returns whether a pawn move is valid
+isPawnValidMove :: Piece -> Move -> AllPieces -> Bool
+isPawnValidMove a b c = isValidTarget a b c && ((isTargetEnemy a b c && isPawnCapture a b) || (isEmpty (getTarget (getPos a) b) c && isBasicPawnMove a b))
+
+-- returns whether a knight move is valid
+isKnightValidMove :: Piece -> Move -> AllPieces -> Bool
+isKnightValidMove a b c = isValidTarget a b c && isLShaped b
+
+-- returns whether a bishop move is valid
+isBishopValidMove :: Piece -> Move -> AllPieces -> Bool
+isBishopValidMove a b c = isValidTarget a b c && isDiagonal b && isDiagonalMovePathEmpty (getPos a) b c
+
 isValidMove :: Piece -> Move -> AllPieces -> Bool
-isValidMove (Pawn, col, pos) x y = isValidTarget (Pawn, col, pos) x y && ((isTargetEnemy (Pawn,col,pos) x y && isPawnCapture (Pawn,col,pos) x) || (isEmpty (getTarget pos x) y && isBasicPawnMove (Pawn,col,pos) x))
-isValidMove (Knight, col, pos) x y = isValidTarget (Knight, col, pos) x y && isLShaped x
+isValidMove (Pawn, col, pos) x y   = isPawnValidMove (Pawn, col, pos) x y
+isValidMove (Knight, col, pos) x y = isKnightValidMove (Knight, col, pos) x y
+isValidMove (Bishop, col, pos) x y = isBishopValidMove (Bishop, col, pos) x y
