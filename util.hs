@@ -47,7 +47,7 @@ isOnBoard :: Piece -> Move -> Bool
 isOnBoard a b = m >= 0 && m <= 7 && n >= 0 && n <= 7
                 where
                     m = getRow (getTarget (getPos a) b)
-                    n = getCol (getTarget (getPos a) b)
+                    n = getColumn (getTarget (getPos a) b)
 
 -- returns whether a square is not occupied by a friendly piece
 isValidTarget :: Piece -> Move -> AllPieces -> Bool
@@ -108,9 +108,10 @@ isKnightValidMove a b c = isValidTarget a b c && isLShaped b
 isBishopValidMove :: Piece -> Move -> AllPieces -> Bool
 isBishopValidMove a b c = isValidTarget a b c && isDiagonal b && isDiagonalMovePathEmpty (getPos a) b c
 
-
+-- returns whether a king move is valid
 validKingMove :: Piece -> Move -> AllPieces -> Bool
 validKingMove a (m,n) b = (abs m >=1 && abs n >=1) && isValidTarget a (m,n) b
+
 
 isValidMove :: Piece -> Move -> AllPieces -> Bool
 isValidMove (Pawn, col, pos) x y   = isPawnValidMove (Pawn, col, pos) x y
