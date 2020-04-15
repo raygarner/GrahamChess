@@ -31,6 +31,11 @@ getTarget (a, b) (c, d) = (a+b, c+d)
 findPiece :: Pos -> AllPieces -> [Piece]
 findPiece a b = [x | x <- b, getPos x == a]
 
+-- returns the inversion of a colour
+invertColour :: Colour -> Colour
+invertColour White = Black
+invertColour Black = White
+
 
 
 -- UTILITIES AND RULES
@@ -108,9 +113,12 @@ isKnightValidMove a b c = isValidTarget a b c && isLShaped b
 isBishopValidMove :: Piece -> Move -> AllPieces -> Bool
 isBishopValidMove a b c = isValidTarget a b c && isDiagonal b && isDiagonalMovePathEmpty (getPos a) b c
 
+-- returns the position of the enemy king
+
+
 -- returns whether a king move is valid
 validKingMove :: Piece -> Move -> AllPieces -> Bool
-validKingMove a (m,n) b = (abs m >=1 && abs n >=1) && isValidTarget a (m,n) b
+validKingMove a (m,n) b = (abs m >=1 && abs n >=1 ) && isValidTarget a (m,n) b
 
 
 isValidMove :: Piece -> Move -> AllPieces -> Bool
