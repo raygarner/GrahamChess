@@ -6,4 +6,6 @@ function to check for an obstruction on a straight line path between two squares
 
 move validation functions for each piece
 
-
+algorithm for the strength of a piece? I guess it would be split up into multiple functions
+that could get the position of the piece and the actual material value of the piece and
+combine them in some way.

@@ -12,4 +12,4 @@ Board stored in text file?
 
 C search engine calling haskell evaluator?
 
-evaluate the strength of a piece instead of using a static material value
+evaluate the strength of a piece instead of using a static material value. Done in haskell, but it can be based off the static value.
