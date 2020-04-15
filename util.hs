@@ -55,4 +55,3 @@ isStraightMove a = (colDiff == rowDiff) || (colDiff == 0 || rowDiff == 0)
                    where
                        colDiff = abs (getColumn (getTarget a)) - (getColumn (getStart a))
                        rowDiff = abs (getRow (getTarget a)) - (getRow (getStart a))
-
