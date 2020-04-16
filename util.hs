@@ -90,15 +90,18 @@ isStraightMovePathEmpty a (0,b) c = isEmpty (getTarget a (0,b2)) c && isStraight
 isStraightMovePathEmpty a (b,0) c = isEmpty (getTarget a (b2,0)) c && isStraightMovePathEmpty a (b2,0) c
                                     where b2 = closerToZero b
 
---returns whether a pawn move is a capture
+--returns whether a pawn move is a capture -- WORKING (i think)
 isPawnCapture :: Piece -> Move -> Bool
-isPawnCapture (_,Black,_) (a,b) = b == 1 && abs a == 1
-isPawnCapture(_,White,_) (a,b)  = b == -1 && abs a == 0
+isPawnCapture (_,Black,_) (a,b) = a == 1 && abs b == 1
+isPawnCapture (_,White,_) (a,b) = a == -1 && abs b == 1
+-- change made - ray
+--isPawnCapture (_,Black,_) (a,b) = b == 1 && abs a == 1
+--isPawnCapture(_,White,_) (a,b)  = b == -1 && abs a == 0
 
---returns whether a pawn move is a regular pawn move
+--returns whether a pawn move is a regular pawn move -- swapped a and b (row,column) WORKING
 isBasicPawnMove :: Piece -> Move -> Bool
-isBasicPawnMove (_,Black,_) (a,b) = b == 1 && a == 0
-isBasicPawnMove (_,White,_) (a,b) = b == -1 && a == 0
+isBasicPawnMove (_,Black,_) (a,b) = a == 1 && b == 0
+isBasicPawnMove (_,White,_) (a,b) = a == -1 && b == 0
 
 -- returns whether a move is in a straight line or not
 isStraightMove :: Move -> Bool
