@@ -148,6 +148,7 @@ validKingMove a (m,n) b = (abs m <= 1 && abs n <= 1 ) && isValidTarget a (m,n) b
                               y = abs ((getRow (getPos a)) - (getRow (findKing (invertColour (getColour a)) b)))
 
 
+-- returns whether a move is valid
 isValidMove :: Piece -> Move -> AllPieces -> Bool
 isValidMove (Pawn, col, pos) x y   = isPawnValidMove (Pawn, col, pos) x y
 isValidMove (Knight, col, pos) x y = isKnightValidMove (Knight, col, pos) x y
@@ -156,7 +157,7 @@ isValidMove (Rook, col, pos) x y   = isRookValidMove (Rook, col, pos) x y
 
 
 -- returns a list of the pieces which can capture piece a
-threatenedBy:: Piece -> AllPieces -> [Piece]
+threatenedBy :: Piece -> AllPieces -> [Piece]
 threatenedBy a b = [ x | x <- b, isValidMove x (m - getRow (getPos x), n - getColumn (getPos x)) b ]
                   where
                       m = getRow (getPos a)
