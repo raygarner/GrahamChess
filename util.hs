@@ -123,7 +123,6 @@ isBishopValidMove :: Piece -> Move -> AllPieces -> Bool
 isBishopValidMove a b c = isDiagonal b && isValidTarget a b c && isDiagonalMovePathEmpty (getPos a) b c
 -- are these the same? - from ray
 --isBishopValidMove a b c | isDiagonal b = isValidTarget a b c && isDiagonalMovePathEmpty (getPos a) b c
---isBishopValidMove a b c | isDiagonal b = isValidTarget a b c && isDiagonalMovePathEmpty (getPos a) b c
  --                       | otherwise = False
 
 isRookValidMove :: Piece -> Move -> AllPieces -> Bool
@@ -149,3 +148,15 @@ isValidMove (Pawn, col, pos) x y   = isPawnValidMove (Pawn, col, pos) x y
 isValidMove (Knight, col, pos) x y = isKnightValidMove (Knight, col, pos) x y
 isValidMove (Bishop, col, pos) x y = isBishopValidMove (Bishop, col, pos) x y
 isValidMove (Rook, col, pos) x y   = isRookValidMove (Rook, col, pos) x y
+
+
+-- returns a list of the pieces which can capture piece a
+threatenedBy:: Piece -> AllPieces -> [Piece]
+threatenedBy a b = [ x | x <- b, isValidMove x (m - getRow (getPos x),n - getColumn (getPos x)) b ]
+                  where
+                      m = getRow (getPos a)
+                      n = getColumn (getPos a)
+
+
+
+
