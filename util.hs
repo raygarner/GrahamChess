@@ -25,7 +25,7 @@ getPos (_,_,x) = x
 
 -- returns the target position for a move
 getTarget :: Pos -> Move -> Pos
-getTarget (a, b) (c, d) = (a+b, c+d)
+getTarget (a, b) (c, d) = (a+c, b+d)
 
 -- returns the piece that is on a square in a list (empty list if no piece there)
 findPiece :: Pos -> AllPieces -> [Piece]
@@ -40,11 +40,11 @@ invertColour Black = White
 
 -- UTILITIES AND RULES
 
--- returns true if there is no piece on pos
+-- returns true if there is no piece on pos WORKING
 isEmpty :: Pos -> AllPieces -> Bool
 isEmpty a b = (findPiece a b) == []
 
--- returns true if the two pieces are enemies
+-- returns true if the two pieces are enemies WORKING
 isEnemy :: Piece -> Piece -> Bool
 isEnemy a b = getColour a /= getColour b
 
