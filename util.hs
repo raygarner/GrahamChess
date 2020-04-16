@@ -23,11 +23,11 @@ getPos (_,_,x) = x
 --getStart :: Move -> Pos
 --getStart (x,_,_) = getPos x
 
--- returns the target position for a move
+-- returns the target position for a move WORKING
 getTarget :: Pos -> Move -> Pos
 getTarget (a, b) (c, d) = (a+c, b+d)
 
--- returns the piece that is on a square in a list (empty list if no piece there)
+-- returns the piece that is on a square in a list (empty list if no piece there) WORKING
 findPiece :: Pos -> AllPieces -> [Piece]
 findPiece a b = [x | x <- b, getPos x == a]
 
@@ -48,26 +48,28 @@ isEmpty a b = (findPiece a b) == []
 isEnemy :: Piece -> Piece -> Bool
 isEnemy a b = getColour a /= getColour b
 
+-- returns whether a move will mean the piece ends up off of the board or not -- WORKING
 isOnBoard :: Piece -> Move -> Bool
 isOnBoard a b = m >= 0 && m <= 7 && n >= 0 && n <= 7
                 where
                     m = getRow (getTarget (getPos a) b)
                     n = getColumn (getTarget (getPos a) b)
 
--- returns whether a square is not occupied by a friendly piece
+-- returns whether a square is not occupied by a friendly piece WORKING
 isValidTarget :: Piece -> Move -> AllPieces -> Bool
-isValidTarget a b c = (isEmpty (getTarget (getPos a) b) c) && (isEnemy a z) && isOnBoard a b
+isValidTarget a b c = ((isEmpty (getTarget (getPos a) b) c) || (isEnemy a z)) && isOnBoard a b
                       where z = head (findPiece (getTarget (getPos a) b) c)
 
--- returns whether a square is occupied by an enemy
+-- returns whether a square is occupied by an enemy -- WORKING
 isTargetEnemy :: Piece -> Move -> AllPieces -> Bool
-isTargetEnemy a b c = isEnemy a z
+isTargetEnemy a b c = not (isEmpty (getTarget (getPos a) b) c) && isEnemy a z -- checks whether square is empty to prevent empty list being passed to head and causing an error - ray
                       where z = head(findPiece (getTarget (getPos a) b) c)
 
 -- get an int closer to 0
 closerToZero :: Int -> Int
 closerToZero a | a < 0 = a + 1
-               | otherwise = a - 1
+               | a > 0 = a - 1 -- added this line so -1 isnt returned if a is 0 - from ray
+               | otherwise = a
 
 -- decrease the value of a move by 1 closer to the original position
 decreaseDiagonalMove :: Move -> Move
@@ -110,11 +112,11 @@ isDiagonal (a,b) = abs a == abs b
 isLShaped :: Move -> Bool
 isLShaped (a,b) = (abs a == 2 && abs b == 1) || (abs a == 1 && abs b == 2)
 
--- returns whether a pawn move is valid
+-- returns whether a pawn move is valid NOT WORKING
 isPawnValidMove :: Piece -> Move -> AllPieces -> Bool
-isPawnValidMove a b c = isValidTarget a b c && ((isTargetEnemy a b c && isPawnCapture a b) || (isEmpty (getTarget (getPos a) b) c && isBasicPawnMove a b))
+isPawnValidMove a b c = isValidTarget a b c && ( (isEmpty (getTarget (getPos a) b) c && isBasicPawnMove a b) || (isTargetEnemy a b c && isPawnCapture a b))
 
--- returns whether a knight move is valid
+-- returns whether a knight move is valid -- WORKING (i think. needs thorough testing)
 isKnightValidMove :: Piece -> Move -> AllPieces -> Bool
 isKnightValidMove a b c = isValidTarget a b c && isLShaped b
 
