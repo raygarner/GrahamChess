@@ -152,7 +152,7 @@ isValidMove (Rook, col, pos) x y   = isRookValidMove (Rook, col, pos) x y
 
 -- returns a list of the pieces which can capture piece a
 threatenedBy:: Piece -> AllPieces -> [Piece]
-threatenedBy a b = [ x | x <- b, isValidMove x (m - getRow (getPos x),n - getColumn (getPos x)) b ]
+threatenedBy a b = [ x | x <- b, isValidMove x (m - getRow (getPos x), n - getColumn (getPos x)) b ]
                   where
                       m = getRow (getPos a)
                       n = getColumn (getPos a)
