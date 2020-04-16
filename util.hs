@@ -120,12 +120,17 @@ isKnightValidMove a b c = isValidTarget a b c && isLShaped b
 
 -- returns whether a bishop move is valid
 isBishopValidMove :: Piece -> Move -> AllPieces -> Bool
-isBishopValidMove a b c | isDiagonal b = isValidTarget a b c && isDiagonalMovePathEmpty (getPos a) b c
-                        | otherwise = False
+isBishopValidMove a b c = isDiagonal b && isValidTarget a b c && isDiagonalMovePathEmpty (getPos a) b c
+-- are these the same? - from ray
+--isBishopValidMove a b c | isDiagonal b = isValidTarget a b c && isDiagonalMovePathEmpty (getPos a) b c
+--isBishopValidMove a b c | isDiagonal b = isValidTarget a b c && isDiagonalMovePathEmpty (getPos a) b c
+ --                       | otherwise = False
 
 isRookValidMove :: Piece -> Move -> AllPieces -> Bool
-isRookValidMove a b c | isStraightMove b = isValidTarget a b c && isStraightMovePathEmpty (getPos a) b c
-                      | otherwise = False
+isRookValidMove a b c = isStraightMove b && isValidTarget a b c && isStraightMovePathEmpty (getPos a) b c
+-- are these the same? - from ray
+--isRookValidMove a b c | isStraightMove b = isValidTarget a b c && isStraightMovePathEmpty (getPos a) b c
+--                      | otherwise = False
 
 -- returns the position of the king
 findKing :: Colour -> AllPieces -> Pos
