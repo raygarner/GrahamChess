@@ -115,7 +115,7 @@ isDiagonal (a,b) = abs a == abs b
 isLShaped :: Move -> Bool
 isLShaped (a,b) = (abs a == 2 && abs b == 1) || (abs a == 1 && abs b == 2)
 
--- returns whether a pawn move is valid NOT WORKING
+-- returns whether a pawn move is valid
 isPawnValidMove :: Piece -> Move -> AllPieces -> Bool
 isPawnValidMove a b c = isValidTarget a b c && ( (isEmpty (getTarget (getPos a) b) c && isBasicPawnMove a b) || (isTargetEnemy a b c && isPawnCapture a b))
 
@@ -136,16 +136,16 @@ isRookValidMove a b c = isStraightMove b && isValidTarget a b c && isStraightMov
 --isRookValidMove a b c | isStraightMove b = isValidTarget a b c && isStraightMovePathEmpty (getPos a) b c
 --                      | otherwise = False
 
--- returns the position of the king
+-- returns the position of the king WORKING
 findKing :: Colour -> AllPieces -> Pos
 findKing a b = head [p | (t, c, p) <- b, t == King, c == a]
 
--- returns whether a king move is valid
+-- returns whether a king move is valid WORKING
 validKingMove :: Piece -> Move -> AllPieces -> Bool
-validKingMove a (m,n) b = (abs m >=1 && abs n >=1 ) && isValidTarget a (m,n) b && x > 1 && y > 1
+validKingMove a (m,n) b = (abs m <= 1 && abs n <= 1 ) && isValidTarget a (m,n) b && x > 1 && y > 1
                           where
-                              x = abs (getColumn (getPos a)) - (getColumn (findKing (invertColour (getColour a)) b))
-                              y = abs (getRow (getPos a)) - (getRow (findKing (invertColour (getColour a)) b))
+                              x = abs ((getColumn (getPos a)) - (getColumn (findKing (invertColour (getColour a)) b)))
+                              y = abs ((getRow (getPos a)) - (getRow (findKing (invertColour (getColour a)) b)))
 
 
 isValidMove :: Piece -> Move -> AllPieces -> Bool
