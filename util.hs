@@ -1,6 +1,7 @@
 import           Debug
 import           Init
 import           TypeDefs
+import           Debug
 
 -- GETTERS
 
@@ -160,10 +161,10 @@ findKing a b = head [p | (t, c, p) <- b, t == King, c == a]
 
 -- returns whether a king move is valid WORKING
 validKingMove :: Piece -> Move -> AllPieces -> Bool
-validKingMove a (m,n) b = (abs m <= 1 && abs n <= 1 ) && isValidTarget a (m,n) b && x > 1 && y > 1
+validKingMove a (m,n) b = (abs m <= 1 && abs n <= 1 ) && isValidTarget a (m,n) b && (x > 1 || y > 1)
                           where
-                              x = abs ((getColumn (getPos a)) - (getColumn (findKing (invertColour (getColour a)) b)))
-                              y = abs ((getRow (getPos a)) - (getRow (findKing (invertColour (getColour a)) b)))
+                              x = abs ((getColumn (getTarget (getPos a) (m,n)) - (getColumn (findKing (invertColour (getColour a)) b))))
+                              y = abs ((getRow (getTarget (getPos a) (m,n)) - (getRow (findKing (invertColour (getColour a)) b))))
 
 
 -- returns whether a move is valid
@@ -173,7 +174,7 @@ isValidMove (Knight, col, pos) x y = isKnightValidMove (Knight, col, pos) x y
 isValidMove (Bishop, col, pos) x y = isBishopValidMove (Bishop, col, pos) x y
 isValidMove (Rook, col, pos) x y   = isRookValidMove (Rook, col, pos) x y
 isValidMove (Queen, col, pos) x y  = isQueenValidMove (Queen, col, pos) x y
-isValidMove (King,col,pos) x y     = validKingMove (King,col,pos) x y
+isValidMove (King, col, pos) x y = validKingMove (King, col, pos) x y
 
 -- returns a list of the pieces which can capture piece a
 threatenedBy :: Piece -> AllPieces -> [Piece]
