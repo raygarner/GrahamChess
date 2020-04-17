@@ -173,6 +173,7 @@ isValidMove (Knight, col, pos) x y = isKnightValidMove (Knight, col, pos) x y
 isValidMove (Bishop, col, pos) x y = isBishopValidMove (Bishop, col, pos) x y
 isValidMove (Rook, col, pos) x y   = isRookValidMove (Rook, col, pos) x y
 isValidMove (Queen, col, pos) x y  = isQueenValidMove (Queen, col, pos) x y
+isValidMove (King,col,pos) x y     = validKingMove (King,col,pos) x y
 
 -- returns a list of the pieces which can capture piece a
 threatenedBy :: Piece -> AllPieces -> [Piece]
@@ -183,8 +184,8 @@ threatenedBy a b = [ x | x <- b, isValidMove x (m - getRow (getPos x), n - getCo
 
 -- returns whether the king is in check.
 isKingInCheck :: Piece -> AllPieces -> Bool
-isKingInCheck a b | null (threatenedBy a b) = True
-                  | otherwise = False
+isKingInCheck a b | null (threatenedBy a b) = False
+                  | otherwise = True
 
 -- removes a piece from the board
 takePiece :: Piece -> AllPieces -> AllPieces
