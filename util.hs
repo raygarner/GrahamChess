@@ -1,3 +1,4 @@
+import           Debug
 import           Init
 import           TypeDefs
 import           Debug
@@ -19,6 +20,14 @@ getColour (_,x,_) = x
 -- returns the position of a piece
 getPos :: Piece -> Pos
 getPos (_,_,x) = x
+
+--returns a list with a given piece removed
+removePiece :: Piece -> [Piece] -> [Piece]
+removePiece pieceToRemove xs = [ x | x <- xs, x /= pieceToRemove]
+
+-- returns a piece with an updated position
+updatePosition :: Piece -> Move -> Piece
+updatePosition (a,b,c) d = (a, b, (getTarget c d))
 
 -- returns the starting position of a move
 --getStart :: Move -> Pos
@@ -174,3 +183,24 @@ threatenedBy a b = [ x | x <- b, isValidMove x (m - getRow (getPos x), n - getCo
                       m = getRow (getPos a)
                       n = getColumn (getPos a)
 
+-- returns whether the king is in check.
+isKingInCheck :: Piece -> AllPieces -> Bool
+isKingInCheck a b | null (threatenedBy a b) = False
+                  | otherwise = True
+
+-- removes a piece from the board
+takePiece :: Piece -> AllPieces -> AllPieces
+takePiece (a,b,c) d = (a,b,(-1,-1)) : removePiece (a,b,c) d
+
+--move piece
+movePiece :: Piece -> Move -> AllPieces -> AllPieces
+movePiece a b c | isValidMove a b c = executeMove a b c
+                | otherwise = c
+
+--execute move
+executeMove :: Piece -> Move -> AllPieces -> AllPieces
+executeMove a b c | not (isTargetEnemy a b c) = updatePosition a b : removePiece a c
+                  | otherwise = takePiece y z
+                              where
+                                    y = head (findPiece (getTarget (getPos a) b) c)
+                                    z = updatePosition a b : removePiece a c
