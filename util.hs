@@ -164,5 +164,3 @@ threatenedBy a b = [ x | x <- b, isValidMove x (m - getRow (getPos x), n - getCo
                       n = getColumn (getPos a)
 
 
-
-
