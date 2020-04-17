@@ -1,5 +1,5 @@
-import TypeDefs
-import Init
+import           Init
+import           TypeDefs
 
 -- GETTERS
 
@@ -85,9 +85,9 @@ isDiagonalMovePathEmpty a b c = isEmpty (getTarget a b2) c && isDiagonalMovePath
 -- checks to see if a piece can move along a straight line without hitting any pieces.
 isStraightMovePathEmpty :: Pos -> Move -> AllPieces -> Bool
 isStraightMovePathEmpty a (0,0) c = True
-isStraightMovePathEmpty a (0,b) c = isEmpty (getTarget a (0,b2)) c && isStraightMovePathEmpty a (0,b2) c
+isStraightMovePathEmpty a (0,b) c = isEmpty (getTarget a (0,b)) c && isStraightMovePathEmpty a (0,b2) c
                                     where b2 = closerToZero b
-isStraightMovePathEmpty a (b,0) c = isEmpty (getTarget a (b2,0)) c && isStraightMovePathEmpty a (b2,0) c
+isStraightMovePathEmpty a (b,0) c = isEmpty (getTarget a (b,0)) c && isStraightMovePathEmpty a (b2,0) c
                                     where b2 = closerToZero b
 
 --returns whether a pawn move is a capture -- WORKING (i think)
@@ -162,7 +162,3 @@ threatenedBy a b = [ x | x <- b, isValidMove x (m - getRow (getPos x), n - getCo
                   where
                       m = getRow (getPos a)
                       n = getColumn (getPos a)
-
-
-
-
