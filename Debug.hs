@@ -13,7 +13,7 @@ addTestKnights :: AllPieces
 addTestKnights = [ (Knight, c, (m, 1)) | (c,m) <- [(White,3), (Black,1)] ]
 
 addTestQueens :: AllPieces
-addTestQueens = [(Queen, White, (7,7))]
+addTestQueens = [(Queen, White, (2,7))]
 
 addTestRooks :: AllPieces
 addTestRooks = [(Rook, White, (5,6))]
