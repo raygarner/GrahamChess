@@ -79,7 +79,7 @@ decreaseDiagonalMove (a,b) = (closerToZero a, closerToZero b)
 --checks to see if a piece can move along a diagonal line without hitting any pieces.
 isDiagonalMovePathEmpty :: Pos -> Move -> AllPieces -> Bool
 isDiagonalMovePathEmpty a (0,0) c = True
-isDiagonalMovePathEmpty a b c = isEmpty (getTarget a b2) c && isDiagonalMovePathEmpty a b2 c
+isDiagonalMovePathEmpty a b c = isEmpty (getTarget a b) c && isDiagonalMovePathEmpty a b2 c
                                 where b2 = decreaseDiagonalMove b
 
 -- checks to see if a piece can move along a straight line without hitting any pieces.
