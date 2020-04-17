@@ -140,6 +140,11 @@ isRookValidMove a b c = False
 --isRookValidMove a b c | isStraightMove b = isValidTarget a b c && isStraightMovePathEmpty (getPos a) b c
 --                      | otherwise = False
 
+
+-- returns whether a queen move is valid
+isQueenValidMove :: Piece -> Move -> AllPieces -> Bool
+isQueenValidMove a b c = isRookValidMove a b c || isBishopValidMove a b c
+
 -- returns the position of the king WORKING
 findKing :: Colour -> AllPieces -> Pos
 findKing a b = head [p | (t, c, p) <- b, t == King, c == a]
@@ -158,7 +163,7 @@ isValidMove (Pawn, col, pos) x y   = isPawnValidMove (Pawn, col, pos) x y
 isValidMove (Knight, col, pos) x y = isKnightValidMove (Knight, col, pos) x y
 isValidMove (Bishop, col, pos) x y = isBishopValidMove (Bishop, col, pos) x y
 isValidMove (Rook, col, pos) x y   = isRookValidMove (Rook, col, pos) x y
-
+isValidMove (Queen, col, pos) x y  = isQueenValidMove (Queen, col, pos) x y
 
 -- returns a list of the pieces which can capture piece a
 threatenedBy :: Piece -> AllPieces -> [Piece]
