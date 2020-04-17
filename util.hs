@@ -181,6 +181,11 @@ threatenedBy a b = [ x | x <- b, isValidMove x (m - getRow (getPos x), n - getCo
                       m = getRow (getPos a)
                       n = getColumn (getPos a)
 
+-- returns whether the king is in check.
+isKingInCheck :: Piece -> AllPieces -> Bool
+isKingInCheck a b | null (threatenedBy a b) = True
+                  | otherwise = False
+
 -- removes a piece from the board
 takePiece :: Piece -> AllPieces -> AllPieces
 takePiece (a,b,c) d = (a,b,(-1,-1)) : removePiece (a,b,c) d
