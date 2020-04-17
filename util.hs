@@ -1,5 +1,5 @@
-import TypeDefs
-import Init
+import           Init
+import           TypeDefs
 
 -- GETTERS
 
@@ -79,15 +79,15 @@ decreaseDiagonalMove (a,b) = (closerToZero a, closerToZero b)
 --checks to see if a piece can move along a diagonal line without hitting any pieces.
 isDiagonalMovePathEmpty :: Pos -> Move -> AllPieces -> Bool
 isDiagonalMovePathEmpty a (0,0) c = True
-isDiagonalMovePathEmpty a b c = isEmpty (getTarget a b2) c && isDiagonalMovePathEmpty a b2 c
+isDiagonalMovePathEmpty a b c = isEmpty (getTarget a b) c && isDiagonalMovePathEmpty a b2 c
                                 where b2 = decreaseDiagonalMove b
 
 -- checks to see if a piece can move along a straight line without hitting any pieces.
 isStraightMovePathEmpty :: Pos -> Move -> AllPieces -> Bool
 isStraightMovePathEmpty a (0,0) c = True
-isStraightMovePathEmpty a (0,b) c = isEmpty (getTarget a (0,b2)) c && isStraightMovePathEmpty a (0,b2) c
+isStraightMovePathEmpty a (0,b) c = isEmpty (getTarget a (0,b)) c && isStraightMovePathEmpty a (0,b2) c
                                     where b2 = closerToZero b
-isStraightMovePathEmpty a (b,0) c = isEmpty (getTarget a (b2,0)) c && isStraightMovePathEmpty a (b2,0) c
+isStraightMovePathEmpty a (b,0) c = isEmpty (getTarget a (b,0)) c && isStraightMovePathEmpty a (b2,0) c
                                     where b2 = closerToZero b
 
 --returns whether a pawn move is a capture -- WORKING (i think)
@@ -125,13 +125,15 @@ isKnightValidMove a b c = isValidTarget a b c && isLShaped b
 
 -- returns whether a bishop move is valid
 isBishopValidMove :: Piece -> Move -> AllPieces -> Bool
-isBishopValidMove a b c = isDiagonal b && isValidTarget a b c && isDiagonalMovePathEmpty (getPos a) b c
+isBishopValidMove a b c = isDiagonal b && isValidTarget a b c && isDiagonalMovePathEmpty (getPos a) (decreaseDiagonalMove b) c
 -- are these the same? - from ray
 --isBishopValidMove a b c | isDiagonal b = isValidTarget a b c && isDiagonalMovePathEmpty (getPos a) b c
  --                       | otherwise = False
 
 isRookValidMove :: Piece -> Move -> AllPieces -> Bool
-isRookValidMove a b c = isStraightMove b && isValidTarget a b c && isStraightMovePathEmpty (getPos a) b c
+isRookValidMove a (0,b) c = isValidTarget a (0,b) c && isStraightMovePathEmpty (getPos a) (0,closerToZero b) c
+isRookValidMove a (b,0) c = isValidTarget a (b,0) c && isStraightMovePathEmpty (getPos a) (closerToZero b,0) c
+isRookValidMove a b c = False
 -- are these the same? - from ray
 --isRookValidMove a b c | isStraightMove b = isValidTarget a b c && isStraightMovePathEmpty (getPos a) b c
 --                      | otherwise = False
@@ -162,5 +164,4 @@ threatenedBy a b = [ x | x <- b, isValidMove x (m - getRow (getPos x), n - getCo
                   where
                       m = getRow (getPos a)
                       n = getColumn (getPos a)
-
 
