@@ -193,8 +193,9 @@ takePiece (a,b,c) d = (a,b,(-1,-1)) : removePiece (a,b,c) d
 
 --move piece
 movePiece :: Piece -> Move -> AllPieces -> AllPieces
-movePiece a b c | isValidMove a b c = executeMove a b c
+movePiece a b c | isValidMove a b c && not (isKingInCheck (King, (getColour a), king) c) = executeMove a b c
                 | otherwise = c
+                where king = findKing (getColour a) c
 
 --execute move
 executeMove :: Piece -> Move -> AllPieces -> AllPieces
