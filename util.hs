@@ -125,13 +125,15 @@ isKnightValidMove a b c = isValidTarget a b c && isLShaped b
 
 -- returns whether a bishop move is valid
 isBishopValidMove :: Piece -> Move -> AllPieces -> Bool
-isBishopValidMove a b c = isDiagonal b && isValidTarget a b c && isDiagonalMovePathEmpty (getPos a) b c
+isBishopValidMove a b c = isDiagonal b && isValidTarget a b c && isDiagonalMovePathEmpty (getPos a) (decreaseDiagonalMove b) c
 -- are these the same? - from ray
 --isBishopValidMove a b c | isDiagonal b = isValidTarget a b c && isDiagonalMovePathEmpty (getPos a) b c
  --                       | otherwise = False
 
 isRookValidMove :: Piece -> Move -> AllPieces -> Bool
-isRookValidMove a b c = isStraightMove b && isValidTarget a b c && isStraightMovePathEmpty (getPos a) b c
+isRookValidMove a (0,b) c = isValidTarget a (0,b) c && isStraightMovePathEmpty (getPos a) (0,closerToZero b) c
+isRookValidMove a (b,0) c = isValidTarget a (b,0) c && isStraightMovePathEmpty (getPos a) (closerToZero b,0) c
+isRookValidMove a b c = False
 -- are these the same? - from ray
 --isRookValidMove a b c | isStraightMove b = isValidTarget a b c && isStraightMovePathEmpty (getPos a) b c
 --                      | otherwise = False
