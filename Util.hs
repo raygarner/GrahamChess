@@ -207,3 +207,21 @@ executeMove a b c | not (isTargetEnemy a b c) = updatePosition a b : removePiece
                               where
                                     y = head (findPiece (getTarget (getPos a) b) c)
                                     z = updatePosition a b : removePiece a c
+
+-- return a list of legal moves that a knight can make
+legalKnightMoves :: Piece -> AllPieces -> [Move]
+legalKnightMoves a b = [ x | x <- y, isKnightValidMove a x b ]
+                     where
+                         z = [-2,-1,1,2]
+                         y = [ (m,n) | m <- z, n <- z, isLShaped (m,n)]
+
+-- return a list of legal moves that a rook can make -- efficiency vs concised code?
+legalRookMoves :: Piece -> AllPieces -> [Move]
+legalRookMoves a b = [ x | x <- y, isRookValidMove a x b ]
+                   where
+                       y = [ (m,n) | m <- [-7..7], n <- [-7..7], isStraightMove (m,n) ]
+                       --z = [ (m,0) | m <- [-7..7] ]
+                       --v = [ (0,n) | n <- [-7..7] ]
+                       --y = z++v
+
+
