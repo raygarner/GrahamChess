@@ -1,3 +1,5 @@
+module Util where
+
 import           Debug
 import           Init
 import           TypeDefs
