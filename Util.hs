@@ -218,6 +218,7 @@ legalKnightMoves a b = [ x | x <- y, isKnightValidMove a x b ]
 -- return a list of legal moves that a rook can make -- efficiency vs concised code?
                                                      -- recursive method more efficient bc it can stop searching one direction as soon as it encounters an obstruction?
 legalRookMoves :: Piece -> AllPieces -> [Move]
+--legalRookMoves a b = [ (m,n) | m <- [-7..7], n <- [-7..7], isRookValidMove a x b ]
 legalRookMoves a b = [ x | x <- y, isRookValidMove a x b ]
                    where
                        y = [ (m,n) | m <- [-7..7], n <- [-7..7], isStraightMove (m,n) ]
