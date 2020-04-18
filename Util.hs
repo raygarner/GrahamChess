@@ -216,6 +216,7 @@ legalKnightMoves a b = [ x | x <- y, isKnightValidMove a x b ]
                          y = [ (m,n) | m <- z, n <- z, isLShaped (m,n)]
 
 -- return a list of legal moves that a rook can make -- efficiency vs concised code?
+                                                     -- recursive method more efficient bc it can stop searching one direction as soon as it encounters an obstruction?
 legalRookMoves :: Piece -> AllPieces -> [Move]
 legalRookMoves a b = [ x | x <- y, isRookValidMove a x b ]
                    where
@@ -224,4 +225,12 @@ legalRookMoves a b = [ x | x <- y, isRookValidMove a x b ]
                        --v = [ (0,n) | n <- [-7..7] ]
                        --y = z++v
 
+-- return a list of legal moves for a bishop -- same questions as legalRookMoves
+legalBishopMoves :: Piece -> AllPieces -> [Move]
+legalBishopMoves a b = [ x | x <- y , isBishopValidMove a x b ]
+                     where
+                         y = [ (m,n) | m <- [-7..7], n <- [-7..7], isDiagonal (m,n) ]
 
+-- returns a list of legal moves for a queen
+legalQueenMoves :: Piece -> AllPieces -> [Move]
+legalQueenMoves a b = (legalBishopMoves a b) ++ (legalRookMoves a b)
