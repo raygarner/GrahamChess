@@ -6,3 +6,6 @@ C search engine calling haskell evaluator?
 evaluate the strength of a piece instead of using a static material value. Done in haskell, but it can be based off the static value (maybe as a multiplier).
 
 write move list to text file in pgn format? This allows for functions to look back on it (potentially useful for checking whether a king can castle or whether you can capture en passant) and it allows the user to look back on their game
+
+different evaluation algorithm depending on point in game? (opening, middlegame, endgame)
+function to determine point in game? (opening, middlegame, endgame)
