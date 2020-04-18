@@ -1,4 +1,4 @@
-TESTING
+function to return list of legal moves for a piece
 
 algorithm for the strength of a piece? I guess it would be split up into multiple functions
 that could get the position of the piece and the actual material value of the piece and

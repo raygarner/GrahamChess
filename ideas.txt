@@ -1,18 +1,8 @@
-type Position = (Int, Int) -- -1 means off the board
-
-type Piece = (Char, Bool, Pos) -- (Type of piece, colour of piece, position of the piece)
-
-type Board = [[Piece]] -- input to evaluation function
-
-
-
 Board stored in text file?
-
-[[('r', False, (0, 0)), ('n', True, (1, 0), ...
+[[('Rook', Black, (0, 0)), ('Knight', Black, (0, 1), ...
 
 C search engine calling haskell evaluator?
 
-evaluate the strength of a piece instead of using a static material value. Done in haskell, but it can be based off the static value.
-
+evaluate the strength of a piece instead of using a static material value. Done in haskell, but it can be based off the static value (maybe as a multiplier).
 
 write move list to text file in pgn format? This allows for functions to look back on it (potentially useful for checking whether a king can castle or whether you can capture en passant) and it allows the user to look back on their game
