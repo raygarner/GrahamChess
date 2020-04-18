@@ -216,21 +216,25 @@ legalKnightMoves a b = [ x | x <- y, isKnightValidMove a x b ]
                          y = [ (m,n) | m <- z, n <- z, isLShaped (m,n)]
 
 -- return a list of legal moves that a rook can make -- efficiency vs concised code?
+                                                     -- 3 options shown for this function
                                                      -- recursive method more efficient bc it can stop searching one direction as soon as it encounters an obstruction?
+                                                     -- using :set +s in GHCi, i can see there is a 0.01s difference on my laptop between definitions 1 and 2 for this function
+                                                     -- definition 1 uses less memory, but it is slower by 0.01s (might add up over lots of calls)
 legalRookMoves :: Piece -> AllPieces -> [Move]
---legalRookMoves a b = [ (m,n) | m <- [-7..7], n <- [-7..7], isRookValidMove a x b ]
-legalRookMoves a b = [ x | x <- y, isRookValidMove a x b ]
-                   where
-                       y = [ (m,n) | m <- [-7..7], n <- [-7..7], isStraightMove (m,n) ]
-                       --z = [ (m,0) | m <- [-7..7] ]
-                       --v = [ (0,n) | n <- [-7..7] ]
-                       --y = z++v
+legalRookMoves a b = [ (m,n) | m <- [-7..7], n <- [-7..7], isRookValidMove a (m,n) b ]
+--legalRookMoves a b = [ x | x <- y, isRookValidMove a x b ]
+--                   where
+--                       y = [ (m,n) | m <- [-7..7], n <- [-7..7], isStraightMove (m,n) ]
+--                       --z = [ (m,0) | m <- [-7..7] ]
+--                       --v = [ (0,n) | n <- [-7..7] ]
+--                       --y = z++v
 
 -- return a list of legal moves for a bishop -- same questions as legalRookMoves
 legalBishopMoves :: Piece -> AllPieces -> [Move]
-legalBishopMoves a b = [ x | x <- y , isBishopValidMove a x b ]
-                     where
-                         y = [ (m,n) | m <- [-7..7], n <- [-7..7], isDiagonal (m,n) ]
+legalBishopMoves a b = [ (m,n) | m <- [-7..7], n <- [-7..7], isBishopValidMove a (m,n) b ]
+--legalBishopMoves a b = [ x | x <- y , isBishopValidMove a x b ]
+--                     where
+--                         y = [ (m,n) | m <- [-7..7], n <- [-7..7], isDiagonal (m,n) ]
 
 -- returns a list of legal moves for a queen
 legalQueenMoves :: Piece -> AllPieces -> [Move]
