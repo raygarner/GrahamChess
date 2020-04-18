@@ -218,7 +218,8 @@ legalKnightMoves a b = [ x | x <- y, isKnightValidMove a x b ]
 -- return a list of legal moves that a rook can make -- efficiency vs concised code?
                                                      -- 3 options shown for this function
                                                      -- recursive method more efficient bc it can stop searching one direction as soon as it encounters an obstruction?
-                                                     -- using :set +s in GHCi, i can see there is a 0.01s difference on my laptop between definitions 1 and 2 for this function
+                                                     -- using :set +s in GHCi, i can see there is a 0.01s difference on my laptop between definitions 1 and 2 for this function (however this isnt evaluating the final compiled version, only the interpreted version)
+                                                     -- currently i think we should leave it in its most consised and readable form and think about optimisations when we have a compiled executable
                                                      -- definition 1 uses less memory, but it is slower by 0.01s (might add up over lots of calls)
 legalRookMoves :: Piece -> AllPieces -> [Move]
 legalRookMoves a b = [ (m,n) | m <- [-7..7], n <- [-7..7], isRookValidMove a (m,n) b ]
