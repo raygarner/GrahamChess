@@ -253,7 +253,6 @@ legalMoves (Bishop, col, pos) x = legalBishopMoves (Bishop, col, pos) x
 legalMoves (Rook, col, pos) x = legalRookMoves (Rook, col, pos) x
 legalMoves (Queen, col, pos) x = legalQueenMoves (Queen, col, pos) x
 
-
 -- returns a list of positions the pawn is controlling
 pawnControlledSquares :: Piece -> [Pos]
 pawnControlledSquares a = [ getTarget (getPos a) (m,n) | m <- [-1,1], n <- [-1,1], isPawnCapture a (m,n) ]

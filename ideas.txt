@@ -18,3 +18,10 @@ bonus positive evalution if a piece has control over central squares
 
 function to find list of most important squares at one point in game?
 (then check whether these squares are controlled/threatened)
+
+
+potential ideas to check if piece has moved at least one:
+    read from text file
+    negative position
+    compound data type with ammount of moves made
+
