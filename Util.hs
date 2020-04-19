@@ -241,7 +241,20 @@ legalBishopMoves a b = [ (m,n) | m <- [-7..7], n <- [-7..7], isBishopValidMove a
 legalQueenMoves :: Piece -> AllPieces -> [Move]
 legalQueenMoves a b = (legalBishopMoves a b) ++ (legalRookMoves a b)
 
+-- returns a list of legal moves for a pawn
+legalPawnMoves :: Piece -> AllPieces -> [Move]
+legalPawnMoves a b = [ (m,n) | m <- [-2..2], n <- [-1..1], isPawnValidMove a (m,n) b ]
+
+-- returns a list of legal moves for a piece
+legalMoves :: Piece -> AllPieces -> [Move]
+legalMoves (Pawn, col, pos) x = legalPawnMoves (Pawn, col, pos) x
+legalMoves (Knight, col, pos) x = legalKnightMoves (Knight, col, pos) x
+legalMoves (Bishop, col, pos) x = legalBishopMoves (Bishop, col, pos) x
+legalMoves (Rook, col, pos) x = legalRookMoves (Rook, col, pos) x
+legalMoves (Queen, col, pos) x = legalQueenMoves (Queen, col, pos) x
+
 
 -- returns a list of positions the pawn is controlling
 pawnControlledSquares :: Piece -> [Pos]
 pawnControlledSquares a = [ getTarget (getPos a) (m,n) | m <- [-1,1], n <- [-1,1], isPawnCapture a (m,n) ]
+
