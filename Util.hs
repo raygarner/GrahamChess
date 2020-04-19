@@ -197,7 +197,7 @@ isKingInCheck a b | null (threatenedBy a b) = False
 takePiece :: Piece -> AllPieces -> AllPieces
 takePiece (a,b,c) d = (a,b,(-1,-1)) : removePiece (a,b,c) d
 
---move piece
+--move piece - check if a move is valid then call executeMove to actually do it
 movePiece :: Piece -> Move -> AllPieces -> AllPieces
 movePiece a b c | getPieceType a  == King && (b == (0,2) || b == (0,-2)) && validCastle a b c = executeCastle a b c
                 | isValidMove a b c && not (isKingInCheck (King, (getColour a), king) c) = executeMove a b c
@@ -264,21 +264,3 @@ legalBishopMoves a b = [ (m,n) | m <- [-7..7], n <- [-7..7], isBishopValidMove a
 -- returns a list of legal moves for a queen
 legalQueenMoves :: Piece -> AllPieces -> [Move]
 legalQueenMoves a b = (legalBishopMoves a b) ++ (legalRookMoves a b)
-
--- returns a list of legal moves for a pawn
-legalPawnMoves :: Piece -> AllPieces -> [Move]
-legalPawnMoves a b = [ (m,n) | m <- [-2..2], n <- [-1..1], isPawnValidMove a (m,n) b ]
-
--- returns a list of legal moves for a piece
-legalMoves :: Piece -> AllPieces -> [Move]
-legalMoves (Pawn, col, pos) x = legalPawnMoves (Pawn, col, pos) x
-legalMoves (Knight, col, pos) x = legalKnightMoves (Knight, col, pos) x
-legalMoves (Bishop, col, pos) x = legalBishopMoves (Bishop, col, pos) x
-legalMoves (Rook, col, pos) x = legalRookMoves (Rook, col, pos) x
-legalMoves (Queen, col, pos) x = legalQueenMoves (Queen, col, pos) x
-
-
--- returns a list of positions the pawn is controlling
-pawnControlledSquares :: Piece -> [Pos]
-pawnControlledSquares a = [ getTarget (getPos a) (m,n) | m <- [-1,1], n <- [-1,1], isPawnCapture a (m,n) ]
-

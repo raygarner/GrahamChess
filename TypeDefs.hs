@@ -16,6 +16,3 @@ type AllPieces = [Piece]
 --type Move = (Piece, Pos, Bool) -- piece, target square, validity
 
 type Move = (Int, Int) -- row difference, column difference
-
-
-
