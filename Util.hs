@@ -1,24 +1,3 @@
-Skip to content
-Search or jump to…
-
-Pull requests
-Issues
-Marketplace
-Explore
-
-@tomcotter7
-raygarner
-/
-GrahamChess
-1
-00
- Code Issues 0 Pull requests 0 Actions Projects 0 Wiki Security Insights
-GrahamChess/Util.hs
-@raygarner raygarner added methods to write to movelist.pgn
-8e4abe2 1 hour ago
-@raygarner@tomcotter7
-292 lines (232 sloc)  13.1 KB
-
 module Util where
 
 import           Debug
@@ -301,11 +280,11 @@ legalPawnMoves a b = [ (m,n) | m <- [-2..2], n <- [-1..1], isPawnValidMove a (m,
 
 -- returns a list of legal moves for a piece
 legalMoves :: Piece -> AllPieces -> [Move]
-legalMoves (Pawn, col, pos) x = legalPawnMoves (Pawn, col, pos) x
+legalMoves (Pawn, col, pos) x   = legalPawnMoves (Pawn, col, pos) x
 legalMoves (Knight, col, pos) x = legalKnightMoves (Knight, col, pos) x
 legalMoves (Bishop, col, pos) x = legalBishopMoves (Bishop, col, pos) x
-legalMoves (Rook, col, pos) x = legalRookMoves (Rook, col, pos) x
-legalMoves (Queen, col, pos) x = legalQueenMoves (Queen, col, pos) x
+legalMoves (Rook, col, pos) x   = legalRookMoves (Rook, col, pos) x
+legalMoves (Queen, col, pos) x  = legalQueenMoves (Queen, col, pos) x
 
 -- returns a list of positions the pawn is controlling
 pawnControlledSquares :: Piece -> [Pos]
