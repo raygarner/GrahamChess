@@ -1,9 +1,9 @@
 module Util where
 
 import           Debug
+import           Debug
 import           Init
 import           TypeDefs
-import           Debug
 
 -- GETTERS
 
@@ -22,6 +22,9 @@ getColour (_,x,_) = x
 -- returns the position of a piece
 getPos :: Piece -> Pos
 getPos (_,_,x) = x
+
+getPieceType :: Piece -> PieceType
+getPieceType (x,_,_) = x
 
 --returns a list with a given piece removed
 removePiece :: Piece -> [Piece] -> [Piece]
@@ -176,7 +179,7 @@ isValidMove (Knight, col, pos) x y = isKnightValidMove (Knight, col, pos) x y
 isValidMove (Bishop, col, pos) x y = isBishopValidMove (Bishop, col, pos) x y
 isValidMove (Rook, col, pos) x y   = isRookValidMove (Rook, col, pos) x y
 isValidMove (Queen, col, pos) x y  = isQueenValidMove (Queen, col, pos) x y
-isValidMove (King, col, pos) x y = validKingMove (King, col, pos) x y
+isValidMove (King, col, pos) x y   = validKingMove (King, col, pos) x y
 
 -- returns a list of the pieces which can capture piece a
 threatenedBy :: Piece -> AllPieces -> [Piece]
@@ -196,7 +199,8 @@ takePiece (a,b,c) d = (a,b,(-1,-1)) : removePiece (a,b,c) d
 
 --move piece
 movePiece :: Piece -> Move -> AllPieces -> AllPieces
-movePiece a b c | isValidMove a b c && not (isKingInCheck (King, (getColour a), king) c) = executeMove a b c
+movePiece a b c | getPieceType a  == King && (b == (0,2) || b == (0,-2)) && validCastle a b c = executeCastle a b c
+                | isValidMove a b c && not (isKingInCheck (King, (getColour a), king) c) = executeMove a b c
                 | otherwise = c
                 where king = findKing (getColour a) c
 
@@ -207,6 +211,26 @@ executeMove a b c | not (isTargetEnemy a b c) = updatePosition a b : removePiece
                               where
                                     y = head (findPiece (getTarget (getPos a) b) c)
                                     z = updatePosition a b : removePiece a c
+
+-- returns King's side castle for either colour
+getKingsCastle :: Colour -> Piece
+getKingsCastle White = (Rook, White, (7,7))
+getKingsCastle Black = (Rook, Black, (0,7))
+
+-- returns Queen's side castle for either colour
+getQueensCastle :: Colour -> Piece
+getQueensCastle White = (Rook, White, (7,0))
+getQueensCastle Black = (Rook, Black, (0,0))
+
+--returns whether a castle is valid or not
+validCastle :: Piece -> Move -> AllPieces -> Bool
+validCastle a (0,2) b  = isStraightMovePathEmpty (getPos a) (0,2) b
+validCastle a (0,-2) b = isStraightMovePathEmpty (getPos a) (0,-3) b
+
+-- executes a castle move -- WORKING
+executeCastle :: Piece -> Move -> AllPieces -> AllPieces
+executeCastle a (0,2) b = executeMove a (0,2) (executeMove (getKingsCastle (getColour a)) (0,-2) b)
+executeCastle a (0,-2) b = executeMove a (0,-2) (executeMove (getQueensCastle (getColour a)) (0,3) b)
 
 -- return a list of legal moves that a knight can make
 legalKnightMoves :: Piece -> AllPieces -> [Move]
