@@ -212,6 +212,15 @@ executeMove a b c | not (isTargetEnemy a b c) = updatePosition a b : removePiece
                                     y = head (findPiece (getTarget (getPos a) b) c)
                                     z = updatePosition a b : removePiece a c
 
+-- writes a move to the pgn file WORKING
+writeMove :: Piece -> Move -> IO ()
+writeMove a b = do appendFile "movelist.pgn" (((show a) ++ " " ++ (show b)) ++ "\n")
+
+-- makes a move and writes it to the pgn. returns AllPieces WORKING
+makeProperMove :: Piece -> Move -> AllPieces -> IO AllPieces
+makeProperMove a b cs = do writeMove a b
+                           return (executeMove a b cs)
+
 -- returns King's side castle for either colour
 getKingsCastle :: Colour -> Piece
 getKingsCastle White = (Rook, White, (7,7))
@@ -264,3 +273,23 @@ legalBishopMoves a b = [ (m,n) | m <- [-7..7], n <- [-7..7], isBishopValidMove a
 -- returns a list of legal moves for a queen
 legalQueenMoves :: Piece -> AllPieces -> [Move]
 legalQueenMoves a b = (legalBishopMoves a b) ++ (legalRookMoves a b)
+<<<<<<< HEAD
+=======
+
+-- returns a list of legal moves for a pawn
+legalPawnMoves :: Piece -> AllPieces -> [Move]
+legalPawnMoves a b = [ (m,n) | m <- [-2..2], n <- [-1..1], isPawnValidMove a (m,n) b ]
+
+-- returns a list of legal moves for a piece
+legalMoves :: Piece -> AllPieces -> [Move]
+legalMoves (Pawn, col, pos) x = legalPawnMoves (Pawn, col, pos) x
+legalMoves (Knight, col, pos) x = legalKnightMoves (Knight, col, pos) x
+legalMoves (Bishop, col, pos) x = legalBishopMoves (Bishop, col, pos) x
+legalMoves (Rook, col, pos) x = legalRookMoves (Rook, col, pos) x
+legalMoves (Queen, col, pos) x = legalQueenMoves (Queen, col, pos) x
+
+-- returns a list of positions the pawn is controlling
+pawnControlledSquares :: Piece -> [Pos]
+pawnControlledSquares a = [ getTarget (getPos a) (m,n) | m <- [-1,1], n <- [-1,1], isPawnCapture a (m,n) ]
+
+>>>>>>> 8e4abe2b33797a6e1e518cbfb6ee7b5b3d313ca3
