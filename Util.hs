@@ -240,3 +240,8 @@ legalBishopMoves a b = [ (m,n) | m <- [-7..7], n <- [-7..7], isBishopValidMove a
 -- returns a list of legal moves for a queen
 legalQueenMoves :: Piece -> AllPieces -> [Move]
 legalQueenMoves a b = (legalBishopMoves a b) ++ (legalRookMoves a b)
+
+
+-- returns a list of positions the pawn is controlling
+pawnControlledSquares :: Piece -> [Pos]
+pawnControlledSquares a = [ getTarget (getPos a) (m,n) | m <- [-1,1], n <- [-1,1], isPawnCapture a (m,n) ]
