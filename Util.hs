@@ -212,6 +212,15 @@ executeMove a b c | not (isTargetEnemy a b c) = updatePosition a b : removePiece
                                     y = head (findPiece (getTarget (getPos a) b) c)
                                     z = updatePosition a b : removePiece a c
 
+-- writes a move to the pgn file WORKING
+writeMove :: Piece -> Move -> IO ()
+writeMove a b = do appendFile "movelist.pgn" (((show a) ++ " " ++ (show b)) ++ "\n")
+
+-- makes a move and writes it to the pgn. returns AllPieces WORKING
+makeProperMove :: Piece -> Move -> AllPieces -> IO AllPieces
+makeProperMove a b cs = do writeMove a b
+                           return (executeMove a b cs)
+
 -- returns King's side castle for either colour
 getKingsCastle :: Colour -> Piece
 getKingsCastle White = (Rook, White, (7,7))
