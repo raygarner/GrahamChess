@@ -199,7 +199,7 @@ takePiece (a,b,c) d = (a,b,(-1,-1)) : removePiece (a,b,c) d
 
 --move piece
 movePiece :: Piece -> Move -> AllPieces -> AllPieces
-movePiece a b c | getPieceType a == King && (b == (0,2) || b == (0,-2)) && validCastle a b c = executeCastle a b c
+movePiece a b c | getPieceType a  == King && (b == (0,2) || b == (0,-2)) && validCastle a b c = executeCastle a b c
                 | isValidMove a b c && not (isKingInCheck (King, (getColour a), king) c) = executeMove a b c
                 | otherwise = c
                 where king = findKing (getColour a) c
@@ -227,7 +227,7 @@ validCastle :: Piece -> Move -> AllPieces -> Bool
 validCastle a (0,2) b  = isStraightMovePathEmpty (getPos a) (0,2) b
 validCastle a (0,-2) b = isStraightMovePathEmpty (getPos a) (0,-3) b
 
--- executes a castle move
+-- executes a castle move -- WORKING
 executeCastle :: Piece -> Move -> AllPieces -> AllPieces
 executeCastle a (0,2) b = executeMove a (0,2) (executeMove (getKingsCastle (getColour a)) (0,-2) b)
 executeCastle a (0,-2) b = executeMove a (0,-2) (executeMove (getQueensCastle (getColour a)) (0,3) b)
