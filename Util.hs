@@ -1,3 +1,24 @@
+Skip to content
+Search or jump to…
+
+Pull requests
+Issues
+Marketplace
+Explore
+
+@tomcotter7
+raygarner
+/
+GrahamChess
+1
+00
+ Code Issues 0 Pull requests 0 Actions Projects 0 Wiki Security Insights
+GrahamChess/Util.hs
+@raygarner raygarner added methods to write to movelist.pgn
+8e4abe2 1 hour ago
+@raygarner@tomcotter7
+292 lines (232 sloc)  13.1 KB
+
 module Util where
 
 import           Debug
@@ -197,7 +218,7 @@ isKingInCheck a b | null (threatenedBy a b) = False
 takePiece :: Piece -> AllPieces -> AllPieces
 takePiece (a,b,c) d = (a,b,(-1,-1)) : removePiece (a,b,c) d
 
---move piece - check if a move is valid then call executeMove to actually do it
+--move piece
 movePiece :: Piece -> Move -> AllPieces -> AllPieces
 movePiece a b c | getPieceType a  == King && (b == (0,2) || b == (0,-2)) && validCastle a b c = executeCastle a b c
                 | isValidMove a b c && not (isKingInCheck (King, (getColour a), king) c) = executeMove a b c
@@ -273,8 +294,6 @@ legalBishopMoves a b = [ (m,n) | m <- [-7..7], n <- [-7..7], isBishopValidMove a
 -- returns a list of legal moves for a queen
 legalQueenMoves :: Piece -> AllPieces -> [Move]
 legalQueenMoves a b = (legalBishopMoves a b) ++ (legalRookMoves a b)
-<<<<<<< HEAD
-=======
 
 -- returns a list of legal moves for a pawn
 legalPawnMoves :: Piece -> AllPieces -> [Move]
@@ -291,5 +310,3 @@ legalMoves (Queen, col, pos) x = legalQueenMoves (Queen, col, pos) x
 -- returns a list of positions the pawn is controlling
 pawnControlledSquares :: Piece -> [Pos]
 pawnControlledSquares a = [ getTarget (getPos a) (m,n) | m <- [-1,1], n <- [-1,1], isPawnCapture a (m,n) ]
-
->>>>>>> 8e4abe2b33797a6e1e518cbfb6ee7b5b3d313ca3
