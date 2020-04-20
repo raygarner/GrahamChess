@@ -1,10 +1,10 @@
 module Util where
 
-import           Data.List.Split
-
+import           Data.List
 import           Debug
 import           Debug
 import           Init
+import           System.Directory
 import           TypeDefs
 
 -- GETTERS
@@ -200,11 +200,16 @@ takePiece :: Piece -> AllPieces -> AllPieces
 takePiece (a,b,c) d = (a,b,(-1,-1)) : removePiece (a,b,c) d
 
 --move piece
-movePiece :: Piece -> Move -> AllPieces -> AllPieces
-movePiece a b c | getPieceType a  == King && (b == (0,2) || b == (0,-2)) && validCastle a b c = executeCastle a b c
-                | isValidMove a b c && not (isKingInCheck (King, (getColour a), king) c) = executeMove a b c
-                | otherwise = c
-                where king = findKing (getColour a) c
+movePiece :: Piece -> Move -> Bool -> Bool -> AllPieces -> AllPieces
+movePiece a b blackKing whiteKing c | getPieceType a  == King && (b == (0,2) || b == (0,-2)) && validCastle a b c && hasKingNotMoved (getColour a) blackKing whiteKing = executeCastle a b c
+                                    | isValidMove a b c && not (isKingInCheck (King, (getColour a), king) c) = executeMove a b c
+                                    | otherwise = c
+                                      where king = findKing (getColour a) c
+
+-- returns whether a king has moved
+hasKingNotMoved :: Colour -> Bool -> Bool -> Bool
+hasKingNotMoved White a b = not b
+hasKingNotMoved Black a b = not a
 
 --execute move
 executeMove :: Piece -> Move -> AllPieces -> AllPieces
@@ -214,14 +219,19 @@ executeMove a b c | not (isTargetEnemy a b c) = updatePosition a b : removePiece
                                     y = head (findPiece (getTarget (getPos a) b) c)
                                     z = updatePosition a b : removePiece a c
 
+
+
 -- writes a move to the pgn file WORKING
 writeMove :: Piece -> Move -> IO ()
-writeMove a b = do appendFile "movelist.pgn" (((show a) ++ ";" ++ (show b)) ++ "\n")
+writeMove a b = do copyFile "movelist.pgn" "movelistTemp.pgn"
+                   appendFile "movelistTemp.pgn" (((show a) ++ ";" ++ (show b)) ++ "\n")
+                   removeFile "movelist.pgn"
+                   renameFile "movelistTemp.pgn" "movelist.pgn"
 
 -- makes a move and writes it to the pgn. returns AllPieces WORKING
-makeProperMove :: Piece -> Move -> AllPieces -> IO AllPieces
-makeProperMove a b cs = do writeMove a b
-                           return (executeMove a b cs)
+makeProperMove :: Piece -> Move -> Bool -> Bool -> AllPieces -> IO AllPieces
+makeProperMove a b blackKing whiteKing cs = do writeMove a b
+                                               return (movePiece a b blackKing whiteKing cs)
 
 -- returns whether the king has moved before or not
 readMoveList :: IO String

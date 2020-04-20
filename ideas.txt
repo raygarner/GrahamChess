@@ -25,3 +25,6 @@ potential ideas to check if piece has moved at least one:
     negative position
     compound data type with ammount of moves made
 
+
+ideas for reading from text file -> use a main function that reads in the text file at the start of each move. Check if the king has already moved and then pass that boolean to the movePiece function.
+You could pass 1 Bool for the black king and 1 for the white king.
