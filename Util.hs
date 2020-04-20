@@ -225,7 +225,12 @@ makeProperMove a b cs = do writeMove a b
 
 -- returns whether the king has moved before or not
 readMoveList :: IO String
-readMoveList = readFile "movelist.pgn"
+readMoveList = do x <- readFile "movelist.pgn"
+                  let pureX = read x
+                  return pureX
+
+testMoveList :: String -> String
+testMoveList a = a
 
 -- returns King's side castle for either colour
 getKingsCastle :: Colour -> Piece
