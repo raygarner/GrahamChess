@@ -20,13 +20,14 @@ main = do
 -}
 
 --main = do content <- readFile "movelist.pgn"
-main :: IO (Piece,Move)
+main :: IO AllPieces
 main = do inh <- openFile "movelist.pgn" ReadMode
+          content <- readFile "movelist.pgn"
           line <- hGetLine inh
           let info = splitOn ";" line
           let piece = buildPiece info
           let move = buildMove info
-          return (piece,move)
+          makeProperMove piece move (contains "King,Black" content) (contains "King,White" content) (addKings ++ addRooks)
 
 -- returns whether a string is inside a another string
 contains :: String -> String -> Bool
