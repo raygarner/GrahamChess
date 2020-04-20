@@ -1,3 +1,2 @@
 
-(Pawn,Black,(1,0)) (1,0)
-(King,White(7,5)) (0,1)
+(Knight,Black,(1,1)) (2,1)
