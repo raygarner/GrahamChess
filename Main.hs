@@ -5,9 +5,11 @@ import Init
 import TypeDefs
 import System.IO
 import Data.List
+import Data.List.Split
 
+{-|
 main = do
-       content <- readFile "moveList.pgn"
+       content <- readFile "movelist.pgn"
        piece <- getLine
        color <- getLine
        row <- getLine
@@ -15,8 +17,16 @@ main = do
        moveRow <- getLine
        moveColumn <- getLine
        makeProperMove (createPiece piece color row column) (position moveRow moveColumn) (contains "King,Black" content) (contains "King,White" content) (addKings ++ addRooks)
+-}
 
-
+--main = do content <- readFile "movelist.pgn"
+main :: IO (Piece,Move)
+main = do inh <- openFile "movelist.pgn" ReadMode
+          line <- hGetLine inh
+          let info = splitOn ";" line
+          let piece = buildPiece info
+          let move = buildMove info
+          return (piece,move)
 
 -- returns whether a string is inside a another string
 contains :: String -> String -> Bool
@@ -27,8 +37,19 @@ createPiece :: String -> String -> String -> String -> Piece
 --createPiece a b c d = (pieceType a, colorType b, position c d)
 createPiece a b c d = (read a, read b, (read c, read d))
 
+
+-- builds a piece from a list of info
+buildPiece :: [String] -> Piece
+buildPiece (piece:colour:row:column:_) = (read piece, read colour, (read row, read column))
+buildPiece _ = (Rook,Black,(0,0)) --never ran, compiler just wanted a default
+
+-- builds a move from a list of info
+buildMove :: [String] -> Move
+buildMove (_:_:_:_:m:n) = (read m, read (head n))
+buildMove _ = (0,0) --never ran, compiler just wanted a default
+
 -- if you can think of nicer ways to do this function then let me know.
-    -- i think the 'read' function can be used instead - ray
+    -- i think the 'read' function can be used instead? - ray
 pieceType :: String -> PieceType
 pieceType "Pawn" = Pawn
 pieceType "Knight" = Knight

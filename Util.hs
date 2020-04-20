@@ -223,10 +223,10 @@ executeMove a b c | not (isTargetEnemy a b c) = updatePosition a b : removePiece
 
 -- writes a move to the pgn file WORKING
 writeMove :: Piece -> Move -> IO ()
-writeMove a b = do copyFile "movelist.pgn" "movelistTemp.pgn"
-                   appendFile "movelistTemp.pgn" (((show a) ++ ";" ++ (show b)) ++ "\n")
-                   removeFile "movelist.pgn"
-                   renameFile "movelistTemp.pgn" "movelist.pgn"
+writeMove (piece,colour,(m,n)) (rows,cols) = do copyFile "movelist.pgn" "movelistTemp.pgn"
+                                                appendFile "movelistTemp.pgn" ((show piece) ++ ";" ++ (show colour) ++ ";" ++ (show m) ++ ";" ++ (show n) ++ ";" ++ (show rows) ++ ";" ++ (show cols) ++ "\n")
+                                                removeFile "movelist.pgn"
+                                                renameFile "movelistTemp.pgn" "movelist.pgn"
 
 -- makes a move and writes it to the pgn. returns AllPieces WORKING
 makeProperMove :: Piece -> Move -> Bool -> Bool -> AllPieces -> IO AllPieces
