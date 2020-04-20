@@ -1,5 +1,7 @@
 module Util where
 
+import           Data.List.Split
+
 import           Debug
 import           Debug
 import           Init
@@ -214,12 +216,16 @@ executeMove a b c | not (isTargetEnemy a b c) = updatePosition a b : removePiece
 
 -- writes a move to the pgn file WORKING
 writeMove :: Piece -> Move -> IO ()
-writeMove a b = do appendFile "movelist.pgn" (((show a) ++ " " ++ (show b)) ++ "\n")
+writeMove a b = do appendFile "movelist.pgn" (((show a) ++ ";" ++ (show b)) ++ "\n")
 
 -- makes a move and writes it to the pgn. returns AllPieces WORKING
 makeProperMove :: Piece -> Move -> AllPieces -> IO AllPieces
 makeProperMove a b cs = do writeMove a b
                            return (executeMove a b cs)
+
+-- returns whether the king has moved before or not
+readMoveList :: IO String
+readMoveList = readFile "movelist.pgn"
 
 -- returns King's side castle for either colour
 getKingsCastle :: Colour -> Piece
