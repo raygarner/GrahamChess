@@ -24,9 +24,11 @@ contains a b = isInfixOf a b
 
 -- returns a piece from 4 strings
 createPiece :: String -> String -> String -> String -> Piece
-createPiece a b c d = (pieceType a, colorType b, position c d)
+--createPiece a b c d = (pieceType a, colorType b, position c d)
+createPiece a b c d = (read a, read b, (read c, read d))
 
 -- if you can think of nicer ways to do this function then let me know.
+    -- i think the 'read' function can be used instead - ray
 pieceType :: String -> PieceType
 pieceType "Pawn" = Pawn
 pieceType "Knight" = Knight
