@@ -204,7 +204,7 @@ takePiece (p, col, pos, mc) d = (p, col, (-1,-1), 0) : removePiece (p, col, pos,
 --move piece
 movePiece :: Piece -> Move -> Bool -> Bool -> AllPieces -> AllPieces
 movePiece a b blackKing whiteKing c | getPieceType a  == King && (b == (0,2) || b == (0,-2)) && validCastle a b c && hasKingNotMoved (getColour a) blackKing whiteKing = executeCastle a b c
-                                    | isValidMove a b c && not (isKingInCheck (King, (getColour a), king) c) = executeMove a b c
+                                    | isValidMove a b c && not (isKingInCheck (King, (getColour a), king, getMovecount a) c) = executeMove a b c
                                     | otherwise = c
                                       where king = findKing (getColour a) c
 
@@ -256,13 +256,13 @@ getQueensCastle Black = (0,0)
 
 --returns whether a castle is valid or not
 validCastle :: Piece -> Move -> AllPieces -> Bool
-validCastle a (0,2) b  = isStraightMovePathEmpty (getPos a) (0,2) b && not (null (findPiece (getKingsCastle (getColour a) b)))
-validCastle a (0,-2) b = isStraightMovePathEmpty (getPos a) (0,-3) b && not (null (findPiece (getQueensCastle (getColour a) b)))
+validCastle a (0,2) b  = isStraightMovePathEmpty (getPos a) (0,2) b && not (null (findPiece (getKingsCastle (getColour a)) b))
+validCastle a (0,-2) b = isStraightMovePathEmpty (getPos a) (0,-3) b && not (null (findPiece (getQueensCastle (getColour a)) b))
 
 -- executes a castle move -- WORKING
 executeCastle :: Piece -> Move -> AllPieces -> AllPieces
-executeCastle a (0,2) b = executeMove a (0,2) (executeMove (getKingsCastle (getColour a)) (0,-2) b)
-executeCastle a (0,-2) b = executeMove a (0,-2) (executeMove (getQueensCastle (getColour a)) (0,3) b)
+executeCastle a (0,2) b = executeMove a (0,2) (executeMove (head (findPiece (getKingsCastle (getColour a)) b)) (0,-2) b)
+executeCastle a (0,-2) b = executeMove a (0,-2) (executeMove (head (findPiece (getQueensCastle (getColour a)) b)) (0,3) b)
 
 -- return a list of legal moves that a knight can make
 legalKnightMoves :: Piece -> AllPieces -> [Move]
