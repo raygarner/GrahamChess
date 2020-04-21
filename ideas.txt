@@ -28,3 +28,8 @@ potential ideas to check if piece has moved at least one:
 
 ideas for reading from text file -> use a main function that reads in the text file at the start of each move. Check if the king has already moved and then pass that boolean to the movePiece function.
 You could pass 1 Bool for the black king and 1 for the white king.
+
+
+check if pawn is passed pawn
+
+pgn files for testing and proper lines
