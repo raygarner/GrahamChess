@@ -41,13 +41,18 @@ createPiece a b c d = (read a, read b, (read c, read d))
 
 -- builds a piece from a list of info
 buildPiece :: [String] -> Piece
-buildPiece (piece:colour:row:column:_) = (read piece, read colour, (read row, read column))
+buildPiece (piece:colour:row:column:moves:_) = (read piece, read colour, (read row, read column), read moves)
 buildPiece _ = (Rook,Black,(0,0)) --never ran, compiler just wanted a default
 
 -- builds a move from a list of info
 buildMove :: [String] -> Move
+<<<<<<< HEAD
 buildMove (_:_:_:_:m:n) = (read m, read (head n))
 buildMove _             = (0,0) --never ran, compiler just wanted a default
+=======
+buildMove (_:_:_:_:m:n:_) = (read m, read (head n))
+buildMove _ = (0,0) --never ran, compiler just wanted a default
+>>>>>>> c29d6ccd88db8888f41cf85b40f0d0e370f2d7c8
 
 -- if you can think of nicer ways to do this function then let me know.
     -- i think the 'read' function can be used instead? - ray
