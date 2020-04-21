@@ -19,14 +19,14 @@ getRow (x,_) = x
 
 -- returns the colour of a piece
 getColour :: Piece -> Colour
-getColour (_,x,_) = x
+getColour (_,x,_,_) = x
 
 -- returns the position of a piece
 getPos :: Piece -> Pos
-getPos (_,_,x) = x
+getPos (_,_,x,_) = x
 
 getPieceType :: Piece -> PieceType
-getPieceType (x,_,_) = x
+getPieceType (x,_,_,_) = x
 
 --returns a list with a given piece removed
 removePiece :: Piece -> [Piece] -> [Piece]
@@ -34,7 +34,7 @@ removePiece pieceToRemove xs = [ x | x <- xs, x /= pieceToRemove]
 
 -- returns a piece with an updated position
 updatePosition :: Piece -> Move -> Piece
-updatePosition (a,b,c) d = (a, b, (getTarget c d))
+updatePosition (a,b,c,mc) d = (a, b, (getTarget c d), mc+1)
 
 -- returns the starting position of a move
 --getStart :: Move -> Pos
@@ -109,18 +109,18 @@ isStraightMovePathEmpty a (b,0) c = isEmpty (getTarget a (b,0)) c && isStraightM
 
 --returns whether a pawn move is a capture -- WORKING (i think)
 isPawnCapture :: Piece -> Move -> Bool
-isPawnCapture (_,Black,_) (a,b) = a == 1 && abs b == 1
-isPawnCapture (_,White,_) (a,b) = a == -1 && abs b == 1
+isPawnCapture (_,Black,_,_) (a,b) = a == 1 && abs b == 1
+isPawnCapture (_,White,_,_) (a,b) = a == -1 && abs b == 1
 -- change made - ray
 --isPawnCapture (_,Black,_) (a,b) = b == 1 && abs a == 1
 --isPawnCapture(_,White,_) (a,b)  = b == -1 && abs a == 0
 
 --returns whether a pawn move is a regular pawn move -- swapped a and b (row,column) WORKING
 isBasicPawnMove :: Piece -> Move -> Bool
-isBasicPawnMove (_,Black,(1,_)) (a,b) = (a == 2 || a == 1) && b == 0
-isBasicPawnMove (_,White,(6,_)) (a,b) = (a == -2 || a == -1) && b == 0
-isBasicPawnMove (_,Black,_) (a,b)     = a == 1 && b == 0
-isBasicPawnMove (_,White,_) (a,b)     = a == -1 && b == 0
+isBasicPawnMove (_,Black,(1,_),_) (a,b) = (a == 2 || a == 1) && b == 0
+isBasicPawnMove (_,White,(6,_),_) (a,b) = (a == -2 || a == -1) && b == 0
+isBasicPawnMove (_,Black,_,_) (a,b)     = a == 1 && b == 0
+isBasicPawnMove (_,White,_,_) (a,b)     = a == -1 && b == 0
 
 -- returns whether a move is in a straight line or not
 isStraightMove :: Move -> Bool
@@ -176,12 +176,12 @@ validKingMove a (m,n) b = (abs m <= 1 && abs n <= 1 ) && isValidTarget a (m,n) b
 
 -- returns whether a move is valid
 isValidMove :: Piece -> Move -> AllPieces -> Bool
-isValidMove (Pawn, col, pos) x y   = isPawnValidMove (Pawn, col, pos) x y
-isValidMove (Knight, col, pos) x y = isKnightValidMove (Knight, col, pos) x y
-isValidMove (Bishop, col, pos) x y = isBishopValidMove (Bishop, col, pos) x y
-isValidMove (Rook, col, pos) x y   = isRookValidMove (Rook, col, pos) x y
-isValidMove (Queen, col, pos) x y  = isQueenValidMove (Queen, col, pos) x y
-isValidMove (King, col, pos) x y   = validKingMove (King, col, pos) x y
+isValidMove (Pawn, col, pos, mc) x y   = isPawnValidMove (Pawn, col, pos, mc) x y
+isValidMove (Knight, col, pos, mc) x y = isKnightValidMove (Knight, col, pos, mc) x y
+isValidMove (Bishop, col, pos, mc) x y = isBishopValidMove (Bishop, col, pos, mc) x y
+isValidMove (Rook, col, pos, mc) x y   = isRookValidMove (Rook, col, pos, mc) x y
+isValidMove (Queen, col, pos, mc) x y  = isQueenValidMove (Queen, col, pos, mc) x y
+isValidMove (King, col, pos, mc) x y   = validKingMove (King, col, pos, mc) x y
 
 -- returns a list of the pieces which can capture piece a
 threatenedBy :: Piece -> AllPieces -> [Piece]
@@ -197,7 +197,7 @@ isKingInCheck a b | null (threatenedBy a b) = False
 
 -- removes a piece from the board
 takePiece :: Piece -> AllPieces -> AllPieces
-takePiece (a,b,c) d = (a,b,(-1,-1)) : removePiece (a,b,c) d
+takePiece (p, col, pos, mc) d = (p, col, (-1,-1), 0) : removePiece (p, col, pos, mc) d
 
 --move piece
 movePiece :: Piece -> Move -> Bool -> Bool -> AllPieces -> AllPieces
@@ -223,8 +223,8 @@ executeMove a b c | not (isTargetEnemy a b c) = updatePosition a b : removePiece
 
 -- writes a move to the pgn file WORKING
 writeMove :: Piece -> Move -> IO ()
-writeMove (piece,colour,(m,n)) (rows,cols) = do copyFile "movelist.pgn" "movelistTemp.pgn"
-                                                appendFile "movelistTemp.pgn" ((show piece) ++ ";" ++ (show colour) ++ ";" ++ (show m) ++ ";" ++ (show n) ++ ";" ++ (show rows) ++ ";" ++ (show cols) ++ "\n")
+writeMove (piece,colour,(m,n),mc) (rows,cols) = do copyFile "movelist.pgn" "movelistTemp.pgn"
+                                                appendFile "movelistTemp.pgn" ((show piece) ++ ";" ++ (show colour) ++ ";" ++ (show m) ++ ";" ++ (show n) ++ ";" ++ (show mc) ++ ";" ++ (show rows) ++ ";" ++ (show cols) ++ "\n")
                                                 removeFile "movelist.pgn"
                                                 renameFile "movelistTemp.pgn" "movelist.pgn"
 
@@ -244,18 +244,18 @@ testMoveList a = a
 
 -- returns King's side castle for either colour
 getKingsCastle :: Colour -> Piece
-getKingsCastle White = (Rook, White, (7,7))
-getKingsCastle Black = (Rook, Black, (0,7))
+getKingsCastle White = head (findPiece (7,7))
+getKingsCastle Black = head (findPiece (0,7))
 
 -- returns Queen's side castle for either colour
 getQueensCastle :: Colour -> Piece
-getQueensCastle White = (Rook, White, (7,0))
-getQueensCastle Black = (Rook, Black, (0,0))
+getQueensCastle White = head (findPiece (0,7))
+getQueensCastle Black = head (findPiece (0,0))
 
 --returns whether a castle is valid or not
 validCastle :: Piece -> Move -> AllPieces -> Bool
-validCastle a (0,2) b  = isStraightMovePathEmpty (getPos a) (0,2) b
-validCastle a (0,-2) b = isStraightMovePathEmpty (getPos a) (0,-3) b
+validCastle a (0,2) b  = isStraightMovePathEmpty (getPos a) (0,2) b && not null getKingsCastle (getColour a)
+validCastle a (0,-2) b = isStraightMovePathEmpty (getPos a) (0,-3) b && not null getQueensCastle (getColour a)
 
 -- executes a castle move -- WORKING
 executeCastle :: Piece -> Move -> AllPieces -> AllPieces
@@ -301,11 +301,11 @@ legalPawnMoves a b = [ (m,n) | m <- [-2..2], n <- [-1..1], isPawnValidMove a (m,
 
 -- returns a list of legal moves for a piece
 legalMoves :: Piece -> AllPieces -> [Move]
-legalMoves (Pawn, col, pos) x   = legalPawnMoves (Pawn, col, pos) x
-legalMoves (Knight, col, pos) x = legalKnightMoves (Knight, col, pos) x
-legalMoves (Bishop, col, pos) x = legalBishopMoves (Bishop, col, pos) x
-legalMoves (Rook, col, pos) x   = legalRookMoves (Rook, col, pos) x
-legalMoves (Queen, col, pos) x  = legalQueenMoves (Queen, col, pos) x
+legalMoves (Pawn, col, pos, mc) x   = legalPawnMoves (Pawn, col, pos, mc) x
+legalMoves (Knight, col, pos, mc) x = legalKnightMoves (Knight, col, pos, mc) x
+legalMoves (Bishop, col, pos, mc) x = legalBishopMoves (Bishop, col, pos, mc) x
+legalMoves (Rook, col, pos, mc) x   = legalRookMoves (Rook, col, pos, mc) x
+legalMoves (Queen, col, pos, mc) x  = legalQueenMoves (Queen, col, pos, mc) x
 
 -- returns a list of positions the pawn is controlling
 pawnControlledSquares :: Piece -> [Pos]

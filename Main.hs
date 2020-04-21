@@ -1,11 +1,11 @@
 module Main where
 
-import Util
-import Init
-import TypeDefs
-import System.IO
-import Data.List
-import Data.List.Split
+import           Data.List
+import           Data.List.Split
+import           Init
+import           System.IO
+import           TypeDefs
+import           Util
 
 {-|
 main = do
@@ -47,17 +47,17 @@ buildPiece _ = (Rook,Black,(0,0)) --never ran, compiler just wanted a default
 -- builds a move from a list of info
 buildMove :: [String] -> Move
 buildMove (_:_:_:_:m:n) = (read m, read (head n))
-buildMove _ = (0,0) --never ran, compiler just wanted a default
+buildMove _             = (0,0) --never ran, compiler just wanted a default
 
 -- if you can think of nicer ways to do this function then let me know.
     -- i think the 'read' function can be used instead? - ray
 pieceType :: String -> PieceType
-pieceType "Pawn" = Pawn
+pieceType "Pawn"   = Pawn
 pieceType "Knight" = Knight
 pieceType "Bishop" = Bishop
-pieceType "Rook" = Rook
-pieceType "Queen" = Queen
-pieceType "King" = King
+pieceType "Rook"   = Rook
+pieceType "Queen"  = Queen
+pieceType "King"   = King
 
 colorType :: String -> Colour
 colorType "Black" = Black
