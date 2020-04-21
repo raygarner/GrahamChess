@@ -164,7 +164,7 @@ isQueenValidMove a b c = isRookValidMove a b c || isBishopValidMove a b c
 
 -- returns the position of the king WORKING
 findKing :: Colour -> AllPieces -> Pos
-findKing a b = head [p | (t, c, p) <- b, t == King, c == a]
+findKing a b = head [p | (t, c, p, m) <- b, t == King, c == a]
 
 -- returns whether a king move is valid WORKING
 validKingMove :: Piece -> Move -> AllPieces -> Bool
@@ -224,9 +224,9 @@ executeMove a b c | not (isTargetEnemy a b c) = updatePosition a b : removePiece
 -- writes a move to the pgn file WORKING
 writeMove :: Piece -> Move -> IO ()
 writeMove (piece,colour,(m,n),mc) (rows,cols) = do copyFile "movelist.pgn" "movelistTemp.pgn"
-                                                appendFile "movelistTemp.pgn" ((show piece) ++ ";" ++ (show colour) ++ ";" ++ (show m) ++ ";" ++ (show n) ++ ";" ++ (show mc) ++ ";" ++ (show rows) ++ ";" ++ (show cols) ++ "\n")
-                                                removeFile "movelist.pgn"
-                                                renameFile "movelistTemp.pgn" "movelist.pgn"
+                                                   appendFile "movelistTemp.pgn" ((show piece) ++ ";" ++ (show colour) ++ ";" ++ (show m) ++ ";" ++ (show n) ++ ";" ++ (show mc) ++ ";" ++ (show rows) ++ ";" ++ (show cols) ++ "\n")
+                                                   removeFile "movelist.pgn"
+                                                   renameFile "movelistTemp.pgn" "movelist.pgn"
 
 -- makes a move and writes it to the pgn. returns AllPieces WORKING
 makeProperMove :: Piece -> Move -> Bool -> Bool -> AllPieces -> IO AllPieces
@@ -243,19 +243,19 @@ testMoveList :: String -> String
 testMoveList a = a
 
 -- returns King's side castle for either colour
-getKingsCastle :: Colour -> Piece
-getKingsCastle White = head (findPiece (7,7))
-getKingsCastle Black = head (findPiece (0,7))
+getKingsCastle :: Colour -> Pos
+getKingsCastle White = (7,7)
+getKingsCastle Black = (0,7)
 
 -- returns Queen's side castle for either colour
-getQueensCastle :: Colour -> Piece
-getQueensCastle White = head (findPiece (0,7))
-getQueensCastle Black = head (findPiece (0,0))
+getQueensCastle :: Colour -> Pos
+getQueensCastle White = (0,7)
+getQueensCastle Black = (0,0)
 
 --returns whether a castle is valid or not
 validCastle :: Piece -> Move -> AllPieces -> Bool
-validCastle a (0,2) b  = isStraightMovePathEmpty (getPos a) (0,2) b && not null getKingsCastle (getColour a)
-validCastle a (0,-2) b = isStraightMovePathEmpty (getPos a) (0,-3) b && not null getQueensCastle (getColour a)
+validCastle a (0,2) b  = isStraightMovePathEmpty (getPos a) (0,2) b && not (null (findPiece (getKingsCastle (getColour a) b)))
+validCastle a (0,-2) b = isStraightMovePathEmpty (getPos a) (0,-3) b && not (null (findPiece (getQueensCastle (getColour a) b)))
 
 -- executes a castle move -- WORKING
 executeCastle :: Piece -> Move -> AllPieces -> AllPieces
