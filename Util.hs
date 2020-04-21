@@ -192,6 +192,10 @@ threatenedBy a b = [ x | x <- b, isValidMove x (m - getRow (getPos x), n - getCo
                       m = getRow (getPos a)
                       n = getColumn (getPos a)
 
+-- returns a list of the pieces which
+protectedBy :: Piece -> AllPieces -> [Piece]
+protectedBy (a, col, pos, moves) ps = threatenedBy (a, invertColour col, pos, moves) ps
+
 -- returns whether the king is in check.
 isKingInCheck :: Piece -> AllPieces -> Bool
 isKingInCheck a b | null (threatenedBy a b) = False
