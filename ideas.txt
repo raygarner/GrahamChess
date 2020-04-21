@@ -14,17 +14,9 @@ positive evaluation if a piece is aimed near the enemey king (even if pieces are
 
 positive evalution if the king is protected
 
+evaluation for a piece - which pieces it protects and which pieces it can take
+
 bonus positive evalution if a piece has control over central squares
 
 function to find list of most important squares at one point in game?
 (then check whether these squares are controlled/threatened)
-
-
-potential ideas to check if piece has moved at least one:
-    read from text file
-    negative position
-    compound data type with ammount of moves made
-
-
-ideas for reading from text file -> use a main function that reads in the text file at the start of each move. Check if the king has already moved and then pass that boolean to the movePiece function.
-You could pass 1 Bool for the black king and 1 for the white king.
