@@ -23,7 +23,7 @@ getColour (_,x,_) = x
 
 -- returns the position of a piece
 getPos :: Piece -> Pos
-getPos (_,_,x) = x
+getPos (_,_,x,_) = x
 
 getPieceType :: Piece -> PieceType
 getPieceType (x,_,_) = x
@@ -53,7 +53,9 @@ invertColour :: Colour -> Colour
 invertColour White = Black
 invertColour Black = White
 
-
+-- gets the ammount of moves a piece has made
+getMovecount :: Piece -> Movecount
+getMovecount (_,_,_,mc) = mc
 
 -- UTILITIES AND RULES
 
