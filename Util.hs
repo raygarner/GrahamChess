@@ -53,7 +53,9 @@ invertColour :: Colour -> Colour
 invertColour White = Black
 invertColour Black = White
 
-
+-- gets the ammount of moves a piece has made
+getMovecount :: Piece -> Movecount
+getMovecount (_,_,_,mc) = mc
 
 -- UTILITIES AND RULES
 
