@@ -14,6 +14,8 @@ positive evaluation if a piece is aimed near the enemey king (even if pieces are
 
 positive evalution if the king is protected
 
+evaluation for a piece - which pieces it protects and which pieces it can take
+
 bonus positive evalution if a piece has control over central squares
 
 function to find list of most important squares at one point in game?
