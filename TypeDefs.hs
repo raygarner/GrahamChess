@@ -9,7 +9,9 @@ data Colour = Black | White
 
 type Pos = (Int, Int) -- row, column
 
-type Piece = (PieceType, Colour, Pos) -- type, colour of piece on square, position
+type movecount = Int
+
+type Piece = (PieceType, Colour, Pos, movecount) -- type, colour of piece on square, position, ammount of moves it has made
 
 type AllPieces = [Piece]
 
