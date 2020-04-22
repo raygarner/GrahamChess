@@ -220,6 +220,7 @@ takePiece (p, col, pos, mc) d = (p, col, (-1,-1), 0) : removePiece (p, col, pos,
 --move piece
 movePiece :: Piece -> Move -> AllPieces -> AllPieces
 movePiece a b c | getPieceType a  == King && (b == (0,2) || b == (0,-2)) && validCastle a b c = executeCastle a b c
+                | isValidEnPassant a b c = captureEnPassant a b c
                 | isValidMove a b c && not (isKingInCheck (King, (getColour a), king, getMovecount a) c) = executeMove a b c
                 | otherwise = c
                   where king = findKing (getColour a) c
