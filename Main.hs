@@ -27,7 +27,7 @@ main = do inh <- openFile "movelist.pgn" ReadMode
           let info = splitOn ";" line
           let piece = buildPiece info
           let move = buildMove info
-          makeProperMove piece move (contains "King;Black" content) (contains "King;White" content) (addKings ++ addRooks)
+          makeProperMove piece move (addKings ++ addRooks)
 
 -- returns whether a string is inside a another string
 contains :: String -> String -> Bool

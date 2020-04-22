@@ -206,8 +206,8 @@ takePiece :: Piece -> AllPieces -> AllPieces
 takePiece (p, col, pos, mc) d = (p, col, (-1,-1), 0) : removePiece (p, col, pos, mc) d
 
 --move piece
-movePiece :: Piece -> Move -> Bool -> Bool -> AllPieces -> AllPieces
-movePiece a b blackKing whiteKing c | getPieceType a  == King && (b == (0,2) || b == (0,-2)) && validCastle a b c && hasKingNotMoved (getColour a) blackKing whiteKing = executeCastle a b c
+movePiece :: Piece -> Move -> AllPieces -> AllPieces
+movePiece a b c | getPieceType a  == King && (b == (0,2) || b == (0,-2)) && validCastle a b c = executeCastle a b c
                                     | isValidMove a b c && not (isKingInCheck (King, (getColour a), king, getMovecount a) c) = executeMove a b c
                                     | otherwise = c
                                       where king = findKing (getColour a) c
@@ -235,9 +235,9 @@ writeMove (piece,colour,(m,n),mc) (rows,cols) = do copyFile "movelist.pgn" "move
                                                    renameFile "movelistTemp.pgn" "movelist.pgn"
 
 -- makes a move and writes it to the pgn. returns AllPieces WORKING
-makeProperMove :: Piece -> Move -> Bool -> Bool -> AllPieces -> IO AllPieces
-makeProperMove a b blackKing whiteKing cs = do writeMove a b
-                                               return (movePiece a b blackKing whiteKing cs)
+makeProperMove :: Piece -> Move -> AllPieces -> IO AllPieces
+makeProperMove a b cs = do writeMove a b
+                           return (movePiece a b cs)
 
 -- returns whether the king has moved before or not
 readMoveList :: IO String
@@ -260,8 +260,8 @@ getQueensCastle Black = (0,0)
 
 --returns whether a castle is valid or not
 validCastle :: Piece -> Move -> AllPieces -> Bool
-validCastle a (0,2) b  = isStraightMovePathEmpty (getPos a) (0,2) b && not (null (findPiece (getKingsCastle (getColour a)) b))
-validCastle a (0,-2) b = isStraightMovePathEmpty (getPos a) (0,-3) b && not (null (findPiece (getQueensCastle (getColour a)) b))
+validCastle a (0,2) b  = isStraightMovePathEmpty (getPos a) (0,2) b && not (null (findPiece (getKingsCastle (getColour a)) b)) && getMovecount a == 0 && getMovecount (head (findPiece (getKingsCastle (getColour a)) b)) == 0
+validCastle a (0,-2) b = isStraightMovePathEmpty (getPos a) (0,-3) b && not (null (findPiece (getQueensCastle (getColour a)) b)) && getMovecount a == 0 && getMovecount (head (findPiece (getQueensCastle (getColour a)) b)) == 0
 
 -- executes a castle move -- WORKING
 executeCastle :: Piece -> Move -> AllPieces -> AllPieces
