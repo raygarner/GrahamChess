@@ -148,6 +148,7 @@ isValidEnPassant a (m,n) ps = isPawnCapture a (m,n) && getRow (getPos a) == r &&
                                   r = if getColour a == White then 3 else 4
 
 -- moves the pawn and removes the adjacent enemy pawn
+-- note this can produce an error if used when the move is not a validEnPassant cus of the use of head
 captureEnPassant :: Piece -> Move -> AllPieces -> AllPieces
 captureEnPassant a (m,n) ps = executeMove a (m,n) (removePiece (head (findPiece ( getTarget (getPos a) (0,n) ) ps )) ps)
 
