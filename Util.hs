@@ -140,6 +140,13 @@ isLShaped (a,b) = (abs a == 2 && abs b == 1) || (abs a == 1 && abs b == 2)
 isPawnValidMove :: Piece -> Move -> AllPieces -> Bool
 isPawnValidMove a b c = isValidTarget a b c && ( (isEmpty (getTarget (getPos a) b) c && isBasicPawnMove a b) || (isTargetEnemy a b c && isPawnCapture a b))
 
+-- returns whether a move is a valid en passant move
+isValidEnPassant :: Piece -> Move -> AllPieces -> Bool
+isValidEnPassant a (m,n) ps = isPawnCapture a (m,n) && getRow (getPos a) == r && not (isEmpty (getTarget (getPos a) (0,n)) ps) && p == (Pawn, invertColour (getColour a), (getRow (getPos a), getColumn (getPos a) + n), 1)
+                              where
+                                  p = head (findPiece (getTarget (getPos a) (0,n)) ps)
+                                  r = if getColour a == White then 3 else 4
+
 -- returns whether a knight move is valid -- WORKING (i think. needs thorough testing)
 isKnightValidMove :: Piece -> Move -> AllPieces -> Bool
 isKnightValidMove a b c = isValidTarget a b c && isLShaped b
