@@ -1,7 +1,5 @@
 TESTING
 
-add castling to list of valid moves a piece can make
-
 pawn promotion
 
 algorithm for the strength of a piece? I guess it would be split up into multiple functions
