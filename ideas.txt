@@ -10,9 +10,9 @@ write move list to text file in pgn format? This allows for functions to look ba
 different evaluation algorithm depending on point in game? (opening, middlegame, endgame)
 function to determine point in game? (opening, middlegame, endgame)
 
-positive evaluation if a piece is aimed near the enemey king (even if pieces are in the way)
+positive evaluation if a piece is aimed near the enemy king (even if pieces are in the way)
 
-positive evalution if the king is protected
+positive evalution if the king is safe
 
 evaluation for a piece - which pieces it protects and which pieces it can take
 

@@ -32,6 +32,10 @@ getPieceType (x,_,_,_) = x
 removePiece :: Piece -> [Piece] -> [Piece]
 removePiece pieceToRemove xs = [ x | x <- xs, x /= pieceToRemove]
 
+-- returns what move was made based on two positions
+moveMade :: Pos -> Pos -> Move
+moveMade (a,b) (c,d) = (c - a, d - b)
+
 -- returns a piece with an updated position
 updatePosition :: Piece -> Move -> Piece
 updatePosition (a,b,c,mc) d = (a, b, (getTarget c d), mc+1)
@@ -66,6 +70,10 @@ isEmpty a b = (findPiece a b) == []
 -- returns true if the two pieces are enemies WORKING
 isEnemy :: Piece -> Piece -> Bool
 isEnemy a b = getColour a /= getColour b
+
+-- returns true if the two piece are friendly
+isFriendly :: Piece -> Piece -> Bool
+isFriendly a b = getColour a == getColour b
 
 -- returns whether a move will mean the piece ends up off of the board or not -- WORKING
 isOnBoard :: Piece -> Move -> Bool
