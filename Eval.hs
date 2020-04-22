@@ -45,5 +45,21 @@ isPieceAimedAtEnemyKing :: Piece -> AllPieces -> Bool
 isPieceAimedAtEnemyKing a b = isValidMove a (moveMade (getPos a) k) (a : [])
                               where k = findKing (invertColour (getColour a)) b
 
+centralSquares :: [Pos]
+centralSquares = [(row,col) | row <- [3..4], col <- [3..4]]
+
+-- returns all the squares that a piece threatens from a passed list of squares.
+doesPieceThreatenSquares :: Piece -> [Pos] -> AllPieces -> [Pos]
+doesPieceThreatenSquares a [] b = []
+doesPieceThreatenSquares a xs b | isValidMove a y b = head xs : doesPieceThreatenSquares a (tail xs) b
+                                | otherwise = doesPieceThreatenSquares a (tail xs) b
+                                  where y = moveMade (getPos a) (head xs)
+
+-- returns all the central squares that a piece controls
+doesPieceControlCentralSquares :: Piece -> AllPieces -> [Pos]
+doesPieceControlCentralSquares (Pawn, col, pos, mc) b = [x | x <- centralSquares, elem x (pawnControlledSquares (Pawn,col,pos,mc))]
+doesPieceControlCentralSquares a b = doesPieceThreatenSquares a centralSquares b
+
+
 totalVal :: Colour -> AllPieces -> Float
 totalVal a ps = sum [ evalPiece x ps | x <- ps, getColour x == a ]
