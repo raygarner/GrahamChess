@@ -2,6 +2,10 @@ TESTING
 
 pawn promotion
 
-algorithm for the strength of a piece? I guess it would be split up into multiple functions
-that could get the position of the piece and the actual material value of the piece and
-combine them in some way.
+function to determine point in game? (opening, middlegame, endgame)
+
+bonus positive evalution if a piece has control over central squares
+
+positive evaluation for a piece if it protects pieces
+
+positive evaluation for a piece if it threatens enemy pieces.
