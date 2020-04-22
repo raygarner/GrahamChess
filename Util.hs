@@ -316,7 +316,7 @@ legalQueenMoves a b = (legalBishopMoves a b) ++ (legalRookMoves a b)
 
 -- returns a list of legal moves for a pawn
 legalPawnMoves :: Piece -> AllPieces -> [Move]
-legalPawnMoves a b = [ (m,n) | m <- [-2..2], n <- [-1..1], isPawnValidMove a (m,n) b ]
+legalPawnMoves a b = [ (m,n) | m <- [-2..2], n <- [-1..1], isPawnValidMove a (m,n) b || isValidEnPassant a (m,n) b]
 
 -- returns a list of legal moves for a piece
 legalMoves :: Piece -> AllPieces -> [Move]
