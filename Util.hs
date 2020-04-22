@@ -213,9 +213,9 @@ movePiece a b c | getPieceType a  == King && (b == (0,2) || b == (0,-2)) && vali
                                       where king = findKing (getColour a) c
 
 -- returns whether a king has moved
-hasKingNotMoved :: Colour -> Bool -> Bool -> Bool
-hasKingNotMoved White a b = not b
-hasKingNotMoved Black a b = not a
+--hasKingNotMoved :: Colour -> Bool -> Bool -> Bool
+--hasKingNotMoved White a b = not b
+--hasKingNotMoved Black a b = not a
 
 --execute move
 executeMove :: Piece -> Move -> AllPieces -> AllPieces
@@ -230,7 +230,7 @@ executeMove a b c | not (isTargetEnemy a b c) = updatePosition a b : removePiece
 -- writes a move to the pgn file WORKING
 writeMove :: Piece -> Move -> IO ()
 writeMove (piece,colour,(m,n),mc) (rows,cols) = do copyFile "movelist.pgn" "movelistTemp.pgn"
-                                                   appendFile "movelistTemp.pgn" ((show piece) ++ ";" ++ (show colour) ++ ";" ++ (show m) ++ ";" ++ (show n) ++ ";" ++ (show mc) ++ ";" ++ (show rows) ++ ";" ++ (show cols) ++ "\n")
+                                                   appendFile "movelistTemp.pgn" ((show piece) ++ ";" ++ (show colour) ++ ";" ++ (show m) ++ ";" ++ (show n) ++ ";" ++ (show mc) ++ ";" ++ (show rows) ++ ";" ++ (show cols) ++ (show mc) ++ "\n")
                                                    removeFile "movelist.pgn"
                                                    renameFile "movelistTemp.pgn" "movelist.pgn"
 
