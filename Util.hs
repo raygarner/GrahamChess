@@ -147,6 +147,10 @@ isValidEnPassant a (m,n) ps = isPawnCapture a (m,n) && getRow (getPos a) == r &&
                                   p = head (findPiece (getTarget (getPos a) (0,n)) ps)
                                   r = if getColour a == White then 3 else 4
 
+-- moves the pawn and removes the adjacent enemy pawn
+captureEnPassant :: Piece -> Move -> AllPieces -> AllPieces
+captureEnPassant a (m,n) ps = executeMove a (m,n) (removePiece (head (findPiece ( getTarget (getPos a) (0,n) ) ps )) ps)
+
 -- returns whether a knight move is valid -- WORKING (i think. needs thorough testing)
 isKnightValidMove :: Piece -> Move -> AllPieces -> Bool
 isKnightValidMove a b c = isValidTarget a b c && isLShaped b
