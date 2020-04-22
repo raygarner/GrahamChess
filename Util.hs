@@ -25,6 +25,7 @@ getColour (_,x,_,_) = x
 getPos :: Piece -> Pos
 getPos (_,_,x,_) = x
 
+-- returns the type of a piece
 getPieceType :: Piece -> PieceType
 getPieceType (x,_,_,_) = x
 
@@ -132,6 +133,23 @@ isBasicPawnMove (_,White,(6,_),_) (a,b) = (a == -2 || a == -1) && b == 0
 isBasicPawnMove (_,Black,_,_) (a,b)     = a == 1 && b == 0
 isBasicPawnMove (_,White,_,_) (a,b)     = a == -1 && b == 0
 
+-- returns whether a pawn move is a promotion
+isValidPromotion :: Piece -> Move -> AllPieces -> Bool
+isValidPromotion a m ps = getPieceType a == Pawn && isPawnValidMove a m ps && getRow (getTarget (getPos a) m) == e
+                          where
+                              e = if getColour a == White then 0 else 7
+
+-- changes a piece to a queen
+upgradeToQueen :: Piece -> AllPieces -> AllPieces
+upgradeToQueen (piece,colour,(m,n),mc) ps = (Queen, colour, (m,n), mc) : (removePiece (piece, colour, (m,n), mc) ps)
+
+-- promotes a pawn
+promotePawn :: Piece -> Move -> AllPieces -> AllPieces
+promotePawn a m ps = upgradeToQueen piece board
+                     where board = executeMove a m ps
+                           piece = head (findPiece (getTarget (getPos a) m) board)
+
+
 -- returns whether a move is in a straight line or not
 isStraightMove :: Move -> Bool
 isStraightMove (a,b) = (a == 0 || b == 0)
@@ -229,6 +247,7 @@ takePiece (p, col, pos, mc) d = (p, col, (-1,-1), 0) : removePiece (p, col, pos,
 movePiece :: Piece -> Move -> AllPieces -> AllPieces
 movePiece a b c | getPieceType a  == King && (b == (0,2) || b == (0,-2)) && validCastle a b c = executeCastle a b c
                 | isValidEnPassant a b c = captureEnPassant a b c
+                | isValidPromotion a b c = promotePawn a b c
                 | isValidMove a b c && not (isKingInCheck (King, (getColour a), king, getMovecount a) c) = executeMove a b c
                 | otherwise = c
                   where king = findKing (getColour a) c
