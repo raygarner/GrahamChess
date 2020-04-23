@@ -1,7 +1,5 @@
 TESTING
 
-pawn promotion
-
 function to determine point in game? (opening, middlegame, endgame)
 
 bonus positive evalution if a piece has control over central squares
@@ -9,3 +7,5 @@ bonus positive evalution if a piece has control over central squares
 positive evaluation for a piece if it protects pieces
 
 positive evaluation for a piece if it threatens enemy pieces.
+
+user interface
