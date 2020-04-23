@@ -6,7 +6,7 @@ import           Util
 -- some crude evaluations
 
 evalPiece :: Piece -> AllPieces -> Float
-evalPiece a ps = fromIntegral (length (legalMoves a ps)) * (pieceVal a)
+evalPiece a ps = fromIntegral (length (legalMoves a ps)) * (pieceVal a) + pieceMaterial a ps
 
 pieceVal :: Piece -> Float
 pieceVal (Pawn,_,_,_)   = 1.0
@@ -82,7 +82,6 @@ isPassedPawn a ps = all (==True) [pawnClearAhead (getColour a) (y,n) ps | y <- [
                         d = if getColour a == White then -1 else 1
                         e = if getColour a == White then 1 else 6
 
-
--- returns whether a pawn is a passed pawn
---isPassedPawn :: Piece -> AllPieces -> Bool
---isPassedPawn a ps =
+pieceMaterial :: Piece -> AllPieces -> Float
+pieceMaterial a ps | length (threatenedBy a ps) > length (protectedBy a ps) = 0
+                   | otherwise = pieceVal a
