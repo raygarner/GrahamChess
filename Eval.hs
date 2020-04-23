@@ -8,6 +8,11 @@ import           Util
 evalPiece :: Piece -> AllPieces -> Float
 evalPiece a ps = fromIntegral (length (legalMoves a ps)) * (pieceVal a) + pieceMaterial a ps
 
+-- crude central square evaluation - if a piece controls 1 or more central squares the return value is 1.5
+evaluationCentralSquares :: Piece -> AllPieces -> Float
+evaluationCentralSquares a b | null (doesPieceControlCentralSquares a b) = 1.0
+                             | otherwise = 1.5
+
 pieceVal :: Piece -> Float
 pieceVal (Pawn,_,_,_)   = 1.0
 pieceVal (Knight,_,_,_) = 3.0
@@ -59,7 +64,6 @@ doesPieceThreatenSquares a xs b | isValidMove a y b = head xs : doesPieceThreate
 doesPieceControlCentralSquares :: Piece -> AllPieces -> [Pos]
 doesPieceControlCentralSquares (Pawn, col, pos, mc) b = [x | x <- centralSquares, elem x (pawnControlledSquares (Pawn,col,pos,mc))]
 doesPieceControlCentralSquares a b = doesPieceThreatenSquares a centralSquares b
-
 
 totalVal :: Colour -> AllPieces -> Float
 totalVal a ps = sum [ evalPiece x ps | x <- ps, getColour x == a ]
