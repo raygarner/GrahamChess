@@ -1,19 +1,13 @@
-evaluate the strength of a piece instead of using a static material value. Done in haskell, but it can be based off the static value (maybe as a multiplier).
-
-write move list to text file in pgn format? This allows for functions to look back on it (potentially useful for checking whether a king can castle or whether you can capture en passant) and it allows the user to look back on their game
-
 different evaluation algorithm depending on point in game? (opening, middlegame, endgame)
 function to determine point in game? (opening, middlegame, endgame)
 
-positive evaluation if a piece is aimed near the enemy king (even if pieces are in the way)
-
 evaluation for a piece - which pieces it protects and which pieces it can take
-
-bonus positive evalution if a piece has control over central squares
 
 function to find list of most important squares at one point in game?
 (then check whether these squares are controlled/threatened)
 
+new .hs file to call evaluation functions on each piece and create a evaluation number for a board position
+This .hs file could be for the main recursive loop.
 
 potential ideas to check if piece has moved at least one:
     read from text file
@@ -21,8 +15,7 @@ potential ideas to check if piece has moved at least one:
     compound data type with ammount of moves made
 
 
-ideas for reading from text file -> use a main function that reads in the text file at the start of each move. Check if the king has already moved and then pass that boolean to the movePiece function.
-You could pass 1 Bool for the black king and 1 for the white king.
+
 
 
 pgn files for testing and proper lines
