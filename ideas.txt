@@ -16,6 +16,11 @@ potential ideas to check if piece has moved at least one:
 
 
 
+-- just an idea if its too slow to calculate moves
+
+Do we need the move count stuff ? For castling, we could just check before the search for the best move. (Pass a boolean maybe?)
+For empasan? pawns im not sure how it would work but we could maybe figure it out.
+
 
 
 pgn files for testing and proper lines
