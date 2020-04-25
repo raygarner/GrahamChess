@@ -6,13 +6,14 @@ import Init
 import Util
 import Eval
 
--- returns the best move for one side (I think checkmate mesess this up)
+-- returns the best move for one side NOT WORKING (plays worse moves than findSingleBest move currently)
 findRealBestMove :: Colour -> AllPieces -> (Piece, Move, Float)
 findRealBestMove c ps = findStrongestMoveFromAll [ addTrueEval c 0 x ps | x <- makeEvalList c ps]
 
 -- updates the evaluation for moves by looking moves into the futur2. l limit must be even
 addTrueEval :: Colour -> Int -> (Piece,Move,Float) -> AllPieces -> (Piece,Move,Float)
 addTrueEval c l (p,m,f) ps | l == 6 = (p,m, totalVal c ps)
+                           | l == 0 = addTrueEval (invertColour c) (l+1) (p,m,f) (movePiece p m ps)
                            | otherwise = addTrueEval (invertColour c) (l+1) (p,m,f) (makeSingleBestMove (findSingleBestMove c ps) ps)
 
 -- returns the best move which can be made without looking ahead WORKING
