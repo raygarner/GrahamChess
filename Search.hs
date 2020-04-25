@@ -12,8 +12,8 @@ findRealBestMove c ps = findStrongestMoveFromAll [ addTrueEval c 0 x ps | x <- m
 
 -- updates the evaluation for moves by looking moves into the futur2. l limit must be even
 addTrueEval :: Colour -> Int -> (Piece,Move,Float) -> AllPieces -> (Piece,Move,Float)
-addTrueEval c l (p,m,f) ps | l == 2 = (p,m, totalVal c ps)
-                           | otherwise = addTrueEval (invertColour c) (l+1) (p,m,f) (makeSingleBestMove (findSingleBestMove (invertColour c) ps) ps)
+addTrueEval c l (p,m,f) ps | l == 6 = (p,m, totalVal c ps)
+                           | otherwise = addTrueEval (invertColour c) (l+1) (p,m,f) (makeSingleBestMove (findSingleBestMove c ps) ps)
 
 -- returns the best move which can be made without looking ahead
 findSingleBestMove :: Colour -> AllPieces -> (Piece, Move, Float)
@@ -22,7 +22,7 @@ findSingleBestMove c ps = findStrongestMoveFromAll (makeEvalList c ps)
 -- returns the stronget move from a list of moves with evaluations
 findStrongestMoveFromAll :: [(Piece,Move,Float)] -> (Piece,Move,Float)
 findStrongestMoveFromAll [(p,m,f)] = (p,m,f)
-findStrongestMoveFromAll ((p,m,f):xs) = if f > getMoveEval (findStrongestMoveFromAll xs) then (p,m,f) else findStrongestMoveFromAll xs
+findStrongestMoveFromAll ((p,m,f):x:xs) = if f > getMoveEval x then (p,m,f) else findStrongestMoveFromAll (x:xs)
 
 -- extracts the evaluation element of the move tuple
 getMoveEval :: (Piece, Move, Float) -> Float

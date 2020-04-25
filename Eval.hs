@@ -8,7 +8,7 @@ import           Util
 -- some crude evaluations
 
 evalPiece :: Piece -> AllPieces -> Float
-evalPiece a ps = fromIntegral (length (legalMoves a ps)) * (pieceVal a)
+evalPiece a ps = fromIntegral (length (legalMoves a ps)) -- * (pieceVal a)
 
 totalMaterial :: Colour -> AllPieces -> Float
 totalMaterial c ps = (sum [ pieceMaterial x ps | x <- ps, getColour x == c ]) - (sum [ pieceMaterial y ps | y <- ps, getColour y /= c ])
