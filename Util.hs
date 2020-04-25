@@ -58,6 +58,11 @@ invertColour :: Colour -> Colour
 invertColour White = Black
 invertColour Black = White
 
+-- invert piece colour
+invertPieceColour :: Piece -> Piece
+invertPieceColour (a,col,pos,mc) = (a, invertColour col, pos, mc)
+
+
 -- gets the ammount of moves a piece has made
 getMovecount :: Piece -> Movecount
 getMovecount (_,_,_,mc) = mc
@@ -230,9 +235,26 @@ threatenedBy a b = [ x | x <- b, isValidMove x (m - getRow (getPos x), n - getCo
                       m = getRow (getPos a)
                       n = getColumn (getPos a)
 
+-- changes all pieces to reflect the inverted colour.
+updateAllPieces :: Piece -> AllPieces -> [Piece]
+updateAllPieces a xs = invertPieceColour a : removePiece a xs
+
 -- returns a list of the pieces which
 protectedBy :: Piece -> AllPieces -> [Piece]
-protectedBy (a, col, pos, moves) ps = threatenedBy (a, invertColour col, pos, moves) ps
+protectedBy a xs = threatenedBy (invertPieceColour a) (updateAllPieces a xs)
+
+-- returns all pieces that a piece is protecting
+protecting :: Piece -> AllPieces -> [Piece]
+protecting (King,col,pos,mc) xs = surroundingPieces col (getSurroundingPos pos) xs
+protecting a xs = getPiecesFromMoves (getPos a) (legalMoves (invertPieceColour a) (updateAllPieces a xs)) xs
+
+-- get a list of pieces from a list of moves and a starting position
+getPiecesFromMoves :: Pos -> [Move] -> AllPieces -> [Piece]
+getPiecesFromMoves a [] xs = []
+getPiecesFromMoves a ms xs | not (null y) = head y : getPiecesFromMoves a (tail ms) xs
+                           | otherwise = getPiecesFromMoves a (tail ms) xs
+                           where
+                             y = findPiece (getTarget a (head ms)) xs
 
 -- returns whether the king is in check.
 isKingInCheck :: Piece -> AllPieces -> Bool
@@ -345,6 +367,10 @@ legalQueenMoves a b = (legalBishopMoves a b) ++ (legalRookMoves a b)
 legalPawnMoves :: Piece -> AllPieces -> [Move]
 legalPawnMoves a b = [ (m,n) | m <- [-2..2], n <- [-1..1], isPawnValidMove a (m,n) b || isValidEnPassant a (m,n) b]
 
+-- returns a list of legal moves for a king
+legalKingMoves :: Piece -> AllPieces -> [Move]
+legalKingMoves a b = [(m,n) | m <- [-1..1], n <- [-1..1], validKingMove a (m,n) b]
+
 -- returns a list of legal moves for a piece
 legalMoves :: Piece -> AllPieces -> [Move]
 legalMoves (Pawn, col, pos, mc) x   = legalPawnMoves (Pawn, col, pos, mc) x
@@ -352,7 +378,23 @@ legalMoves (Knight, col, pos, mc) x = legalKnightMoves (Knight, col, pos, mc) x
 legalMoves (Bishop, col, pos, mc) x = legalBishopMoves (Bishop, col, pos, mc) x
 legalMoves (Rook, col, pos, mc) x   = legalRookMoves (Rook, col, pos, mc) x
 legalMoves (Queen, col, pos, mc) x  = legalQueenMoves (Queen, col, pos, mc) x
+legalMoves (King, col, pos, mc) x = legalKingMoves (King, col, pos, mc) x
 
 -- returns a list of positions the pawn is controlling
 pawnControlledSquares :: Piece -> [Pos]
 pawnControlledSquares a = [ getTarget (getPos a) (m,n) | m <- [-1,1], n <- [-1,1], isPawnCapture a (m,n) ]
+
+
+-- returns a list containg all the surrounding friendly pieces from a position
+surroundingPieces :: Colour -> [Pos] -> AllPieces -> [Piece]
+surroundingPieces a [] b = []
+surroundingPieces a xs b | not (null p) && a ==  getColour (head p) = head p : surroundingPieces a (tail xs) b
+                         | otherwise = surroundingPieces a (tail xs) b
+                           where p = findPiece (head xs) b
+
+isIntOnBoard :: Int -> Bool
+isIntOnBoard a | a < 0 || a > 7 = False
+               | otherwise = True
+
+getSurroundingPos :: Pos -> [Pos]
+getSurroundingPos (m,n) = [ (row,col) | row <- [m-1..m+1], col <- [n-1..n+1], isIntOnBoard row, isIntOnBoard col, (row,col) /= (m,n)]
