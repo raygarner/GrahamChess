@@ -19,10 +19,9 @@ addTrueEval c l (p,m,f) ps | l == 6 = (p,m, totalVal c ps)
 findSingleBestMove :: Colour -> AllPieces -> (Piece, Move, Float)
 findSingleBestMove c ps = findStrongestMoveFromAll (makeEvalList c ps)
 
--- returns the stronget move from a list of moves with evaluations
+-- returns the stronget move from a list of moves with evaluations -- NOT WORKING
 findStrongestMoveFromAll :: [(Piece,Move,Float)] -> (Piece,Move,Float)
-findStrongestMoveFromAll [(p,m,f)] = (p,m,f)
-findStrongestMoveFromAll ((p,m,f):x:xs) = if f > getMoveEval x then (p,m,f) else findStrongestMoveFromAll (x:xs)
+findStrongestMoveFromAll xs = head [ x | x <- xs, all (\y -> (getMoveEval y) <= (getMoveEval x)) xs ]
 
 -- extracts the evaluation element of the move tuple
 getMoveEval :: (Piece, Move, Float) -> Float

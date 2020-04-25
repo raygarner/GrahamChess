@@ -11,7 +11,7 @@ evalPiece :: Piece -> AllPieces -> Float
 evalPiece a ps = fromIntegral (length (legalMoves a ps)) -- * (pieceVal a)
 
 totalMaterial :: Colour -> AllPieces -> Float
-totalMaterial c ps = (sum [ pieceMaterial x ps | x <- ps, getColour x == c ]) - (sum [ pieceMaterial y ps | y <- ps, getColour y /= c ])
+totalMaterial c ps = ( (10 * (sum [ pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ])) - (10 * (sum [ pieceMaterial y ps | y <- ps, getPos y /= (-1,-1), getColour y /= c ])) )
 
 totalVal :: Colour -> AllPieces -> Float
 totalVal a ps = sum [ evalPiece x ps | x <- ps, getColour x == a ] + (totalMaterial a ps)
