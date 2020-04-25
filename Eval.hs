@@ -41,15 +41,20 @@ protectedEvaluation :: Piece -> AllPieces -> Float
 protectedEvaluation a b | y < 1 = 1.0
                         | otherwise = y
                           where
-                            y = protectedPieces (protecting a b)
+                            y = analyzePieces (protecting a b)
 
 
--- analyze the list of all protected pieces
-protectedPieces :: [Piece] -> Float
-protectedPieces [] = 0
-protectedPieces xs = (pieceVal (head xs) * 0.5) + protectedPieces (tail xs)
+-- analyze the list of all pieces to return a float value for that list - currently used for threaten / protect
+analyzePieces :: [Piece] -> Float
+analyzePieces [] = 0
+analyzePieces xs = (pieceVal (head xs) * 0.5) + analyzePieces (tail xs)
 
--- TODO: positive evaluation for threaten
+-- Tpositive evaluation for threaten
+threatenEvaluation :: Piece -> AllPieces -> Float
+threatenEvaluation a b | y < 1 = 1.0
+                       | otherwise = y
+                         where
+                           y = analyzePieces (threatening a b)
 
 -- crude central square evaluation - if a piece controls 1 or more central squares the return value is 1.5
 evaluationCentralSquares :: Piece -> AllPieces -> Float
