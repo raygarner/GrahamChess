@@ -1,3 +1,5 @@
+module Search where
+
 import TypeDefs
 import Debug
 import Init
