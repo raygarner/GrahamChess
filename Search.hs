@@ -6,7 +6,7 @@ import Init
 import Util
 import Eval
 
--- returns the best move for one side
+-- returns the best move for one side (I think checkmate mesess this up)
 findRealBestMove :: Colour -> AllPieces -> (Piece, Move, Float)
 findRealBestMove c ps = findStrongestMoveFromAll [ addTrueEval c 0 x ps | x <- makeEvalList c ps]
 
@@ -15,11 +15,11 @@ addTrueEval :: Colour -> Int -> (Piece,Move,Float) -> AllPieces -> (Piece,Move,F
 addTrueEval c l (p,m,f) ps | l == 6 = (p,m, totalVal c ps)
                            | otherwise = addTrueEval (invertColour c) (l+1) (p,m,f) (makeSingleBestMove (findSingleBestMove c ps) ps)
 
--- returns the best move which can be made without looking ahead
+-- returns the best move which can be made without looking ahead WORKING
 findSingleBestMove :: Colour -> AllPieces -> (Piece, Move, Float)
 findSingleBestMove c ps = findStrongestMoveFromAll (makeEvalList c ps)
 
--- returns the stronget move from a list of moves with evaluations -- NOT WORKING
+-- returns the stronget move from a list of moves with evaluations
 findStrongestMoveFromAll :: [(Piece,Move,Float)] -> (Piece,Move,Float)
 findStrongestMoveFromAll xs = head [ x | x <- xs, all (\y -> (getMoveEval y) <= (getMoveEval x)) xs ]
 
