@@ -14,11 +14,13 @@ import Eval
 
 -- returns the best move which can be made without looking ahead
 --findSingleBestMove :: Colour -> AllPieces -> (Piece, Move)
---findSingleBestMove
+--findSingleBestMove c ps =
+
+--makeEvalList :: Colour -> AllPieces -> [(Piece, Move)]
 
 
---makeSingleBestMove :: (Piece, Move) -> AllPieces -> AllPieces
---makeSingleBestMove (a,b) ps = movePiece m n ps
+makeSingleBestMove :: (Piece, Move) -> AllPieces -> AllPieces
+makeSingleBestMove (a,b) ps = movePiece a b ps
 
 -- makes a move and then evaluates the new AllPieces
 evalMove :: Piece -> Move -> AllPieces -> Float
