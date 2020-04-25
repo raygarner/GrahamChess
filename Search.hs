@@ -16,8 +16,8 @@ import Eval
 --findSingleBestMove :: Colour -> AllPieces -> (Piece, Move)
 --findSingleBestMove c ps =
 
---makeEvalList :: Colour -> AllPieces -> [(Piece, Move)]
-
+makeEvalList :: Colour -> AllPieces -> [(Piece, Move, Float)]
+makeEvalList c ps = [ (x,y,evalMove x y ps) | x <- ps, getColour x == c, y <- legalMoves x ps ]
 
 makeSingleBestMove :: (Piece, Move) -> AllPieces -> AllPieces
 makeSingleBestMove (a,b) ps = movePiece a b ps
