@@ -7,9 +7,9 @@ import Util
 import Eval
 
 -- returns the strongest move which can be made in a position
---findBestMove :: Int -> Colour -> AllPieces -> (Piece,Move,Float)
---findBestMove l c ps | l == 5 = findSingleBestMove c ps
---                    | otherwise findSingleBestMove c (makeSingleBestMove (findBestMove (++l) (invertColour c) ps))
+findBestMove :: Int -> Colour -> AllPieces -> (Piece,Move,Float)
+findBestMove l c ps | l == 5 = findSingleBestMove c ps
+                    | otherwise = findSingleBestMove c (makeSingleBestMove (findBestMove (l+1) (invertColour c) ps) ps)
 
 
 -- returns the best move which can be made without looking ahead
@@ -27,8 +27,8 @@ getMoveEval (_,_,f) = f
 makeEvalList :: Colour -> AllPieces -> [(Piece, Move, Float)]
 makeEvalList c ps = [ (x,y,evalMove x y ps) | x <- ps, getColour x == c, y <- legalMoves x ps ]
 
-makeSingleBestMove :: (Piece, Move) -> AllPieces -> AllPieces
-makeSingleBestMove (a,b) ps = movePiece a b ps
+makeSingleBestMove :: (Piece, Move, Float) -> AllPieces -> AllPieces
+makeSingleBestMove (a,b,_) ps = movePiece a b ps
 
 -- makes a move and then evaluates the new AllPieces
 evalMove :: Piece -> Move -> AllPieces -> Float
