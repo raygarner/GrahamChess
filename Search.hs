@@ -6,7 +6,7 @@ import Init
 import Util
 import Eval
 
--- returns the best move for one side NOT WORKING (plays worse moves than findSingleBest move currently)
+-- returns the best move for one side (not sure how this handles checkmate????)
 findRealBestMove :: Colour -> AllPieces -> (Piece, Move, Float)
 findRealBestMove c ps = findStrongestMoveFromAll [ addTrueEval c 0 x ps | x <- makeEvalList c ps]
 
