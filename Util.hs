@@ -248,6 +248,10 @@ protecting :: Piece -> AllPieces -> [Piece]
 protecting (King,col,pos,mc) xs = surroundingPieces col (getSurroundingPos pos) xs
 protecting a xs = getPiecesFromMoves (getPos a) (legalMoves (invertPieceColour a) (updateAllPieces a xs)) xs
 
+-- returns all pieces that a piece is threatening
+threatening :: Piece -> AllPieces -> [Piece]
+threatening a xs = getPiecesFromMoves (getPos a) (legalMoves a xs) xs
+
 -- get a list of pieces from a list of moves and a starting position
 getPiecesFromMoves :: Pos -> [Move] -> AllPieces -> [Piece]
 getPiecesFromMoves a [] xs = []
