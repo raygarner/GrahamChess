@@ -6,11 +6,14 @@ import Init
 import Util
 import Eval
 
--- returns the strongest move which can be made in a position
-findBestMove :: Int -> Colour -> AllPieces -> (Piece,Move,Float)
-findBestMove l c ps | l == 5 = findSingleBestMove c ps
-                    | otherwise = findSingleBestMove c (makeSingleBestMove (findBestMove (l+1) (invertColour c) ps) ps)
+-- returns the best move for one side
+findRealBestMove :: Colour -> AllPieces -> (Piece, Move, Float)
+findRealBestMove c ps = findStrongestMoveFromAll [ addTrueEval c 0 x ps | x <- makeEvalList c ps]
 
+-- updates the evaluation for moves by looking moves into the futur2. l limit must be even
+addTrueEval :: Colour -> Int -> (Piece,Move,Float) -> AllPieces -> (Piece,Move,Float)
+addTrueEval c l (p,m,f) ps | l == 2 = (p,m, totalVal c ps)
+                           | otherwise = addTrueEval (invertColour c) (l+1) (p,m,f) (makeSingleBestMove (findSingleBestMove (invertColour c) ps) ps)
 
 -- returns the best move which can be made without looking ahead
 findSingleBestMove :: Colour -> AllPieces -> (Piece, Move, Float)
@@ -21,12 +24,15 @@ findStrongestMoveFromAll :: [(Piece,Move,Float)] -> (Piece,Move,Float)
 findStrongestMoveFromAll [(p,m,f)] = (p,m,f)
 findStrongestMoveFromAll ((p,m,f):xs) = if f > getMoveEval (findStrongestMoveFromAll xs) then (p,m,f) else findStrongestMoveFromAll xs
 
+-- extracts the evaluation element of the move tuple
 getMoveEval :: (Piece, Move, Float) -> Float
 getMoveEval (_,_,f) = f
 
+-- generates a list of all legal moves for one side with evaluations
 makeEvalList :: Colour -> AllPieces -> [(Piece, Move, Float)]
 makeEvalList c ps = [ (x,y,evalMove x y ps) | x <- ps, getColour x == c, y <- legalMoves x ps ]
 
+-- makes a move which is stored using the format with eval
 makeSingleBestMove :: (Piece, Move, Float) -> AllPieces -> AllPieces
 makeSingleBestMove (a,b,_) ps = movePiece a b ps
 
