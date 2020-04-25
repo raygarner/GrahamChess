@@ -1,10 +1,10 @@
 TESTING
 
-function to determine point in game? (opening, middlegame, endgame)
-
 positive evaluation for a piece if it protects pieces
 
 positive evaluation for a piece if it threatens enemy pieces.
+
+move searching
 
 user interface
 
