@@ -1,11 +1,12 @@
 TESTING
 
-positive evaluation for a piece if it protects pieces
-
-positive evaluation for a piece if it threatens enemy pieces.
-
 move searching
 
 user interface
+-------------
+-> print out current board
+-> ask user for piece
+-> ask user for move
+-> convert that into a format that can be used by our functions
 
 think of ways to add offensive capabilities (ie mating the opponent)
