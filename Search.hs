@@ -8,13 +8,13 @@ import Eval
 
 -- returns the best move for one side (not sure how this handles checkmate????)
 findRealBestMove :: Colour -> AllPieces -> (Piece, Move, Float)
-findRealBestMove c ps = findStrongestMoveFromAll [ addTrueEval c 0 x ps | x <- makeEvalList c ps]
+findRealBestMove c ps = findStrongestMoveFromAll [ addTrueEval (c,c) 0 x ps | x <- makeEvalList c ps]
 
--- updates the evaluation for moves by looking moves into the futur2. l limit must be even
-addTrueEval :: Colour -> Int -> (Piece,Move,Float) -> AllPieces -> (Piece,Move,Float)
-addTrueEval c l (p,m,f) ps | l == 6 = (p,m, totalVal c ps)
-                           | l == 0 = addTrueEval (invertColour c) (l+1) (p,m,f) (movePiece p m ps)
-                           | otherwise = addTrueEval (invertColour c) (l+1) (p,m,f) (makeSingleBestMove (findSingleBestMove c ps) ps)
+-- updates the evaluation for moves by looking moves into the futur2
+addTrueEval :: (Colour,Colour) -> Int -> (Piece,Move,Float) -> AllPieces -> (Piece,Move,Float)
+addTrueEval (c,nc) l (p,m,f) ps | l == 10 = (p,m, (totalVal c ps) + f)
+                           | l == 0 = addTrueEval (c,(invertColour nc)) (l+1) (p,m,f) (movePiece p m ps)
+                           | otherwise = addTrueEval (c,(invertColour nc)) (l+1) (p,m,f) (makeSingleBestMove (findSingleBestMove nc ps) ps)
 
 -- returns the best move which can be made without looking ahead WORKING
 findSingleBestMove :: Colour -> AllPieces -> (Piece, Move, Float)
