@@ -13,8 +13,8 @@ findRealBestMove c ps = findStrongestMoveFromAll [ addTrueEval (c,c) 0 x ps | x 
 -- updates the evaluation for moves by looking moves into the futur2
 addTrueEval :: (Colour,Colour) -> Int -> (Piece,Move,Float) -> AllPieces -> (Piece,Move,Float)
 addTrueEval (c,nc) l (p,m,f) ps | l == 10 = (p,m, (totalVal c ps) + f)
-                           | l == 0 = addTrueEval (c,(invertColour nc)) (l+1) (p,m,f) (movePiece p m ps)
-                           | otherwise = addTrueEval (c,(invertColour nc)) (l+1) (p,m,f) (makeSingleBestMove (findSingleBestMove nc ps) ps)
+                                | l == 0 = addTrueEval (c,(invertColour nc)) (l+1) (p,m,f) (movePiece p m ps)
+                                | otherwise = addTrueEval (c,(invertColour nc)) (l+1) (p,m,f) (makeSingleBestMove (findSingleBestMove nc ps) ps)
 
 -- returns the best move which can be made without looking ahead WORKING
 findSingleBestMove :: Colour -> AllPieces -> (Piece, Move, Float)
@@ -27,6 +27,12 @@ findStrongestMoveFromAll xs = head [ x | x <- xs, all (\y -> (getMoveEval y) <= 
 -- extracts the evaluation element of the move tuple
 getMoveEval :: (Piece, Move, Float) -> Float
 getMoveEval (_,_,f) = f
+
+extractMove :: (Piece, Move, Float) -> Move
+extractMove (_,m,_) = m
+
+extractPiece :: (Piece, Move, Float) -> Piece
+extractPiece (p,_,_) = p
 
 -- generates a list of all legal moves for one side with evaluations
 makeEvalList :: Colour -> AllPieces -> [(Piece, Move, Float)]
