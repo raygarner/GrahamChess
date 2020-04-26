@@ -137,7 +137,10 @@ pieceMaterial a ps | (length (threatenedBy a ps) > length (protectedBy a ps)) = 
 
 -- returns the value of the lowest value piece in a list of pieces
 getLowestVal :: [Piece] -> Float
-getLowestVal ps = head [pieceVal x | x <- ps, all (\y -> (pieceVal y) > pieceVal x) ps ]
+getLowestVal ps | null a = 10.0 -- return a value greater than any piece
+                | otherwise = head a
+                  where
+                      a = [pieceVal x | x <- ps, all (\y -> (pieceVal y) > pieceVal x) ps ]
 
 -- returns whether all pieces have moved at least once
 allPiecesMoved :: AllPieces -> Bool

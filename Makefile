@@ -1,4 +1,5 @@
 all:
+	make clean
 	ghc Main.hs
 
 clean:
