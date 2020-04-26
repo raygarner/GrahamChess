@@ -11,10 +11,14 @@ evalPiece :: Piece -> AllPieces -> Float
 evalPiece a ps = fromIntegral (length (legalMoves a ps)) -- * (pieceVal a)
 
 totalMaterial :: Colour -> AllPieces -> Float
-totalMaterial c ps = ( (2 * (sum [ pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ])) - (2 * (sum [ pieceMaterial y ps | y <- ps, getPos y /= (-1,-1), getColour y /= c ])) )
+totalMaterial c ps = ( (5 * (sum [ pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ])) - (5 * (sum [ pieceMaterial y ps | y <- ps, getPos y /= (-1,-1), getColour y /= c ])) )
+
+
+totalMobility :: Colour -> AllPieces -> Float
+totalMobility c ps = (sum [ evalPiece x ps | x <- ps, getColour x == c ]) - (sum [ evalPiece y ps | y <- ps, getColour y /= c])
 
 totalVal :: Colour -> AllPieces -> Float
-totalVal a ps = sum [ evalPiece x ps | x <- ps, getColour x == a ] + (totalMaterial a ps)
+totalVal a ps = (totalMobility a ps) + (totalMaterial a ps)
 
 pieceVal :: Piece -> Float
 pieceVal (Pawn,_,_,_)   = 1.0
@@ -102,7 +106,7 @@ isPassedPawn a ps = all (==True) [pawnClearAhead (getColour a) (y,n) ps | y <- [
                         d = if getColour a == White then -1 else 1
                         e = if getColour a == White then 1 else 6
 
--- if a piece is going to be captured then it doesnt really have any material
+-- if a piece is going to be captured then it doesnt really have any material NOT WORKING: NEEDS TO TAKE VALUE OF THREATS INTO ACCOUNT
 pieceMaterial :: Piece -> AllPieces -> Float
 pieceMaterial a ps | length (threatenedBy a ps) > length (protectedBy a ps) = 0
                    | otherwise = pieceVal a
