@@ -20,14 +20,23 @@ main = do
 -}
 
 --main = do content <- readFile "movelist.pgn"
-main :: IO AllPieces
-main = do inh <- openFile "movelist.pgn" ReadMode
-          content <- readFile "movelist.pgn"
-          line <- hGetLine inh
+main :: IO ()
+main = do
+          line <- getLine
           let info = splitOn ";" line
           let piece = buildPiece info
           let move = buildMove info
-          makeProperMove piece move (addKings ++ addRooks)
+          secondMain piece move addAllPieces
+
+--secondMain :: Piece -> Move -> AllPieces -> IO ()
+--secondMain a b ps = do
+                      --line <- getLine
+                      --let updatedBoard = makeProperMove a b ps
+                      --let info = splitOn ";" line
+                      --let piece = buildPiece info
+                      --let move = buildMove info
+                      --secondMain piece move updatedBoard
+-- TODO: make a function that executes both the user move and the computer move
 
 -- returns whether a string is inside a another string
 contains :: String -> String -> Bool
