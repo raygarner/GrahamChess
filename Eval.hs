@@ -26,7 +26,7 @@ allPawns :: Colour -> AllPieces -> Float
 allPawns c ps = (sum [passPawnScore x ps | x <- ps, getColour x == c, getPieceType x == Pawn]) - (sum[passPawnScore y ps | y <- ps, getColour y /= c, getPieceType y == Pawn])
 
 totalVal :: Colour -> AllPieces -> Float
-totalVal a ps = (totalMobility a ps) + (totalMaterial a ps) + (totalBonus a ps) + (allPawns a ps)
+totalVal a ps = (totalMobility a ps) + (totalMaterial a ps) + (totalBonus a ps) + (allPawns a ps) + (fromIntegral (castleBonus a ps))
 
 pieceVal :: Piece -> Float
 pieceVal (Pawn,_,_,_)   = 1.0
@@ -36,6 +36,20 @@ pieceVal (Rook,_,_,_)   = 5.0
 pieceVal (Queen,_,_,_)  = 9.0
 pieceVal (King,_,_,_)   = 0.0
 
+-- TODO: function to return how close a colour is to castling.
+
+castlingPiece :: Piece -> Bool
+castlingPiece a = getPieceType a == Queen || getPieceType a == Bishop || getPieceType a == Knight
+
+closeToCastling :: Colour -> Bool -> AllPieces -> [Piece]
+closeToCastling c True ps = [x | x <- ps, getColour x == c, castlingPiece x, getMovecount x == 0, getColumn (getPos x) == 5 || getColumn (getPos x) == 6]
+closeToCastling c False ps = [x | x <- ps, getColour x == c, castlingPiece x, getMovecount x == 0, getColumn (getPos x) == 1 || getColumn (getPos x) == 2 || getColumn (getPos x) == 3]
+
+castleBonus :: Colour -> AllPieces -> Int
+castleBonus c ps | possibleToCastle c True ps && possibleToCastle c False ps = (min (length (closeToCastling c True ps)) (length (closeToCastling c False ps))) * (-2)
+                 | possibleToCastle c True ps = (length (closeToCastling c True ps)) * (-2)
+                 | possibleToCastle c False ps = (length (closeToCastling c False ps)) * (-2)
+                 | otherwise = 0
 
 -- returns true if the king is surrounded by friendly pieces.
 isKingSurrounded :: Piece -> AllPieces -> Bool

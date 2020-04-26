@@ -324,10 +324,16 @@ getQueensCastle :: Colour -> Pos
 getQueensCastle White = (0,7)
 getQueensCastle Black = (0,0)
 
+-- returns whether a king and the revelant castle has moved or not. True = kings side castle
+possibleToCastle :: Colour -> Bool -> AllPieces -> Bool
+possibleToCastle c True ps = not (null (findPiece (getKingsCastle c) ps)) && getMovecount (head (findPiece (findKing c ps) ps)) == 0 && getMovecount (head (findPiece (getKingsCastle c) ps)) == 0
+possibleToCastle c False ps = not (null (findPiece (getQueensCastle c) ps)) && getMovecount (head (findPiece (findKing c ps) ps)) == 0 && getMovecount (head (findPiece (getQueensCastle c) ps)) == 0
+
+
 --returns whether a castle is valid or not
 validCastle :: Piece -> Move -> AllPieces -> Bool
-validCastle a (0,2) b  = isStraightMovePathEmpty (getPos a) (0,2) b && not (null (findPiece (getKingsCastle (getColour a)) b)) && getMovecount a == 0 && getMovecount (head (findPiece (getKingsCastle (getColour a)) b)) == 0
-validCastle a (0,-2) b = isStraightMovePathEmpty (getPos a) (0,-3) b && not (null (findPiece (getQueensCastle (getColour a)) b)) && getMovecount a == 0 && getMovecount (head (findPiece (getQueensCastle (getColour a)) b)) == 0
+validCastle a (0,2) b  = isStraightMovePathEmpty (getPos a) (0,2) b && possibleToCastle (getColour a) True b
+validCastle a (0,-2) b = isStraightMovePathEmpty (getPos a) (0,-3) b && possibleToCastle (getColour a) False b
 
 -- executes a castle move -- WORKING
 executeCastle :: Piece -> Move -> AllPieces -> AllPieces
