@@ -20,7 +20,7 @@ gameLoop ps = do putStr "Your turn: \n"
                  n <- getLine
                  r <- getLine
                  c <- getLine
-                 piece <- return ( head (findPiece (read m, read n) addAllPieces))
+                 piece <- return ( head (findPiece (read m, read n) ps))
                  print piece
                  move <- return (buildMove (r,c))
                  print move
