@@ -132,8 +132,12 @@ isPassedPawn a ps = all (==True) [pawnClearAhead (getColour a) (y,n) ps | y <- [
 -- if a piece is going to be captured then it doesnt really have any material NOT FULL COMPLETE: NEEDS TO TAKE VALUE OF THREATS INTO ACCOUNT
 pieceMaterial :: Piece -> AllPieces -> Float
 pieceMaterial a ps | (length (threatenedBy a ps) > length (protectedBy a ps)) = 0
+                   | getLowestVal (threatenedBy a ps) < pieceVal a = 0
                    | otherwise = pieceVal a
 
+-- returns the value of the lowest value piece in a list of pieces
+getLowestVal :: [Piece] -> Float
+getLowestVal ps = head [pieceVal x | x <- ps, all (\y -> (pieceVal y) > pieceVal x) ps ]
 
 -- returns whether all pieces have moved at least once
 allPiecesMoved :: AllPieces -> Bool
