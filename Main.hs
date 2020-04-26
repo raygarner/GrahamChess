@@ -20,13 +20,20 @@ gameLoop ps = do putStr "Your turn: \n"
                  n <- getLine
                  r <- getLine
                  c <- getLine
-                 let piece = head (findPiece (read m, read n) addAllPieces)
-                 let move = buildMove (r,c)
-                 let ps = movePiece piece move ps
+                 piece <- return ( head (findPiece (read m, read n) addAllPieces))
+                 print piece
+                 move <- return (buildMove (r,c))
+                 print move
+                 ps <- return (movePiece piece move ps)
+                 print ps
                  putStr "Graham is thinking of a move...\n"
-                 let response = findRealBestMove Black ps
-                 let move = extractMove response
-                 let piece = extractPiece response
+                 response <- return (findRealBestMove Black ps)
+                 print response
+                 putStr "Graham has made his move...\n"
+                 move <- return (extractMove response)
+                 print move
+                 piece <- return (extractPiece response)
+                 print piece
                  gameLoop (movePiece piece move ps)
 
 
