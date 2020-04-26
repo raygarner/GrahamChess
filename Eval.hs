@@ -36,8 +36,6 @@ pieceVal (Rook,_,_,_)   = 5.0
 pieceVal (Queen,_,_,_)  = 9.0
 pieceVal (King,_,_,_)   = 0.0
 
--- TODO: function to return how close a colour is to castling.
-
 castlingPiece :: Piece -> Bool
 castlingPiece a = getPieceType a == Queen || getPieceType a == Bishop || getPieceType a == Knight
 
@@ -70,8 +68,11 @@ isPieceAimedAtEnemyKing a b = isValidMove a (moveMade (getPos a) k) (a : [])
 
 -- protection evaluation
 protectedEvaluation :: Piece -> AllPieces -> Float
-protectedEvaluation a b = analyzePieces a (protecting a b)
+protectedEvaluation a b = analyzeProtection (protecting a b)
 
+analyzeProtection :: [Piece] -> Float
+analyzeProtection [] = 0
+analyzeProtection xs = (10 - pieceVal (head xs)) / 4  + analyzeProtection (tail xs)
 
 -- analyze the list of all pieces to return a float value for that list - currently used for threaten / protect
 analyzePieces :: Piece -> [Piece] -> Float
