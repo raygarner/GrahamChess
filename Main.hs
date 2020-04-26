@@ -36,6 +36,7 @@ main = do
                       --let piece = buildPiece info
                       --let move = buildMove info
                       --secondMain piece move updatedBoard
+                      
 -- TODO: make a function that executes both the user move and the computer move
 
 -- returns whether a string is inside a another string

@@ -8,17 +8,25 @@ import           Util
 -- some crude evaluations
 
 evalPiece :: Piece -> AllPieces -> Float
-evalPiece a ps = fromIntegral (length (legalMoves a ps)) -- * (pieceVal a)
+evalPiece a ps = fromIntegral (length (legalMoves a ps))
+
+evalPieceBonus :: Piece -> AllPieces -> Float
+evalPieceBonus a ps = (threatenKing a ps) + (protectedEvaluation a ps) + (threatenEvaluation a ps) + (evaluationCentralSquares a ps)
 
 totalMaterial :: Colour -> AllPieces -> Float
 totalMaterial c ps = ( (5 * (sum [ pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ])) - (5 * (sum [ pieceMaterial y ps | y <- ps, getPos y /= (-1,-1), getColour y /= c ])) )
 
-
 totalMobility :: Colour -> AllPieces -> Float
 totalMobility c ps = (sum [ evalPiece x ps | x <- ps, getColour x == c ]) - (sum [ evalPiece y ps | y <- ps, getColour y /= c])
 
+totalBonus :: Colour -> AllPieces -> Float
+totalBonus c ps = (sum [evalPieceBonus x ps | x <- ps, getColour x == c]) - (sum [evalPieceBonus y ps | y <- ps, getColour y /= c])
+
+allPawns :: Colour -> AllPieces -> Float
+allPawns c ps = (sum [passPawnScore x ps | x <- ps, getColour x == c, getPieceType x == Pawn]) - (sum[passPawnScore y ps | y <- ps, getColour y /= c, getPieceType y == Pawn])
+
 totalVal :: Colour -> AllPieces -> Float
-totalVal a ps = (totalMobility a ps) + (totalMaterial a ps)
+totalVal a ps = (totalMobility a ps) + (totalMaterial a ps) + (totalBonus a ps) + (allPawns a ps)
 
 pieceVal :: Piece -> Float
 pieceVal (Pawn,_,_,_)   = 1.0
@@ -38,8 +46,8 @@ isKingSurrounded a b = length x == length y
 
 -- returns a float value for whether a piece is aimed at the enemy king.
 threatenKing :: Piece -> AllPieces -> Float
-threatenKing a b | isPieceAimedAtEnemyKing a b = 1.5
-                 | otherwise = 1.0
+threatenKing a b | isPieceAimedAtEnemyKing a b = 3.0
+                 | otherwise = 0.0
 
 -- returns a bool value for whether a piece is aimed at an enemy king.
 isPieceAimedAtEnemyKing :: Piece -> AllPieces -> Bool
@@ -48,28 +56,25 @@ isPieceAimedAtEnemyKing a b = isValidMove a (moveMade (getPos a) k) (a : [])
 
 -- protection evaluation
 protectedEvaluation :: Piece -> AllPieces -> Float
-protectedEvaluation a b | y < 1 = 1.0
-                        | otherwise = y
-                          where
-                            y = analyzePieces (protecting a b)
+protectedEvaluation a b = analyzePieces a (protecting a b)
 
 
 -- analyze the list of all pieces to return a float value for that list - currently used for threaten / protect
-analyzePieces :: [Piece] -> Float
-analyzePieces [] = 0
-analyzePieces xs = (pieceVal (head xs) * 0.5) + analyzePieces (tail xs)
+analyzePieces :: Piece -> [Piece] -> Float
+analyzePieces a [] = 0
+analyzePieces a xs | pieceVal a < pieceVal y = (pieceVal y - pieceVal a) + analyzePieces a (tail xs)
+                   | otherwise = 1.0 + analyzePieces a (tail xs)
+                     where
+                       y = head xs
 
 -- Tpositive evaluation for threaten
 threatenEvaluation :: Piece -> AllPieces -> Float
-threatenEvaluation a b | y < 1 = 1.0
-                       | otherwise = y
-                         where
-                           y = analyzePieces (threatening a b)
+threatenEvaluation a b = analyzePieces a (threatening a b)
 
 -- crude central square evaluation - if a piece controls 1 or more central squares the return value is 1.5
 evaluationCentralSquares :: Piece -> AllPieces -> Float
-evaluationCentralSquares a b | null (doesPieceControlCentralSquares a b) = 1.0
-                             | otherwise = 1.5
+evaluationCentralSquares a b | null (doesPieceControlCentralSquares a b) = 0.0
+                             | otherwise = 3.0
 
 centralSquares :: [Pos]
 centralSquares = [(row,col) | row <- [3..4], col <- [3..4]]
@@ -87,6 +92,10 @@ doesPieceControlCentralSquares (Pawn, col, pos, mc) b = [x | x <- centralSquares
 doesPieceControlCentralSquares a b = doesPieceThreatenSquares a centralSquares b
 
 
+
+passPawnScore :: Piece -> AllPieces -> Float
+passPawnScore a ps | isPassedPawn a ps = 3.0
+                   | otherwise = 0
 
 -- returns whether a position doesnt contain an enemy pawn
 isNotEnemyPawn :: Colour -> Pos -> AllPieces -> Bool
