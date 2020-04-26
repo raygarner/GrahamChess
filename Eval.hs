@@ -106,9 +106,9 @@ isPassedPawn a ps = all (==True) [pawnClearAhead (getColour a) (y,n) ps | y <- [
                         d = if getColour a == White then -1 else 1
                         e = if getColour a == White then 1 else 6
 
--- if a piece is going to be captured then it doesnt really have any material NOT WORKING: NEEDS TO TAKE VALUE OF THREATS INTO ACCOUNT
+-- if a piece is going to be captured then it doesnt really have any material NOT FULL COMPLETE: NEEDS TO TAKE VALUE OF THREATS INTO ACCOUNT
 pieceMaterial :: Piece -> AllPieces -> Float
-pieceMaterial a ps | length (threatenedBy a ps) > length (protectedBy a ps) = 0
+pieceMaterial a ps | (length (threatenedBy a ps) > length (protectedBy a ps)) = 0
                    | otherwise = pieceVal a
 
 
