@@ -55,7 +55,7 @@ castleBonus c ps | possibleToCastle c True ps && possibleToCastle c False ps = (
 
 -- TODO: add bonus for moving multiple pieces.
 movePieceBonus :: Colour -> AllPieces -> Int
-movePieceBonus c ps = (length [x | x <- ps, getMovecount x == 0, getPieceType x /= Pawn]) * (-4)
+movePieceBonus c ps = (length [x | x <- ps, getMovecount x == 0, getPieceType x /= Pawn, getPieceType x /= Queen]) * (-4)
 
 
 -- returns true if the king is surrounded by friendly pieces.
