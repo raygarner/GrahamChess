@@ -10,6 +10,10 @@ move searching
 
 make a function that collects together all the evaluation information
 
+main
+----
+-> graham gets two moves in a row if a move mistake is made
+
 user interface
 -------------
 -> print out current board

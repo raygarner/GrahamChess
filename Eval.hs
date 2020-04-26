@@ -17,7 +17,7 @@ totalMaterial :: Colour -> AllPieces -> Float
 totalMaterial c ps = ( (8 * (sum [ pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ])) - (8 * (sum [ pieceMaterial y ps | y <- ps, getPos y /= (-1,-1), getColour y /= c ])) )
 
 totalMobility :: Colour -> AllPieces -> Float
-totalMobility c ps = ( 6 * sum [ evalPiece x ps | x <- ps, getColour x == c ]) - (6 * sum [ evalPiece y ps | y <- ps, getColour y /= c])
+totalMobility c ps = ( 3 * sum [ evalPiece x ps | x <- ps, getColour x == c ]) - (3 * sum [ evalPiece y ps | y <- ps, getColour y /= c])
 
 totalBonus :: Colour -> AllPieces -> Float
 totalBonus c ps = (sum [evalPieceBonus x ps | x <- ps, getColour x == c]) - (sum [evalPieceBonus y ps | y <- ps, getColour y /= c])
@@ -26,7 +26,7 @@ allPawns :: Colour -> AllPieces -> Float
 allPawns c ps = (sum [passPawnScore x ps | x <- ps, getColour x == c, getPieceType x == Pawn]) - (sum[passPawnScore y ps | y <- ps, getColour y /= c, getPieceType y == Pawn])
 
 totalVal :: Colour -> AllPieces -> Float
-totalVal a ps = (totalMobility a ps) + (totalMaterial a ps) + (totalBonus a ps) + (allPawns a ps) + (fromIntegral (castleBonus a ps))
+totalVal a ps = (totalMobility a ps) + (totalMaterial a ps) + (totalBonus a ps) + (allPawns a ps) + (fromIntegral (castleBonus a ps)) + (fromIntegral (movePieceBonus a ps))
 
 pieceVal :: Piece -> Float
 pieceVal (Pawn,_,_,_)   = 1.0
@@ -36,6 +36,9 @@ pieceVal (Rook,_,_,_)   = 5.0
 pieceVal (Queen,_,_,_)  = 9.0
 pieceVal (King,_,_,_)   = 0.0
 
+
+-- castling bonus functions
+
 castlingPiece :: Piece -> Bool
 castlingPiece a = getPieceType a == Queen || getPieceType a == Bishop || getPieceType a == Knight
 
@@ -44,10 +47,16 @@ closeToCastling c True ps = [x | x <- ps, getColour x == c, castlingPiece x, get
 closeToCastling c False ps = [x | x <- ps, getColour x == c, castlingPiece x, getMovecount x == 0, getColumn (getPos x) == 1 || getColumn (getPos x) == 2 || getColumn (getPos x) == 3]
 
 castleBonus :: Colour -> AllPieces -> Int
-castleBonus c ps | possibleToCastle c True ps && possibleToCastle c False ps = (min (length (closeToCastling c True ps)) (length (closeToCastling c False ps))) * (-2)
-                 | possibleToCastle c True ps = (length (closeToCastling c True ps)) * (-2)
-                 | possibleToCastle c False ps = (length (closeToCastling c False ps)) * (-2)
+castleBonus c ps | possibleToCastle c True ps && possibleToCastle c False ps = (min (length (closeToCastling c True ps)) (length (closeToCastling c False ps))) * (-6)
+                 | possibleToCastle c True ps = (length (closeToCastling c True ps)) * (-6)
+                 | possibleToCastle c False ps = (length (closeToCastling c False ps)) * (-6)
                  | otherwise = 0
+
+
+-- TODO: add bonus for moving multiple pieces.
+movePieceBonus :: Colour -> AllPieces -> Int
+movePieceBonus c ps = (length [x | x <- ps, getMovecount x == 0, getPieceType x /= Pawn]) * (-4)
+
 
 -- returns true if the king is surrounded by friendly pieces.
 isKingSurrounded :: Piece -> AllPieces -> Bool
@@ -89,7 +98,8 @@ threatenEvaluation a b = analyzePieces a (threatening a b)
 -- crude central square evaluation - if a piece controls 1 or more central squares the return value is 1.5
 evaluationCentralSquares :: Piece -> AllPieces -> Float
 evaluationCentralSquares a b | null (doesPieceControlCentralSquares a b) = 0.0
-                             | otherwise = 3.0
+                             | getGamePoint b == Opening = 10.0
+                             | otherwise = 2.0
 
 centralSquares :: [Pos]
 centralSquares = [(row,col) | row <- [3..4], col <- [3..4]]
