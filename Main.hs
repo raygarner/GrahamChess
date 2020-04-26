@@ -1,11 +1,13 @@
 module Main where
 
 import           Data.List
-import           Data.List.Split
+--import           Data.List.Split
 import           Init
 import           System.IO
 import           TypeDefs
 import           Util
+import           Data.Char
+import           Search
 
 {-|
 main = do
@@ -20,6 +22,7 @@ main = do
 -}
 
 --main = do content <- readFile "movelist.pgn"
+{-|
 main :: IO AllPieces
 main = do inh <- openFile "movelist.pgn" ReadMode
           content <- readFile "movelist.pgn"
@@ -28,6 +31,35 @@ main = do inh <- openFile "movelist.pgn" ReadMode
           let piece = buildPiece info
           let move = buildMove info
           makeProperMove piece move (addKings ++ addRooks)
+-}
+
+
+main :: IO ()
+main = gameLoop addAllPieces
+
+
+
+gameLoop :: AllPieces -> IO ()
+gameLoop ps = do putStr "Your turn: \n"
+                 m <- getLine
+                 n <- getLine
+                 r <- getLine
+                 c <- getLine
+                 let piece = head (findPiece (read m, read n) addAllPieces)
+                 let move = buildMove (r,c)
+                 let ps = movePiece piece move ps
+                 putStr "Graham is thinking of a move...\n"
+                 let response = findRealBestMove Black ps
+                 let move = extractMove response
+                 let piece = extractPiece response
+                 gameLoop (movePiece piece move ps)
+
+
+--printBoard :: AllPieces -> IO ()
+--printBoard ps = do
+
+buildMove :: (String, String) -> (Int,Int)
+buildMove (r,c) = (read r, read c)
 
 -- returns whether a string is inside a another string
 contains :: String -> String -> Bool
@@ -45,9 +77,9 @@ buildPiece (piece:colour:row:column:moves:_) = (read piece, read colour, (read r
 buildPiece _ = (Rook,Black,(0,0),0) --never ran, compiler just wanted a default
 
 -- builds a move from a list of info
-buildMove :: [String] -> Move
-buildMove (_:_:_:_:m:n:_) = (read m, read n)
-buildMove _ = (0,0) --never ran, compiler just wanted a default
+--buildMove :: [String] -> Move
+--buildMove (_:_:_:_:m:n:_) = (read m, read n)
+--buildMove _ = (0,0) --never ran, compiler just wanted a default
 
 -- if you can think of nicer ways to do this function then let me know.
     -- i think the 'read' function can be used instead? - ray
