@@ -1,5 +1,9 @@
 TESTING
 
+evaluation
+----------
+-> tweak bonuses
+
 move searching
 --------------
 -> make it play mating move if one is detected
@@ -12,5 +16,3 @@ user interface
 -> ask user for piece
 -> ask user for move
 -> convert that into a format that can be used by our functions
-
-think of ways to add offensive capabilities (ie mating the opponent)
