@@ -4,6 +4,8 @@ move searching
 --------------
 -> make it play mating move if one is detected
 
+make a function that collects together all the evaluation information
+
 user interface
 -------------
 -> print out current board
