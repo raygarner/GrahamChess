@@ -169,7 +169,7 @@ isLShaped (a,b) = (abs a == 2 && abs b == 1) || (abs a == 1 && abs b == 2)
 
 -- returns whether a pawn move is valid
 isPawnValidMove :: Piece -> Move -> AllPieces -> Bool
-isPawnValidMove a b c = isValidTarget a b c && ( (isEmpty (getTarget (getPos a) b) c && isBasicPawnMove a b) || (isTargetEnemy a b c && isPawnCapture a b))
+isPawnValidMove a b c = isValidTarget a b c && ( (isEmpty (getTarget (getPos a) b) c && isBasicPawnMove a b && isStraightMovePathEmpty (getPos a) b c) || (isTargetEnemy a b c && isPawnCapture a b))
 
 -- returns whether a move is a valid en passant move
 isValidEnPassant :: Piece -> Move -> AllPieces -> Bool

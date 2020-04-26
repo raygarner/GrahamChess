@@ -14,7 +14,7 @@ evalPieceBonus :: Piece -> AllPieces -> Float
 evalPieceBonus a ps = (threatenKing a ps) + (protectedEvaluation a ps) + (threatenEvaluation a ps) + (evaluationCentralSquares a ps)
 
 totalMaterial :: Colour -> AllPieces -> Float
-totalMaterial c ps = ( (10 * (sum [ pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ])) - (10 * (sum [ pieceMaterial y ps | y <- ps, getPos y /= (-1,-1), getColour y /= c ])) )
+totalMaterial c ps = ( (20 * (sum [ pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ])) - (20 * (sum [ pieceMaterial y ps | y <- ps, getPos y /= (-1,-1), getColour y /= c ])) )
 
 totalMobility :: Colour -> AllPieces -> Float
 totalMobility c ps = ( 3 * sum [ evalPiece x ps | x <- ps, getColour x == c ]) - (3 * sum [ evalPiece y ps | y <- ps, getColour y /= c])
@@ -47,12 +47,16 @@ closeToCastling c True ps = [x | x <- ps, getColour x == c, castlingPiece x, get
 closeToCastling c False ps = [x | x <- ps, getColour x == c, castlingPiece x, getMovecount x == 0, getColumn (getPos x) == 1 || getColumn (getPos x) == 2 || getColumn (getPos x) == 3]
 
 castleBonus :: Colour -> AllPieces -> Int
-castleBonus c ps | possibleToCastle c True ps && possibleToCastle c False ps = (min (length (closeToCastling c True ps)) (length (closeToCastling c False ps))) * (-20)
-                 | possibleToCastle c True ps = (length (closeToCastling c True ps)) * (-20)
-                 | possibleToCastle c False ps = (length (closeToCastling c False ps)) * (-20)
+castleBonus c ps | possibleToCastle c True ps && possibleToCastle c False ps = (min (length (closeToCastling c True ps)) (length (closeToCastling c False ps))) * (-15)
+                 | possibleToCastle c True ps = (length (closeToCastling c True ps)) * (-15)
+                 | possibleToCastle c False ps = (length (closeToCastling c False ps)) * (-15)
                  | otherwise = 0
 
-
+executeCastle :: Colour -> AllPieces -> Float
+executeCastle c ps | validCastle king (0,2) ps || validCastle king (0,-2) ps = 150
+                   | otherwise = 0
+                   where
+                     king = head (findPiece (findKing c ps) ps)
 -- TODO: add bonus for moving multiple pieces.
 movePieceBonus :: Colour -> AllPieces -> Int
 movePieceBonus c ps = (length [x | x <- ps, getMovecount x == 0, getPieceType x /= Pawn, getPieceType x /= Queen]) * (-8)
