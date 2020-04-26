@@ -47,15 +47,15 @@ closeToCastling c True ps = [x | x <- ps, getColour x == c, castlingPiece x, get
 closeToCastling c False ps = [x | x <- ps, getColour x == c, castlingPiece x, getMovecount x == 0, getColumn (getPos x) == 1 || getColumn (getPos x) == 2 || getColumn (getPos x) == 3]
 
 castleBonus :: Colour -> AllPieces -> Int
-castleBonus c ps | possibleToCastle c True ps && possibleToCastle c False ps = (min (length (closeToCastling c True ps)) (length (closeToCastling c False ps))) * (-6)
-                 | possibleToCastle c True ps = (length (closeToCastling c True ps)) * (-6)
-                 | possibleToCastle c False ps = (length (closeToCastling c False ps)) * (-6)
+castleBonus c ps | possibleToCastle c True ps && possibleToCastle c False ps = (min (length (closeToCastling c True ps)) (length (closeToCastling c False ps))) * (-20)
+                 | possibleToCastle c True ps = (length (closeToCastling c True ps)) * (-20)
+                 | possibleToCastle c False ps = (length (closeToCastling c False ps)) * (-20)
                  | otherwise = 0
 
 
 -- TODO: add bonus for moving multiple pieces.
 movePieceBonus :: Colour -> AllPieces -> Int
-movePieceBonus c ps = (length [x | x <- ps, getMovecount x == 0, getPieceType x /= Pawn]) * (-4)
+movePieceBonus c ps = (length [x | x <- ps, getMovecount x == 0, getPieceType x /= Pawn, getPieceType x /= Queen]) * (-8)
 
 
 -- returns true if the king is surrounded by friendly pieces.
@@ -98,7 +98,7 @@ threatenEvaluation a b = analyzePieces a (threatening a b)
 -- crude central square evaluation - if a piece controls 1 or more central squares the return value is 1.5
 evaluationCentralSquares :: Piece -> AllPieces -> Float
 evaluationCentralSquares a b | null (doesPieceControlCentralSquares a b) = 0.0
-                             | getGamePoint b == Opening = 10.0
+                             | getGamePoint b == Opening = 20.0
                              | otherwise = 2.0
 
 centralSquares :: [Pos]
