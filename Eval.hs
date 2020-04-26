@@ -76,8 +76,8 @@ protectedEvaluation a b = analyzePieces a (protecting a b)
 -- analyze the list of all pieces to return a float value for that list - currently used for threaten / protect
 analyzePieces :: Piece -> [Piece] -> Float
 analyzePieces a [] = 0
-analyzePieces a xs | pieceVal a < pieceVal y = (pieceVal y - pieceVal a) + analyzePieces a (tail xs)
-                   | otherwise = 1.0 + analyzePieces a (tail xs)
+analyzePieces a xs | pieceVal a < pieceVal y = ((pieceVal y - pieceVal a) * 2) + analyzePieces a (tail xs)
+                   | otherwise = 2.0 + analyzePieces a (tail xs)
                      where
                        y = head xs
 
