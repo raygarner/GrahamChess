@@ -8,10 +8,13 @@ import           Util
 -- some crude evaluations
 
 evalPiece :: Piece -> AllPieces -> Float
-evalPiece a ps = fromIntegral (length (legalMoves a ps)) * (pieceVal a) + pieceMaterial a ps
+evalPiece a ps = fromIntegral (length (legalMoves a ps)) -- * (pieceVal a)
+
+totalMaterial :: Colour -> AllPieces -> Float
+totalMaterial c ps = ( (1 * (sum [ pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ])) - (1 * (sum [ pieceMaterial y ps | y <- ps, getPos y /= (-1,-1), getColour y /= c ])) )
 
 totalVal :: Colour -> AllPieces -> Float
-totalVal a ps = sum [ evalPiece x ps | x <- ps, getColour x == a ]
+totalVal a ps = sum [ evalPiece x ps | x <- ps, getColour x == a ] + (totalMaterial a ps)
 
 pieceVal :: Piece -> Float
 pieceVal (Pawn,_,_,_)   = 1.0
@@ -19,6 +22,7 @@ pieceVal (Knight,_,_,_) = 3.0
 pieceVal (Bishop,_,_,_) = 3.5
 pieceVal (Rook,_,_,_)   = 5.0
 pieceVal (Queen,_,_,_)  = 9.0
+pieceVal (King,_,_,_)   = 0.0
 
 
 -- returns true if the king is surrounded by friendly pieces.
