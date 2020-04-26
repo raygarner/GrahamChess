@@ -14,10 +14,10 @@ evalPieceBonus :: Piece -> AllPieces -> Float
 evalPieceBonus a ps = (threatenKing a ps) + (protectedEvaluation a ps) + (threatenEvaluation a ps) + (evaluationCentralSquares a ps)
 
 totalMaterial :: Colour -> AllPieces -> Float
-totalMaterial c ps = ( (8 * (sum [ pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ])) - (8 * (sum [ pieceMaterial y ps | y <- ps, getPos y /= (-1,-1), getColour y /= c ])) )
+totalMaterial c ps = ( (10 * (sum [ pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ])) - (10 * (sum [ pieceMaterial y ps | y <- ps, getPos y /= (-1,-1), getColour y /= c ])) )
 
 totalMobility :: Colour -> AllPieces -> Float
-totalMobility c ps = ( 6 * sum [ evalPiece x ps | x <- ps, getColour x == c ]) - (6 * sum [ evalPiece y ps | y <- ps, getColour y /= c])
+totalMobility c ps = ( 3 * sum [ evalPiece x ps | x <- ps, getColour x == c ]) - (3 * sum [ evalPiece y ps | y <- ps, getColour y /= c])
 
 totalBonus :: Colour -> AllPieces -> Float
 totalBonus c ps = (sum [evalPieceBonus x ps | x <- ps, getColour x == c]) - (sum [evalPieceBonus y ps | y <- ps, getColour y /= c])
