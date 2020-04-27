@@ -90,8 +90,10 @@ isOnBoard a b = m >= 0 && m <= 7 && n >= 0 && n <= 7
 
 -- returns whether a square is not occupied by a friendly piece WORKING
 isValidTarget :: Piece -> Move -> AllPieces -> Bool
-isValidTarget a b c = ((isEmpty (getTarget (getPos a) b) c) || (isEnemy a z)) && isOnBoard a b
+isValidTarget a b c = ((isEmpty (getTarget (getPos a) b) c) || (isEnemy a z)) && isOnBoard a b && not (isKingInCheck k n)
                       where z = head (findPiece (getTarget (getPos a) b) c)
+                            n = executeMove a b c
+                            k = head (findPiece (findKing (getColour a) n) n)
 
 -- returns whether a square is occupied by an enemy -- WORKING
 isTargetEnemy :: Piece -> Move -> AllPieces -> Bool
