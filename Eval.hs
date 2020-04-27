@@ -39,29 +39,29 @@ pieceVal (King,_,_,_)   = 0.0
 
 -- castling bonus functions
 
---castlingPiece :: Piece -> Bool
---castlingPiece a = getPieceType a == Queen || getPieceType a == Bishop || getPieceType a == Knight
+castlingPiece :: Piece -> Bool
+castlingPiece a = getPieceType a == Queen || getPieceType a == Bishop || getPieceType a == Knight
 
--- closeToCastling :: Colour -> Bool -> AllPieces -> [Piece]
--- closeToCastling c True ps = [x | x <- ps, getColour x == c, castlingPiece x, getMovecount x == 0, getColumn (getPos x) == 5 || getColumn (getPos x) == 6]
--- closeToCastling c False ps = [x | x <- ps, getColour x == c, castlingPiece x, getMovecount x == 0, getColumn (getPos x) == 1 || getColumn (getPos x) == 2 || getColumn (getPos x) == 3]
---
--- castleBonus :: Colour -> AllPieces -> Int
--- castleBonus c ps | possibleToCastle c True ps && possibleToCastle c False ps = (min (length (closeToCastling c True ps)) (length (closeToCastling c False ps))) * (-15)
---                  | possibleToCastle c True ps = (length (closeToCastling c True ps)) * (-15)
---                  | possibleToCastle c False ps = (length (closeToCastling c False ps)) * (-15)
---                  | otherwise = 0
+closeToCastling :: Colour -> Bool -> AllPieces -> [Piece]
+closeToCastling c True ps = [x | x <- ps, getColour x == c, castlingPiece x, getMovecount x == 0, getColumn (getPos x) == 5 || getColumn (getPos x) == 6]
+closeToCastling c False ps = [x | x <- ps, getColour x == c, castlingPiece x, getMovecount x == 0, getColumn (getPos x) == 1 || getColumn (getPos x) == 2 || getColumn (getPos x) == 3]
+
+castleBonus :: Colour -> AllPieces -> Int
+castleBonus c ps | possibleToCastle c True ps && possibleToCastle c False ps = (min (length (closeToCastling c True ps)) (length (closeToCastling c False ps))) * (-15)
+                  | possibleToCastle c True ps = (length (closeToCastling c True ps)) * (-15)
+                  | possibleToCastle c False ps = (length (closeToCastling c False ps)) * (-15)
+                  | otherwise = 0
 
 -- add bonus for moving multiple pieces.
--- movePieceBonus :: Colour -> AllPieces -> Int
--- movePieceBonus c ps = (length [x | x <- ps, getMovecount x == 0, getPieceType x /= Pawn, getPieceType x /= Queen]) * (-20)
+movePieceBonus :: Colour -> AllPieces -> Int
+movePieceBonus c ps = (length [x | x <- ps, getMovecount x == 0, getPieceType x /= Pawn, getPieceType x /= Queen]) * (-20)
 
 
 -- returns true if the king is surrounded by friendly pieces.
--- isKingSurrounded :: Piece -> AllPieces -> Bool
--- isKingSurrounded a b = length x == length y
---                  where y = getSurroundingPos (getPos a)
---                        x = surroundingPieces (getColour a) y b
+isKingSurrounded :: Piece -> AllPieces -> Bool
+isKingSurrounded a b = length x == length y
+                  where y = getSurroundingPos (getPos a)
+                        x = surroundingPieces (getColour a) y b
 
 
 -- returns a float value for whether a piece is aimed at the enemy king.
@@ -74,13 +74,13 @@ isPieceAimedAtEnemyKing :: Piece -> AllPieces -> Bool
 isPieceAimedAtEnemyKing a b = isValidMove a (moveMade (getPos a) k) (a : [])
                               where k = findKing (invertColour (getColour a)) b
 
--- -- protection evaluation
--- protectedEvaluation :: Piece -> AllPieces -> Float
--- protectedEvaluation a b = analyzeProtection (protecting a b)
---
--- analyzeProtection :: [Piece] -> Float
--- analyzeProtection [] = 0
--- analyzeProtection xs = (10 - pieceVal (head xs)) / 4  + analyzeProtection (tail xs)
+-- protection evaluation
+protectedEvaluation :: Piece -> AllPieces -> Float
+protectedEvaluation a b = analyzeProtection (protecting a b)
+
+analyzeProtection :: [Piece] -> Float
+analyzeProtection [] = 0
+analyzeProtection xs = (10 - pieceVal (head xs)) / 4  + analyzeProtection (tail xs)
 
 -- analyze the list of all pieces to return a float value for that list - currently used for threaten / protect
 analyzePieces :: Piece -> [Piece] -> Float

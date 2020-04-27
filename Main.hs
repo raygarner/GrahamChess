@@ -39,7 +39,3 @@ gameLoop ps = do putStr "Your turn: \n"
 
 buildMove :: (String, String) -> (Int,Int)
 buildMove (r,c) = (read r, read c)
-
-
-
-
