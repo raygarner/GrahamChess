@@ -47,11 +47,10 @@ closeToCastling c True ps = [x | x <- ps, getColour x == c, castlingPiece x, get
 closeToCastling c False ps = [x | x <- ps, getColour x == c, castlingPiece x, getMovecount x == 0, getColumn (getPos x) == 1 || getColumn (getPos x) == 2 || getColumn (getPos x) == 3]
 
 castleBonus :: Colour -> AllPieces -> Int
-castleBonus c ps | possibleToCastle c True ps && possibleToCastle c False ps = (min (length (closeToCastling c True ps)) (length (closeToCastling c False ps))) * (-20)
-                 | possibleToCastle c True ps = (length (closeToCastling c True ps)) * (-20)
-                 | possibleToCastle c False ps = (length (closeToCastling c False ps)) * (-20)
+castleBonus c ps | possibleToCastle c True ps && possibleToCastle c False ps = (min (length (closeToCastling c True ps)) (length (closeToCastling c False ps))) * (-15)
+                 | possibleToCastle c True ps = (length (closeToCastling c True ps)) * (-15)
+                 | possibleToCastle c False ps = (length (closeToCastling c False ps)) * (-15)
                  | otherwise = 0
-
 
 -- TODO: add bonus for moving multiple pieces.
 movePieceBonus :: Colour -> AllPieces -> Int
