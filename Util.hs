@@ -90,11 +90,10 @@ isOnBoard a b = m >= 0 && m <= 7 && n >= 0 && n <= 7
                     n = getColumn (getTarget (getPos a) b)
 
 -- returns whether a square is not occupied by a friendly piece -- NOT WORKING: needs to prevent the king from being in check after the move has been made
+-- recursion problem: calls itsself through isKingInCheck
 isValidTarget :: Piece -> Move -> AllPieces -> Bool
 isValidTarget a b c = ((isEmpty (getTarget (getPos a) b) c) || (isEnemy a z)) && isOnBoard a b
                       where z = head (findPiece (getTarget (getPos a) b) c)
-                            n = executeMove a b c
-                            k = findPiece (findKing (getColour a) n) n
 
 
 -- returns whether a square is occupied by an enemy -- WORKING
@@ -217,7 +216,6 @@ findKing a b | null l = trace (show a ++ "\n" ++ show b) (-7,-7)
              | otherwise = head l
                where
                    l = [(x,y) | (t, c, (x,y), m) <- b, t == King, c == a, x > -1, y > -1, x < 8, y < 8 ]
-
 
 
 -- returns whether a king move is valid WORKING
@@ -356,6 +354,13 @@ legalKnightMoves a b = [ x | x <- y, isKnightValidMove a x b ]
                          z = [-2,-1,1,2]
                          y = [ (m,n) | m <- z, n <- z, isLShaped (m,n)]
 
+-- returns whether teh king will be in check after a move is made
+willKingBeInCheck :: Piece -> Move -> AllPieces -> Bool
+willKingBeInCheck p m ps = isKingInCheck k n
+                           where
+                               n = executeMove p m ps
+                               k = head (findPiece (findKing (getColour p) n) n)
+
 -- return a list of legal moves that a rook can make -- efficiency vs concised code?
                                                      -- 3 options shown for this function
                                                      -- recursive method more efficient bc it can stop searching one direction as soon as it encounters an obstruction?
@@ -363,7 +368,7 @@ legalKnightMoves a b = [ x | x <- y, isKnightValidMove a x b ]
                                                      -- currently i think we should leave it in its most consised and readable form and think about optimisations when we have a compiled executable
                                                      -- definition 1 uses less memory, but it is slower by 0.01s (might add up over lots of calls)
 legalRookMoves :: Piece -> AllPieces -> [Move]
-legalRookMoves a b = [ (m,n) | m <- [-7..7], n <- [-7..7], isRookValidMove a (m,n) b ]
+legalRookMoves a b = [ (m,n) | m <- [-7..7], n <- [-7..7], isRookValidMove a (m,n) b, not (willKingBeInCheck a (m,n) b) ]
 --legalRookMoves a b = [ x | x <- y, isRookValidMove a x b ]
 --                   where
 --                       y = [ (m,n) | m <- [-7..7], n <- [-7..7], isStraightMove (m,n) ]
@@ -371,9 +376,10 @@ legalRookMoves a b = [ (m,n) | m <- [-7..7], n <- [-7..7], isRookValidMove a (m,
 --                       --v = [ (0,n) | n <- [-7..7] ]
 --                       --y = z++v
 
+
 -- return a list of legal moves for a bishop -- same questions as legalRookMoves
 legalBishopMoves :: Piece -> AllPieces -> [Move]
-legalBishopMoves a b = [ (m,n) | m <- [-7..7], n <- [-7..7], isBishopValidMove a (m,n) b ]
+legalBishopMoves a b = [ (m,n) | m <- [-7..7], n <- [-7..7], isBishopValidMove a (m,n) b, not (willKingBeInCheck a (m,n) b) ]
 --legalBishopMoves a b = [ x | x <- y , isBishopValidMove a x b ]
 --                     where
 --                         y = [ (m,n) | m <- [-7..7], n <- [-7..7], isDiagonal (m,n) ]
@@ -384,11 +390,11 @@ legalQueenMoves a b = (legalBishopMoves a b) ++ (legalRookMoves a b)
 
 -- returns a list of legal moves for a pawn
 legalPawnMoves :: Piece -> AllPieces -> [Move]
-legalPawnMoves a b = [ (m,n) | m <- [-2..2], n <- [-1..1], isPawnValidMove a (m,n) b || isValidEnPassant a (m,n) b]
+legalPawnMoves a b = [ (m,n) | m <- [-2..2], n <- [-1..1], isPawnValidMove a (m,n) b || isValidEnPassant a (m,n) b, not (willKingBeInCheck a (m,n) b) ]
 
 -- returns a list of legal moves for a king
 legalKingMoves :: Piece -> AllPieces -> [Move]
-legalKingMoves a b = [(m,n) | m <- [-1..1], n <- [-1..1], validKingMove a (m,n) b]
+legalKingMoves a b = [(m,n) | m <- [-1..1], n <- [-1..1], validKingMove a (m,n) b, not (willKingBeInCheck a (m,n) b)]
 
 -- returns a list of legal moves for a piece
 legalMoves :: Piece -> AllPieces -> [Move]
