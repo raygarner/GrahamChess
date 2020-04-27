@@ -1,14 +1,16 @@
 TESTING
 
+bugs
+----
+-> legal moves includes moves that leave the king in check. getValidTarget should make sure this doesnt happen
+
 evaluation
 ----------
--> tweak bonuses
+-> tweak weights of different elements
 
 move searching
 --------------
 -> make it play mating move if one is detected
-
-make a function that collects together all the evaluation information
 
 main
 ----

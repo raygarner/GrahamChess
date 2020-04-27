@@ -89,7 +89,7 @@ isOnBoard a b = m >= 0 && m <= 7 && n >= 0 && n <= 7
                     m = getRow (getTarget (getPos a) b)
                     n = getColumn (getTarget (getPos a) b)
 
--- returns whether a square is not occupied by a friendly piece WORKING
+-- returns whether a square is not occupied by a friendly piece -- NOT WORKING: needs to prevent the king from being in check after the move has been made
 isValidTarget :: Piece -> Move -> AllPieces -> Bool
 isValidTarget a b c = ((isEmpty (getTarget (getPos a) b) c) || (isEnemy a z)) && isOnBoard a b -- && ((findKing (getColour a) n) == (-7,-7) || not (isKingInCheck (head k) n))
                       where z = head (findPiece (getTarget (getPos a) b) c)
