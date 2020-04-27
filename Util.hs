@@ -90,10 +90,10 @@ isOnBoard a b = m >= 0 && m <= 7 && n >= 0 && n <= 7
 
 -- returns whether a square is not occupied by a friendly piece WORKING
 isValidTarget :: Piece -> Move -> AllPieces -> Bool
-isValidTarget a b c = ((isEmpty (getTarget (getPos a) b) c) || (isEnemy a z)) && isOnBoard a b && not (isKingInCheck k n)
+isValidTarget a b c = ((isEmpty (getTarget (getPos a) b) c) || (isEnemy a z)) && isOnBoard a b && not (null k) && not (isKingInCheck (head k) n)
                       where z = head (findPiece (getTarget (getPos a) b) c)
                             n = executeMove a b c
-                            k = head (findPiece (findKing (getColour a) n) n)
+                            k = findPiece (findKing (getColour a) n) n
 
 -- returns whether a square is occupied by an enemy -- WORKING
 isTargetEnemy :: Piece -> Move -> AllPieces -> Bool
@@ -211,7 +211,12 @@ isQueenValidMove a b c = isRookValidMove a b c || isBishopValidMove a b c
 
 -- returns the position of the king WORKING
 findKing :: Colour -> AllPieces -> Pos
-findKing a b = head [p | (t, c, p, m) <- b, t == King, c == a]
+findKing a b | null l = (-7,-7)
+             | otherwise = head l
+               where
+                   l = [p | (t, c, p, m) <- b, t == King, c == a]
+
+
 
 -- returns whether a king move is valid WORKING
 validKingMove :: Piece -> Move -> AllPieces -> Bool
