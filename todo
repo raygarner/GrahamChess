@@ -2,15 +2,17 @@ TESTING
 
 bugs
 ----
--> legal moves includes moves that leave the king in check. getValidTarget should make sure this doesnt happen
+-> Graham sometimes doesnt make a move at all (his move fails validation probably)
 
 evaluation
 ----------
 -> tweak weights of different elements
+-> dont bring the queen out so early
+->
 
 move searching
 --------------
--> make it play mating move if one is detected
+-> make it instantly play mating move if one is detected
 
 main
 ----
