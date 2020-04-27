@@ -133,8 +133,8 @@ isPawnCapture (_,White,_,_) (a,b) = a == -1 && abs b == 1
 
 --returns whether a pawn move is a regular pawn move -- swapped a and b (row,column) WORKING
 isBasicPawnMove :: Piece -> Move -> AllPieces-> Bool
-isBasicPawnMove (_,Black,(1,n),_) (a,b)  ps = ((a == 2 && (isStraightMovePathEmpty (1,n) (a,b) ps)) || a == 1) && b == 0
-isBasicPawnMove (_,White,(6,n),_) (a,b)  ps = ((a == -2 && (isStraightMovePathEmpty (6,n) (a,b) ps)) || a == -1) && b == 0
+isBasicPawnMove (_,Black,(1,n),_) (a,b)  ps = ((a == 2 && (isStraightMovePathEmpty (1,n) (a,0) ps)) || a == 1) && b == 0
+isBasicPawnMove (_,White,(6,n),_) (a,b)  ps = ((a == -2 && (isStraightMovePathEmpty (6,n) (a,0) ps)) || a == -1) && b == 0
 isBasicPawnMove (_,Black,_,_) (a,b)      ps = a == 1 && b == 0
 isBasicPawnMove (_,White,_,_) (a,b)      ps = a == -1 && b == 0
 
