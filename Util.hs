@@ -6,6 +6,7 @@ import           Debug
 import           Init
 import           System.Directory
 import           TypeDefs
+import           Debug.Trace
 
 -- GETTERS
 
@@ -88,10 +89,12 @@ isOnBoard a b = m >= 0 && m <= 7 && n >= 0 && n <= 7
                     m = getRow (getTarget (getPos a) b)
                     n = getColumn (getTarget (getPos a) b)
 
--- returns whether a square is not occupied by a friendly piece WORKING
+-- returns whether a square is not occupied by a friendly piece -- NOT WORKING: needs to prevent the king from being in check after the move has been made
 isValidTarget :: Piece -> Move -> AllPieces -> Bool
-isValidTarget a b c = ((isEmpty (getTarget (getPos a) b) c) || (isEnemy a z)) && isOnBoard a b
+isValidTarget a b c = ((isEmpty (getTarget (getPos a) b) c) || (isEnemy a z)) && isOnBoard a b -- && ((findKing (getColour a) n) == (-7,-7) || not (isKingInCheck (head k) n))
                       where z = head (findPiece (getTarget (getPos a) b) c)
+                            n = executeMove a b c
+                            k = findPiece (findKing (getColour a) n) n
 
 -- returns whether a square is occupied by an enemy -- WORKING
 isTargetEnemy :: Piece -> Move -> AllPieces -> Bool
@@ -132,11 +135,11 @@ isPawnCapture (_,White,_,_) (a,b) = a == -1 && abs b == 1
 --isPawnCapture(_,White,_) (a,b)  = b == -1 && abs a == 0
 
 --returns whether a pawn move is a regular pawn move -- swapped a and b (row,column) WORKING
-isBasicPawnMove :: Piece -> Move -> Bool
-isBasicPawnMove (_,Black,(1,_),_) (a,b) = (a == 2 || a == 1) && b == 0
-isBasicPawnMove (_,White,(6,_),_) (a,b) = (a == -2 || a == -1) && b == 0
-isBasicPawnMove (_,Black,_,_) (a,b)     = a == 1 && b == 0
-isBasicPawnMove (_,White,_,_) (a,b)     = a == -1 && b == 0
+isBasicPawnMove :: Piece -> Move -> AllPieces-> Bool
+isBasicPawnMove (_,Black,(1,n),_) (a,b)  ps = ((a == 2 && (isStraightMovePathEmpty (1,n) (a,0) ps)) || a == 1) && b == 0
+isBasicPawnMove (_,White,(6,n),_) (a,b)  ps = ((a == -2 && (isStraightMovePathEmpty (6,n) (a,0) ps)) || a == -1) && b == 0
+isBasicPawnMove (_,Black,_,_) (a,b)      ps = a == 1 && b == 0
+isBasicPawnMove (_,White,_,_) (a,b)      ps = a == -1 && b == 0
 
 -- returns whether a pawn move is a promotion
 isValidPromotion :: Piece -> Move -> AllPieces -> Bool
@@ -169,7 +172,11 @@ isLShaped (a,b) = (abs a == 2 && abs b == 1) || (abs a == 1 && abs b == 2)
 
 -- returns whether a pawn move is valid
 isPawnValidMove :: Piece -> Move -> AllPieces -> Bool
+<<<<<<< HEAD
 isPawnValidMove a b c = isValidTarget a b c && ( (isEmpty (getTarget (getPos a) b) c && isBasicPawnMove a b && isStraightMovePathEmpty (getPos a) b c) || (isTargetEnemy a b c && isPawnCapture a b))
+=======
+isPawnValidMove a b c = isValidTarget a b c && ( (isEmpty (getTarget (getPos a) b) c && isBasicPawnMove a b c) || (isTargetEnemy a b c && isPawnCapture a b))
+>>>>>>> f633d4c6875641a010f093aebbe8f96df5ea6400
 
 -- returns whether a move is a valid en passant move
 isValidEnPassant :: Piece -> Move -> AllPieces -> Bool
@@ -209,7 +216,12 @@ isQueenValidMove a b c = isRookValidMove a b c || isBishopValidMove a b c
 
 -- returns the position of the king WORKING
 findKing :: Colour -> AllPieces -> Pos
-findKing a b = head [p | (t, c, p, m) <- b, t == King, c == a]
+findKing a b | null l = trace (show a ++ "\n" ++ show b) (-7,-7)
+             | otherwise = head l
+               where
+                   l = [(x,y) | (t, c, (x,y), m) <- b, t == King, c == a, x > -1, y > -1, x < 8, y < 8 ]
+
+
 
 -- returns whether a king move is valid WORKING
 validKingMove :: Piece -> Move -> AllPieces -> Bool

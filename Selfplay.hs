@@ -8,6 +8,7 @@ import           TypeDefs
 import           Util
 import           Data.Char
 import           Search
+import           UI
 
 main :: IO ()
 main = gameLoop White addAllPieces
@@ -17,18 +18,17 @@ main = gameLoop White addAllPieces
 gameLoop :: Colour -> AllPieces -> IO ()
 gameLoop c ps = do putStr "Graham is thinking of a move...\n"
                    response <- return (findRealBestMove c ps)
-                   print response
-                   putStr "Graham has made his move...\n"
+                   --print response
+                   --putStr "Graham has made his move...\n"
+                   printBoard 0 ps
                    move <- return (extractMove response)
-                   print move
+                   --print move
                    piece <- return (extractPiece response)
-                   print piece
+                   --print piece
                    gameLoop (invertColour c) (movePiece piece move ps)
 
 
 buildMove :: (String, String) -> (Int,Int)
 buildMove (r,c) = (read r, read c)
-
-
 
 

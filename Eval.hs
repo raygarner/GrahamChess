@@ -14,10 +14,14 @@ evalPieceBonus :: Piece -> AllPieces -> Float
 evalPieceBonus a ps = (threatenKing a ps) + (protectedEvaluation a ps) + (threatenEvaluation a ps) + (evaluationCentralSquares a ps)
 
 totalMaterial :: Colour -> AllPieces -> Float
+<<<<<<< HEAD
 totalMaterial c ps = ( (20 * (sum [ pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ])) - (20 * (sum [ pieceMaterial y ps | y <- ps, getPos y /= (-1,-1), getColour y /= c ])) )
+=======
+totalMaterial c ps = ( (40 * (sum [ pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ])) - (40 * (sum [ pieceMaterial y ps | y <- ps, getPos y /= (-1,-1), getColour y /= c ])) )
+>>>>>>> f633d4c6875641a010f093aebbe8f96df5ea6400
 
 totalMobility :: Colour -> AllPieces -> Float
-totalMobility c ps = ( 3 * sum [ evalPiece x ps | x <- ps, getColour x == c ]) - (3 * sum [ evalPiece y ps | y <- ps, getColour y /= c])
+totalMobility c ps = ( 6 * sum [ evalPiece x ps | x <- ps, getColour x == c ]) - (6 * sum [ evalPiece y ps | y <- ps, getColour y /= c])
 
 totalBonus :: Colour -> AllPieces -> Float
 totalBonus c ps = (sum [evalPieceBonus x ps | x <- ps, getColour x == c]) - (sum [evalPieceBonus y ps | y <- ps, getColour y /= c])
@@ -54,7 +58,7 @@ castleBonus c ps | possibleToCastle c True ps && possibleToCastle c False ps = (
 
 -- TODO: add bonus for moving multiple pieces.
 movePieceBonus :: Colour -> AllPieces -> Int
-movePieceBonus c ps = (length [x | x <- ps, getMovecount x == 0, getPieceType x /= Pawn, getPieceType x /= Queen]) * (-8)
+movePieceBonus c ps = (length [x | x <- ps, getMovecount x == 0, getPieceType x /= Pawn, getPieceType x /= Queen]) * (-20)
 
 
 -- returns true if the king is surrounded by friendly pieces.
@@ -97,8 +101,8 @@ threatenEvaluation a b = analyzePieces a (threatening a b)
 -- crude central square evaluation - if a piece controls 1 or more central squares the return value is 1.5
 evaluationCentralSquares :: Piece -> AllPieces -> Float
 evaluationCentralSquares a b | null (doesPieceControlCentralSquares a b) = 0.0
-                             | getGamePoint b == Opening = 20.0
-                             | otherwise = 2.0
+--                             | getGamePoint b == Opening = 20.0
+                             | otherwise = fromIntegral (length (doesPieceControlCentralSquares a b)) * 40.0
 
 centralSquares :: [Pos]
 centralSquares = [(row,col) | row <- [3..4], col <- [3..4]]
@@ -139,7 +143,7 @@ isPassedPawn a ps = all (==True) [pawnClearAhead (getColour a) (y,n) ps | y <- [
                         d = if getColour a == White then -1 else 1
                         e = if getColour a == White then 1 else 6
 
--- if a piece is going to be captured then it doesnt really have any material NOT FULL COMPLETE: NEEDS TO TAKE VALUE OF THREATS INTO ACCOUNT
+-- if a piece is going to be captured then it doesnt really have any material
 pieceMaterial :: Piece -> AllPieces -> Float
 pieceMaterial a ps | (length (threatenedBy a ps) > length (protectedBy a ps)) = 0
                    | getLowestVal (threatenedBy a ps) < pieceVal a = 0
