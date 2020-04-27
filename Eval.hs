@@ -52,11 +52,6 @@ castleBonus c ps | possibleToCastle c True ps && possibleToCastle c False ps = (
                  | possibleToCastle c False ps = (length (closeToCastling c False ps)) * (-15)
                  | otherwise = 0
 
-executeCastle :: Colour -> AllPieces -> Float
-executeCastle c ps | validCastle king (0,2) ps || validCastle king (0,-2) ps = 150
-                   | otherwise = 0
-                   where
-                     king = head (findPiece (findKing c ps) ps)
 -- TODO: add bonus for moving multiple pieces.
 movePieceBonus :: Colour -> AllPieces -> Int
 movePieceBonus c ps = (length [x | x <- ps, getMovecount x == 0, getPieceType x /= Pawn, getPieceType x /= Queen]) * (-8)
