@@ -6,6 +6,7 @@ import           Debug
 import           Init
 import           System.Directory
 import           TypeDefs
+import           Debug.Trace
 
 -- GETTERS
 
@@ -90,7 +91,7 @@ isOnBoard a b = m >= 0 && m <= 7 && n >= 0 && n <= 7
 
 -- returns whether a square is not occupied by a friendly piece WORKING
 isValidTarget :: Piece -> Move -> AllPieces -> Bool
-isValidTarget a b c = ((isEmpty (getTarget (getPos a) b) c) || (isEnemy a z)) && isOnBoard a b && not (null k) && not (isKingInCheck (head k) n)
+isValidTarget a b c = ((isEmpty (getTarget (getPos a) b) c) || (isEnemy a z)) && isOnBoard a b -- && ((findKing (getColour a) n) == (-7,-7) || not (isKingInCheck (head k) n))
                       where z = head (findPiece (getTarget (getPos a) b) c)
                             n = executeMove a b c
                             k = findPiece (findKing (getColour a) n) n
@@ -211,10 +212,10 @@ isQueenValidMove a b c = isRookValidMove a b c || isBishopValidMove a b c
 
 -- returns the position of the king WORKING
 findKing :: Colour -> AllPieces -> Pos
-findKing a b | null l = (-7,-7)
+findKing a b | null l = trace (show a ++ "\n" ++ show b) (-7,-7)
              | otherwise = head l
                where
-                   l = [p | (t, c, p, m) <- b, t == King, c == a]
+                   l = [(x,y) | (t, c, (x,y), m) <- b, t == King, c == a, x > -1, y > -1, x < 8, y < 8 ]
 
 
 
