@@ -229,7 +229,7 @@ validKingMove a (m,n) b | abs n == 2 = validCastle a (m,n) b
 
 -- returns whether a move is valid
 isValidMove :: Piece -> Move -> AllPieces -> Bool
-isValidMove (Pawn, col, pos, mc) x y   = isPawnValidMove (Pawn, col, pos, mc) x y
+isValidMove (Pawn, col, pos, mc) x y   = isPawnValidMove (Pawn, col, pos, mc) x y || isValidEnPassant (Pawn,col,pos,mc) x y || isValidPromotion (Pawn,col,pos,mc) x y
 isValidMove (Knight, col, pos, mc) x y = isKnightValidMove (Knight, col, pos, mc) x y
 isValidMove (Bishop, col, pos, mc) x y = isBishopValidMove (Bishop, col, pos, mc) x y
 isValidMove (Rook, col, pos, mc) x y   = isRookValidMove (Rook, col, pos, mc) x y
@@ -279,11 +279,9 @@ takePiece (p, col, pos, mc) d = (p, col, (-1,-1), 0) : removePiece (p, col, pos,
 
 --move piece
 movePiece :: Piece -> Move -> AllPieces -> AllPieces
-movePiece a b c | isValidEnPassant a b c = captureEnPassant a b c
-                | isValidPromotion a b c = promotePawn a b c
-                | isValidMove a b c && not (isKingInCheck (King, (getColour a), king, getMovecount a) c) = executeMove a b c
+movePiece a b c | isValidMove a b c && not (willKingBeInCheck a b c) = executeMove a b c
                 | otherwise = c
-                  where king = findKing (getColour a) c
+
 
 -- returns whether a king has moved
 --hasKingNotMoved :: Colour -> Bool -> Bool -> Bool
