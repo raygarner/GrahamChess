@@ -282,7 +282,7 @@ movePiece :: Piece -> Move -> AllPieces -> AllPieces
 movePiece a b c | isValidEnPassant a b c = captureEnPassant a b c
                 | isValidPromotion a b c = promotePawn a b c
                 | isValidMove a b c && not (isKingInCheck (King, (getColour a), king, getMovecount a) c) = executeMove a b c
-                | otherwise = c
+                | otherwise = trace (show a ++ " " ++ show b ++ "\n") c
                   where king = findKing (getColour a) c
 
 -- returns whether a king has moved
