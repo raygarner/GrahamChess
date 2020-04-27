@@ -11,10 +11,10 @@ evalPiece :: Piece -> AllPieces -> Float
 evalPiece a ps = fromIntegral (length (legalMoves a ps))
 
 evalPieceBonus :: Piece -> AllPieces -> Float
-evalPieceBonus a ps = (threatenKing a ps) + (protectedEvaluation a ps) + (threatenEvaluation a ps) + (evaluationCentralSquares a ps)
+evalPieceBonus a ps = (threatenKing a ps) + (threatenEvaluation a ps) + (evaluationCentralSquares a ps)
 
 totalMaterial :: Colour -> AllPieces -> Float
-totalMaterial c ps = ( (40 * (sum [ pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ])) - (40 * (sum [ pieceMaterial y ps | y <- ps, getPos y /= (-1,-1), getColour y /= c ])) )
+totalMaterial c ps = ( (50 * (sum [ pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ])) - (50 * (sum [ pieceMaterial y ps | y <- ps, getPos y /= (-1,-1), getColour y /= c ])) )
 
 totalMobility :: Colour -> AllPieces -> Float
 totalMobility c ps = ( 6 * sum [ evalPiece x ps | x <- ps, getColour x == c ]) - (6 * sum [ evalPiece y ps | y <- ps, getColour y /= c])
@@ -26,7 +26,7 @@ allPawns :: Colour -> AllPieces -> Float
 allPawns c ps = (sum [passPawnScore x ps | x <- ps, getColour x == c, getPieceType x == Pawn]) - (sum[passPawnScore y ps | y <- ps, getColour y /= c, getPieceType y == Pawn])
 
 totalVal :: Colour -> AllPieces -> Float
-totalVal a ps = (totalMobility a ps) + (totalMaterial a ps) + (totalBonus a ps) + (allPawns a ps) + (fromIntegral (castleBonus a ps)) + (fromIntegral (movePieceBonus a ps))
+totalVal a ps = (totalMobility a ps) + (totalMaterial a ps) + (totalBonus a ps) + (allPawns a ps)
 
 pieceVal :: Piece -> Float
 pieceVal (Pawn,_,_,_)   = 1.0
@@ -39,34 +39,34 @@ pieceVal (King,_,_,_)   = 0.0
 
 -- castling bonus functions
 
-castlingPiece :: Piece -> Bool
-castlingPiece a = getPieceType a == Queen || getPieceType a == Bishop || getPieceType a == Knight
+--castlingPiece :: Piece -> Bool
+--castlingPiece a = getPieceType a == Queen || getPieceType a == Bishop || getPieceType a == Knight
 
-closeToCastling :: Colour -> Bool -> AllPieces -> [Piece]
-closeToCastling c True ps = [x | x <- ps, getColour x == c, castlingPiece x, getMovecount x == 0, getColumn (getPos x) == 5 || getColumn (getPos x) == 6]
-closeToCastling c False ps = [x | x <- ps, getColour x == c, castlingPiece x, getMovecount x == 0, getColumn (getPos x) == 1 || getColumn (getPos x) == 2 || getColumn (getPos x) == 3]
+-- closeToCastling :: Colour -> Bool -> AllPieces -> [Piece]
+-- closeToCastling c True ps = [x | x <- ps, getColour x == c, castlingPiece x, getMovecount x == 0, getColumn (getPos x) == 5 || getColumn (getPos x) == 6]
+-- closeToCastling c False ps = [x | x <- ps, getColour x == c, castlingPiece x, getMovecount x == 0, getColumn (getPos x) == 1 || getColumn (getPos x) == 2 || getColumn (getPos x) == 3]
+--
+-- castleBonus :: Colour -> AllPieces -> Int
+-- castleBonus c ps | possibleToCastle c True ps && possibleToCastle c False ps = (min (length (closeToCastling c True ps)) (length (closeToCastling c False ps))) * (-15)
+--                  | possibleToCastle c True ps = (length (closeToCastling c True ps)) * (-15)
+--                  | possibleToCastle c False ps = (length (closeToCastling c False ps)) * (-15)
+--                  | otherwise = 0
 
-castleBonus :: Colour -> AllPieces -> Int
-castleBonus c ps | possibleToCastle c True ps && possibleToCastle c False ps = (min (length (closeToCastling c True ps)) (length (closeToCastling c False ps))) * (-15)
-                 | possibleToCastle c True ps = (length (closeToCastling c True ps)) * (-15)
-                 | possibleToCastle c False ps = (length (closeToCastling c False ps)) * (-15)
-                 | otherwise = 0
-
--- TODO: add bonus for moving multiple pieces.
-movePieceBonus :: Colour -> AllPieces -> Int
-movePieceBonus c ps = (length [x | x <- ps, getMovecount x == 0, getPieceType x /= Pawn, getPieceType x /= Queen]) * (-20)
+-- add bonus for moving multiple pieces.
+-- movePieceBonus :: Colour -> AllPieces -> Int
+-- movePieceBonus c ps = (length [x | x <- ps, getMovecount x == 0, getPieceType x /= Pawn, getPieceType x /= Queen]) * (-20)
 
 
 -- returns true if the king is surrounded by friendly pieces.
-isKingSurrounded :: Piece -> AllPieces -> Bool
-isKingSurrounded a b = length x == length y
-                 where y = getSurroundingPos (getPos a)
-                       x = surroundingPieces (getColour a) y b
+-- isKingSurrounded :: Piece -> AllPieces -> Bool
+-- isKingSurrounded a b = length x == length y
+--                  where y = getSurroundingPos (getPos a)
+--                        x = surroundingPieces (getColour a) y b
 
 
 -- returns a float value for whether a piece is aimed at the enemy king.
 threatenKing :: Piece -> AllPieces -> Float
-threatenKing a b | isPieceAimedAtEnemyKing a b = 3.0
+threatenKing a b | isPieceAimedAtEnemyKing a b = 5.0
                  | otherwise = 0.0
 
 -- returns a bool value for whether a piece is aimed at an enemy king.
@@ -74,13 +74,13 @@ isPieceAimedAtEnemyKing :: Piece -> AllPieces -> Bool
 isPieceAimedAtEnemyKing a b = isValidMove a (moveMade (getPos a) k) (a : [])
                               where k = findKing (invertColour (getColour a)) b
 
--- protection evaluation
-protectedEvaluation :: Piece -> AllPieces -> Float
-protectedEvaluation a b = analyzeProtection (protecting a b)
-
-analyzeProtection :: [Piece] -> Float
-analyzeProtection [] = 0
-analyzeProtection xs = (10 - pieceVal (head xs)) / 4  + analyzeProtection (tail xs)
+-- -- protection evaluation
+-- protectedEvaluation :: Piece -> AllPieces -> Float
+-- protectedEvaluation a b = analyzeProtection (protecting a b)
+--
+-- analyzeProtection :: [Piece] -> Float
+-- analyzeProtection [] = 0
+-- analyzeProtection xs = (10 - pieceVal (head xs)) / 4  + analyzeProtection (tail xs)
 
 -- analyze the list of all pieces to return a float value for that list - currently used for threaten / protect
 analyzePieces :: Piece -> [Piece] -> Float
@@ -97,8 +97,8 @@ threatenEvaluation a b = analyzePieces a (threatening a b)
 -- crude central square evaluation - if a piece controls 1 or more central squares the return value is 1.5
 evaluationCentralSquares :: Piece -> AllPieces -> Float
 evaluationCentralSquares a b | null (doesPieceControlCentralSquares a b) = 0.0
---                             | getGamePoint b == Opening = 20.0
-                             | otherwise = fromIntegral (length (doesPieceControlCentralSquares a b)) * 40.0
+                             | getGamePoint b == Opening = fromIntegral (length (doesPieceControlCentralSquares a b)) * 40.0
+                             | otherwise = 5.0
 
 centralSquares :: [Pos]
 centralSquares = [(row,col) | row <- [3..4], col <- [3..4]]
