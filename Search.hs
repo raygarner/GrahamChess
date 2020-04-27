@@ -12,7 +12,7 @@ findRealBestMove c ps = findStrongestMoveFromAll [ addTrueEval (c,c) 0 x ps | x 
 
 -- updates the evaluation for moves by looking moves into the futur2
 addTrueEval :: (Colour,Colour) -> Int -> (Piece,Move,Float) -> AllPieces -> (Piece,Move,Float)
-addTrueEval (c,nc) l (p,m,f) ps | l == 1 = (p,m, (totalVal c ps) + f)
+addTrueEval (c,nc) l (p,m,f) ps | l == 10 = (p,m, (totalVal c ps) + f)
                                 | l == 0 = addTrueEval (c,(invertColour nc)) (l+1) (p,m,f) (movePiece p m ps)
                                 | otherwise = addTrueEval (c,(invertColour nc)) (l+1) (p,m,f+(totalVal c ps)) (makeSingleBestMove e ps)
                                   where
