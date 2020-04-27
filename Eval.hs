@@ -14,10 +14,10 @@ evalPieceBonus :: Piece -> AllPieces -> Float
 evalPieceBonus a ps = (threatenKing a ps) + (threatenEvaluation a ps) + (evaluationCentralSquares a ps)
 
 totalMaterial :: Colour -> AllPieces -> Float
-totalMaterial c ps = ( (50 * (sum [ pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ])) - (50 * (sum [ pieceMaterial y ps | y <- ps, getPos y /= (-1,-1), getColour y /= c ])) )
+totalMaterial c ps = ( (sum [ 50 * pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - (sum [ 50 * pieceMaterial y ps | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
 
 totalMobility :: Colour -> AllPieces -> Float
-totalMobility c ps = ( 6 * sum [ evalPiece x ps | x <- ps, getColour x == c ]) - (6 * sum [ evalPiece y ps | y <- ps, getColour y /= c])
+totalMobility c ps = ( 1 * sum [ evalPiece x ps | x <- ps, getColour x == c, getPos x /= (-1,-1) ]) - (1 * sum [ evalPiece y ps | y <- ps, getColour y /= c, getPos y /= (-1,-1) ])
 
 totalBonus :: Colour -> AllPieces -> Float
 totalBonus c ps = (sum [evalPieceBonus x ps | x <- ps, getColour x == c]) - (sum [evalPieceBonus y ps | y <- ps, getColour y /= c])
@@ -26,7 +26,7 @@ allPawns :: Colour -> AllPieces -> Float
 allPawns c ps = (sum [passPawnScore x ps | x <- ps, getColour x == c, getPieceType x == Pawn]) - (sum[passPawnScore y ps | y <- ps, getColour y /= c, getPieceType y == Pawn])
 
 totalVal :: Colour -> AllPieces -> Float
-totalVal a ps = (totalMobility a ps) + (totalMaterial a ps) + (totalBonus a ps) + (allPawns a ps)
+totalVal a ps = (totalMobility a ps) + (totalMaterial a ps) + (totalBonus a ps)  + (allPawns a ps)
 
 pieceVal :: Piece -> Float
 pieceVal (Pawn,_,_,_)   = 1.0
@@ -141,8 +141,8 @@ isPassedPawn a ps = all (==True) [pawnClearAhead (getColour a) (y,n) ps | y <- [
 
 -- if a piece is going to be captured then it doesnt really have any material
 pieceMaterial :: Piece -> AllPieces -> Float
-pieceMaterial a ps | (length (threatenedBy a ps) > length (protectedBy a ps)) = 0
-                   | getLowestVal (threatenedBy a ps) < pieceVal a = 0
+pieceMaterial a ps | (length (threatenedBy a ps) > length (protectedBy a ps)) = 0 - pieceVal a
+                   | getLowestVal (threatenedBy a ps) < pieceVal a = 0 - pieceVal a
                    | otherwise = pieceVal a
 
 -- returns the value of the lowest value piece in a list of pieces
