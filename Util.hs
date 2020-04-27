@@ -341,6 +341,7 @@ possibleToCastle c False ps = not (null (findPiece (getQueensCastle c) ps)) && g
 validCastle :: Piece -> Move -> AllPieces -> Bool
 validCastle a (0,2) b  = isStraightMovePathEmpty (getPos a) (0,2) b && possibleToCastle (getColour a) True b
 validCastle a (0,-2) b = isStraightMovePathEmpty (getPos a) (0,-3) b && possibleToCastle (getColour a) False b
+validCastle _ _ _ = False
 
 -- executes a castle move -- WORKING
 executeCastle :: Piece -> Move -> AllPieces -> AllPieces
