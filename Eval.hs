@@ -14,7 +14,7 @@ evalPieceBonus :: Piece -> AllPieces -> Float
 evalPieceBonus a ps = (threatenKing a ps) + (protectedEvaluation a ps) + (threatenEvaluation a ps) + (evaluationCentralSquares a ps)
 
 totalMaterial :: Colour -> AllPieces -> Float
-totalMaterial c ps = ( (30 * (sum [ pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ])) - (30 * (sum [ pieceMaterial y ps | y <- ps, getPos y /= (-1,-1), getColour y /= c ])) )
+totalMaterial c ps = ( (40 * (sum [ pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ])) - (40 * (sum [ pieceMaterial y ps | y <- ps, getPos y /= (-1,-1), getColour y /= c ])) )
 
 totalMobility :: Colour -> AllPieces -> Float
 totalMobility c ps = ( 3 * sum [ evalPiece x ps | x <- ps, getColour x == c ]) - (3 * sum [ evalPiece y ps | y <- ps, getColour y /= c])
@@ -140,7 +140,7 @@ isPassedPawn a ps = all (==True) [pawnClearAhead (getColour a) (y,n) ps | y <- [
                         d = if getColour a == White then -1 else 1
                         e = if getColour a == White then 1 else 6
 
--- if a piece is going to be captured then it doesnt really have any material NOT FULL COMPLETE: NEEDS TO TAKE VALUE OF THREATS INTO ACCOUNT
+-- if a piece is going to be captured then it doesnt really have any material
 pieceMaterial :: Piece -> AllPieces -> Float
 pieceMaterial a ps | (length (threatenedBy a ps) > length (protectedBy a ps)) = 0
                    | getLowestVal (threatenedBy a ps) < pieceVal a = 0
