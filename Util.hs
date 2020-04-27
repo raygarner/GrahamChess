@@ -132,11 +132,11 @@ isPawnCapture (_,White,_,_) (a,b) = a == -1 && abs b == 1
 --isPawnCapture(_,White,_) (a,b)  = b == -1 && abs a == 0
 
 --returns whether a pawn move is a regular pawn move -- swapped a and b (row,column) WORKING
-isBasicPawnMove :: Piece -> Move -> Bool
-isBasicPawnMove (_,Black,(1,_),_) (a,b) = (a == 2 || a == 1) && b == 0
-isBasicPawnMove (_,White,(6,_),_) (a,b) = (a == -2 || a == -1) && b == 0
-isBasicPawnMove (_,Black,_,_) (a,b)     = a == 1 && b == 0
-isBasicPawnMove (_,White,_,_) (a,b)     = a == -1 && b == 0
+isBasicPawnMove :: Piece -> Move -> AllPieces-> Bool
+isBasicPawnMove (_,Black,(1,n),_) (a,b)  ps = ((a == 2 && (isStraightMovePathEmpty (1,n) (a,b) ps)) || a == 1) && b == 0
+isBasicPawnMove (_,White,(6,n),_) (a,b)  ps = ((a == -2 && (isStraightMovePathEmpty (6,n) (a,b) ps)) || a == -1) && b == 0
+isBasicPawnMove (_,Black,_,_) (a,b)      ps = a == 1 && b == 0
+isBasicPawnMove (_,White,_,_) (a,b)      ps = a == -1 && b == 0
 
 -- returns whether a pawn move is a promotion
 isValidPromotion :: Piece -> Move -> AllPieces -> Bool
@@ -169,7 +169,7 @@ isLShaped (a,b) = (abs a == 2 && abs b == 1) || (abs a == 1 && abs b == 2)
 
 -- returns whether a pawn move is valid
 isPawnValidMove :: Piece -> Move -> AllPieces -> Bool
-isPawnValidMove a b c = isValidTarget a b c && ( (isEmpty (getTarget (getPos a) b) c && isBasicPawnMove a b) || (isTargetEnemy a b c && isPawnCapture a b))
+isPawnValidMove a b c = isValidTarget a b c && ( (isEmpty (getTarget (getPos a) b) c && isBasicPawnMove a b c) || (isTargetEnemy a b c && isPawnCapture a b))
 
 -- returns whether a move is a valid en passant move
 isValidEnPassant :: Piece -> Move -> AllPieces -> Bool

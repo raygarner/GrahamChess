@@ -55,7 +55,7 @@ castleBonus c ps | possibleToCastle c True ps && possibleToCastle c False ps = (
 
 -- TODO: add bonus for moving multiple pieces.
 movePieceBonus :: Colour -> AllPieces -> Int
-movePieceBonus c ps = (length [x | x <- ps, getMovecount x == 0, getPieceType x /= Pawn, getPieceType x /= Queen]) * (-8)
+movePieceBonus c ps = (length [x | x <- ps, getMovecount x == 0, getPieceType x /= Pawn, getPieceType x /= Queen]) * (-20)
 
 
 -- returns true if the king is surrounded by friendly pieces.
@@ -98,8 +98,8 @@ threatenEvaluation a b = analyzePieces a (threatening a b)
 -- crude central square evaluation - if a piece controls 1 or more central squares the return value is 1.5
 evaluationCentralSquares :: Piece -> AllPieces -> Float
 evaluationCentralSquares a b | null (doesPieceControlCentralSquares a b) = 0.0
-                             | getGamePoint b == Opening = 20.0
-                             | otherwise = 2.0
+--                             | getGamePoint b == Opening = 20.0
+                             | otherwise = 40.0
 
 centralSquares :: [Pos]
 centralSquares = [(row,col) | row <- [3..4], col <- [3..4]]
