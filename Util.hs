@@ -220,10 +220,11 @@ findKing a b | null l = trace (show a ++ "\n" ++ show b) (-7,-7)
 
 -- returns whether a king move is valid WORKING
 validKingMove :: Piece -> Move -> AllPieces -> Bool
-validKingMove a (m,n) b = (abs m <= 1 && abs n <= 1 ) && isValidTarget a (m,n) b && (x > 1 || y > 1)
-                          where
-                              x = abs ((getColumn (getTarget (getPos a) (m,n)) - (getColumn (findKing (invertColour (getColour a)) b))))
-                              y = abs ((getRow (getTarget (getPos a) (m,n)) - (getRow (findKing (invertColour (getColour a)) b))))
+validKingMove a (m,n) b | abs n == 2 = validCastle a (m,n) b
+                        | otherwise = (abs m <= 1 && abs n <= 1 ) && isValidTarget a (m,n) b && (x > 1 || y > 1)
+                                    where
+                                        x = abs ((getColumn (getTarget (getPos a) (m,n)) - (getColumn (findKing (invertColour (getColour a)) b))))
+                                        y = abs ((getRow (getTarget (getPos a) (m,n)) - (getRow (findKing (invertColour (getColour a)) b))))
 
 
 -- returns whether a move is valid
@@ -278,8 +279,7 @@ takePiece (p, col, pos, mc) d = (p, col, (-1,-1), 0) : removePiece (p, col, pos,
 
 --move piece
 movePiece :: Piece -> Move -> AllPieces -> AllPieces
-movePiece a b c | getPieceType a  == King && (b == (0,2) || b == (0,-2)) && validCastle a b c = executeCastle a b c
-                | isValidEnPassant a b c = captureEnPassant a b c
+movePiece a b c | isValidEnPassant a b c = captureEnPassant a b c
                 | isValidPromotion a b c = promotePawn a b c
                 | isValidMove a b c && not (isKingInCheck (King, (getColour a), king, getMovecount a) c) = executeMove a b c
                 | otherwise = c
@@ -394,7 +394,7 @@ legalPawnMoves a b = [ (m,n) | m <- [-2..2], n <- [-1..1], isPawnValidMove a (m,
 
 -- returns a list of legal moves for a king
 legalKingMoves :: Piece -> AllPieces -> [Move]
-legalKingMoves a b = [(m,n) | m <- [-1..1], n <- [-1..1], validKingMove a (m,n) b, not (willKingBeInCheck a (m,n) b)]
+legalKingMoves a b = [(m,n) | m <- [-1..1], n <- [-2..2], validKingMove a (m,n) b, not (willKingBeInCheck a (m,n) b)]
 
 -- returns a list of legal moves for a piece
 legalMoves :: Piece -> AllPieces -> [Move]
