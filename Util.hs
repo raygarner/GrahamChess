@@ -368,7 +368,7 @@ willKingBeInCheck p m ps = isKingInCheck k n
                                                      -- currently i think we should leave it in its most consised and readable form and think about optimisations when we have a compiled executable
                                                      -- definition 1 uses less memory, but it is slower by 0.01s (might add up over lots of calls)
 legalRookMoves :: Piece -> AllPieces -> [Move]
-legalRookMoves a b = [ (m,n) | m <- [-7..7], n <- [-7..7], isRookValidMove a (m,n) b, not (willKingBeInCheck a (m,n) b) ]
+legalRookMoves a b = [ (m,n) | m <- [-7..7], n <- [-7..7], targetNotKing a (m,n) b, isRookValidMove a (m,n) b, not (willKingBeInCheck a (m,n) b) ]
 --legalRookMoves a b = [ x | x <- y, isRookValidMove a x b ]
 --                   where
 --                       y = [ (m,n) | m <- [-7..7], n <- [-7..7], isStraightMove (m,n) ]
@@ -379,7 +379,7 @@ legalRookMoves a b = [ (m,n) | m <- [-7..7], n <- [-7..7], isRookValidMove a (m,
 
 -- return a list of legal moves for a bishop -- same questions as legalRookMoves
 legalBishopMoves :: Piece -> AllPieces -> [Move]
-legalBishopMoves a b = [ (m,n) | m <- [-7..7], n <- [-7..7], isBishopValidMove a (m,n) b, not (willKingBeInCheck a (m,n) b) ]
+legalBishopMoves a b = [ (m,n) | m <- [-7..7], n <- [-7..7], targetNotKing a (m,n) b, isBishopValidMove a (m,n) b, not (willKingBeInCheck a (m,n) b) ]
 --legalBishopMoves a b = [ x | x <- y , isBishopValidMove a x b ]
 --                     where
 --                         y = [ (m,n) | m <- [-7..7], n <- [-7..7], isDiagonal (m,n) ]
@@ -390,7 +390,7 @@ legalQueenMoves a b = (legalBishopMoves a b) ++ (legalRookMoves a b)
 
 -- returns a list of legal moves for a pawn
 legalPawnMoves :: Piece -> AllPieces -> [Move]
-legalPawnMoves a b = [ (m,n) | m <- [-2..2], n <- [-1..1], isPawnValidMove a (m,n) b || isValidEnPassant a (m,n) b, not (willKingBeInCheck a (m,n) b) ]
+legalPawnMoves a b = [ (m,n) | m <- [-2..2], n <- [-1..1], targetNotKing a (m,n) b, isPawnValidMove a (m,n) b || isValidEnPassant a (m,n) b, not (willKingBeInCheck a (m,n) b) ]
 
 -- returns a list of legal moves for a king
 legalKingMoves :: Piece -> AllPieces -> [Move]
@@ -404,6 +404,12 @@ legalMoves (Bishop, col, pos, mc) x = legalBishopMoves (Bishop, col, pos, mc) x
 legalMoves (Rook, col, pos, mc) x   = legalRookMoves (Rook, col, pos, mc) x
 legalMoves (Queen, col, pos, mc) x  = legalQueenMoves (Queen, col, pos, mc) x
 legalMoves (King, col, pos, mc) x = legalKingMoves (King, col, pos, mc) x
+
+-- returns whether the target square is a king
+targetNotKing :: Piece -> Move -> AllPieces -> Bool
+targetNotKing p m ps = null t || getPieceType (head t) /= King
+                       where
+                           t = findPiece (getTarget (getPos p) m) ps
 
 -- returns a list of positions the pawn is controlling
 pawnControlledSquares :: Piece -> [Pos]
