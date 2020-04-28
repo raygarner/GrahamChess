@@ -26,7 +26,7 @@ allPawns :: Colour -> AllPieces -> Float
 allPawns c ps = (sum [passPawnScore x ps | x <- ps, getColour x == c, getPieceType x == Pawn]) - (sum[passPawnScore y ps | y <- ps, getColour y /= c, getPieceType y == Pawn])
 
 pawnCenterControl :: Colour -> AllPieces -> Int
-pawnCenterControl colour ps = (length [ x | x <- ps, getPieceType x == Pawn, y <- pawnControlledSquares x, any (==y) centralSquares ]) * 4
+pawnCenterControl colour ps = (length [ x | x <- ps, getPieceType x == Pawn, y <- pawnControlledSquares x, any (==y) centralSquares ]) * 40
 
 totalVal :: Colour -> AllPieces -> Float
 totalVal a ps = (totalMobility a ps) + (totalMaterial a ps) + (totalBonus a ps)  + (allPawns a ps) + fromIntegral(castleBonus a ps) + fromIntegral (pawnCenterControl a ps)
@@ -84,7 +84,7 @@ protectedEvaluation p ps = analyzeProtection (protecting p ps)
 
 analyzeProtection :: [Piece] -> Float
 analyzeProtection [] = 0
-analyzeProtection xs = (10 - pieceVal (head xs)) / 4  + analyzeProtection (tail xs)
+analyzeProtection xs = (10 - pieceVal (head xs)) + analyzeProtection (tail xs)
 
 -- analyze the list of all pieces to return a float value for that list - currently used for threaten / protect
 analyzePieces :: Piece -> [Piece] -> Float
@@ -101,8 +101,8 @@ threatenEvaluation p ps = analyzePieces p (threatening p ps)
 -- crude central square evaluation - if a piece controls 1 or more central squares the return value is 1.5
 evaluationCentralSquares :: Piece -> AllPieces -> Float
 evaluationCentralSquares p ps | null (doesPieceControlCentralSquares p ps) = 0.0
-                              | getGamePoint ps == Opening = fromIntegral (length (doesPieceControlCentralSquares p ps)) * 60.0
-                              | otherwise = 40.0
+                              | getGamePoint ps == Opening = fromIntegral (length (doesPieceControlCentralSquares p ps)) * 100.0
+                              | otherwise = 50.0
 
 centralSquares :: [Pos]
 centralSquares = [(row,col) | row <- [3..4], col <- [3..4]]
