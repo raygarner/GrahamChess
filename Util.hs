@@ -12,19 +12,19 @@ import           Debug.Trace
 
 -- returns the column of a position
 getColumn :: Pos -> Int
-getColumn (_,y) = y
+getColumn (_,col) = col
 
 -- returns the row of a position
 getRow :: Pos -> Int
-getRow (x,_) = x
+getRow (row,_) = row
 
 -- returns the colour of a piece
 getColour :: Piece -> Colour
-getColour (_,x,_,_) = x
+getColour (_,col,_,_) = col
 
 -- returns the position of a piece
 getPos :: Piece -> Pos
-getPos (_,_,x,_) = x
+getPos (_,_,pos,_) = pos
 
 -- returns the type of a piece
 getPieceType :: Piece -> PieceType
@@ -32,15 +32,15 @@ getPieceType (x,_,_,_) = x
 
 --returns a list with a given piece removed
 removePiece :: Piece -> [Piece] -> [Piece]
-removePiece pieceToRemove xs = [ x | x <- xs, x /= pieceToRemove]
+removePiece pieceToRemove ps = [ p | p <- ps, p /= pieceToRemove]
 
--- returns what move was made based on two positions
+-- returns what move was made based on starting position and final position
 moveMade :: Pos -> Pos -> Move
 moveMade (a,b) (c,d) = (c - a, d - b)
 
 -- returns a piece with an updated position
 updatePosition :: Piece -> Move -> Piece
-updatePosition (a,b,c,mc) d = (a, b, (getTarget c d), mc+1)
+updatePosition (p,col,pos,mc) move = (p, col, (getTarget pos move), mc+1)
 
 -- returns the starting position of a move
 --getStart :: Move -> Pos
