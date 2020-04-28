@@ -348,7 +348,7 @@ executeCastle a (0,-2) b = executeMove a (0,-2) (executeMove (head (findPiece (g
 
 -- return a list of legal moves that a knight can make
 legalKnightMoves :: Piece -> AllPieces -> [Move]
-legalKnightMoves a b = [ x | x <- y, isKnightValidMove a x b ]
+legalKnightMoves a b = [ x | x <- y, isKnightValidMove a x b, targetNotKing a x b, not (willKingBeInCheck a x b) ]
                      where
                          z = [-2,-1,1,2]
                          y = [ (m,n) | m <- z, n <- z, isLShaped (m,n)]
@@ -389,11 +389,11 @@ legalQueenMoves a b = (legalBishopMoves a b) ++ (legalRookMoves a b)
 
 -- returns a list of legal moves for a pawn
 legalPawnMoves :: Piece -> AllPieces -> [Move]
-legalPawnMoves a b = [ (m,n) | m <- [-2..2], n <- [-1..1], targetNotKing a (m,n) b, isPawnValidMove a (m,n) b || isValidEnPassant a (m,n) b, not (willKingBeInCheck a (m,n) b) ]
+legalPawnMoves a b = [ (m,n) | m <- [-2..2], n <- [-1..1], targetNotKing a (m,n) b, isPawnValidMove a (m,n) b || isValidEnPassant a (m,n) b || isValidPromotion a (m,n) b, not (willKingBeInCheck a (m,n) b) ]
 
 -- returns a list of legal moves for a king
 legalKingMoves :: Piece -> AllPieces -> [Move]
-legalKingMoves a b = [(m,n) | m <- [-1..1], n <- [-2..2], validKingMove a (m,n) b, not (willKingBeInCheck a (m,n) b)]
+legalKingMoves a b = [(m,n) | m <- [-1..1], n <- [-2..2], targetNotKing a (m,n) b, validKingMove a (m,n) b, not (willKingBeInCheck a (m,n) b)]
 
 -- returns a list of legal moves for a piece
 legalMoves :: Piece -> AllPieces -> [Move]

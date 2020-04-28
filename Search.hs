@@ -13,7 +13,7 @@ findRealBestMove c ps = findStrongestMoveFromAll [ addTrueEval (c,c) 0 x ps | x 
 -- updates the evaluation for moves by looking moves into the futur2
 addTrueEval :: (Colour,Colour) -> Int -> (Piece,Move,Float) -> AllPieces -> (Piece,Move,Float)
 addTrueEval (c,nc) l (p,m,f) ps | l == 1 = (p,m, (totalVal c ps) + f)
-                                | l == 0 = addTrueEval (c,(invertColour nc)) (l+1) (p,m,f) (movePiece p m ps)
+                                | l == 0 = addTrueEval (c,(invertColour nc)) (l+1) (p,m,f) (executeMove p m ps)
                                 | otherwise = addTrueEval (c,(invertColour nc)) (l+1) (p,m,f+(totalVal c ps)) (makeSingleBestMove e ps)
                                   where
                                       e = findSingleBestMove nc ps
@@ -42,10 +42,10 @@ makeEvalList c ps = [ (x,y,evalMove x y ps) | x <- ps, getColour x == c, y <- le
 
 -- makes a move which is stored using the format with eval
 makeSingleBestMove :: (Piece, Move, Float) -> AllPieces -> AllPieces
-makeSingleBestMove (a,b,_) ps = movePiece a b ps
+makeSingleBestMove (a,b,_) ps = executeMove a b ps
 
 -- makes a move and then evaluates the new AllPieces
 evalMove :: Piece -> Move -> AllPieces -> Float
-evalMove a m ps = totalVal (getColour a) (movePiece a m ps)
+evalMove a m ps = totalVal (getColour a) (executeMove a m ps)
 
 --
