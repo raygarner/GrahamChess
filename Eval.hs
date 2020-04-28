@@ -59,24 +59,25 @@ movePieceBonus c ps = (length [x | x <- ps, getMovecount x == 0, getPieceType x 
 
 -- returns true if the king is surrounded by friendly pieces.
 isKingSurrounded :: Piece -> AllPieces -> Bool
-isKingSurrounded a b = length x == length y
-                  where y = getSurroundingPos (getPos a)
-                        x = surroundingPieces (getColour a) y b
+isKingSurrounded p ps = length x == length y
+                  where y = getSurroundingPos (getPos p)
+                        x = surroundingPieces (getColour p) y ps
 
 
 -- returns a float value for whether a piece is aimed at the enemy king.
 threatenKing :: Piece -> AllPieces -> Float
-threatenKing a b | isPieceAimedAtEnemyKing a b = 5.0
-                 | otherwise = 0.0
+threatenKing p ps | isPieceAimedAtEnemyKing p ps = 5.0
+                  | otherwise = 0.0
 
 -- returns a bool value for whether a piece is aimed at an enemy king.
 isPieceAimedAtEnemyKing :: Piece -> AllPieces -> Bool
-isPieceAimedAtEnemyKing a b = isValidMove a (moveMade (getPos a) k) (a : [])
-                              where k = findKing (invertColour (getColour a)) b
+isPieceAimedAtEnemyKing p ps = isValidMove p (moveMade (getPos p) k) (p : [])
+                               where
+                                 k = findKing (invertColour (getColour p)) ps
 
 -- protection evaluation
 protectedEvaluation :: Piece -> AllPieces -> Float
-protectedEvaluation a b = analyzeProtection (protecting a b)
+protectedEvaluation p ps = analyzeProtection (protecting p ps)
 
 analyzeProtection :: [Piece] -> Float
 analyzeProtection [] = 0
@@ -92,23 +93,24 @@ analyzePieces a xs | pieceVal a < pieceVal y = ((pieceVal y - pieceVal a) * 2) +
 
 -- Tpositive evaluation for threaten
 threatenEvaluation :: Piece -> AllPieces -> Float
-threatenEvaluation a b = analyzePieces a (threatening a b)
+threatenEvaluation p ps = analyzePieces p (threatening p ps)
 
 -- crude central square evaluation - if a piece controls 1 or more central squares the return value is 1.5
 evaluationCentralSquares :: Piece -> AllPieces -> Float
-evaluationCentralSquares a b | null (doesPieceControlCentralSquares a b) = 0.0
-                             | getGamePoint b == Opening = fromIntegral (length (doesPieceControlCentralSquares a b)) * 40.0
-                             | otherwise = 5.0
+evaluationCentralSquares p ps | null (doesPieceControlCentralSquares p ps) = 0.0
+                              | getGamePoint ps == Opening = fromIntegral (length (doesPieceControlCentralSquares p ps)) * 40.0
+                              | otherwise = 5.0
 
 centralSquares :: [Pos]
 centralSquares = [(row,col) | row <- [3..4], col <- [3..4]]
 
 -- returns all the squares that a piece threatens from a passed list of squares.
 doesPieceThreatenSquares :: Piece -> [Pos] -> AllPieces -> [Pos]
-doesPieceThreatenSquares a [] b = []
-doesPieceThreatenSquares a xs b | isValidMove a y b = head xs : doesPieceThreatenSquares a (tail xs) b
-                                | otherwise = doesPieceThreatenSquares a (tail xs) b
-                                  where y = moveMade (getPos a) (head xs)
+doesPieceThreatenSquares p [] ps = []
+doesPieceThreatenSquares p xs ps | isValidMove p y ps = head xs : doesPieceThreatenSquares p (tail xs) ps
+                                 | otherwise = doesPieceThreatenSquares p (tail xs) ps
+                                    where
+                                      y = moveMade (getPos p) (head xs)
 
 -- returns all the central squares that a piece controls
 doesPieceControlCentralSquares :: Piece -> AllPieces -> [Pos]
