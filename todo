@@ -10,6 +10,7 @@ evaluation
 -> dont bring the queen out so early
 -> deduction for doubled pawns
 -> bonus for connected rooks
+-> deduction for blocking pawns
 
 move searching
 --------------

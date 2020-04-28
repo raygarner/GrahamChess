@@ -8,7 +8,7 @@ import           Util
 -- some crude evaluations
 
 evalPiece :: Piece -> AllPieces -> Float
-evalPiece a ps = fromIntegral (length (legalMoves a ps)) * (10.0 - (pieceVal a))
+evalPiece a ps = fromIntegral (length (legalMoves a ps)) * ((10.0 - (pieceVal a)) * 2)
 
 evalPieceBonus :: Piece -> AllPieces -> Float
 evalPieceBonus a ps = (threatenKing a ps) + (threatenEvaluation a ps) + (evaluationCentralSquares a ps)
@@ -25,8 +25,11 @@ totalBonus c ps = (sum [evalPieceBonus x ps | x <- ps, getColour x == c]) - (sum
 allPawns :: Colour -> AllPieces -> Float
 allPawns c ps = (sum [passPawnScore x ps | x <- ps, getColour x == c, getPieceType x == Pawn]) - (sum[passPawnScore y ps | y <- ps, getColour y /= c, getPieceType y == Pawn])
 
+pawnCenterControl :: Colour -> AllPieces -> Int
+pawnCenterControl colour ps = (length [ x | x <- ps, getPieceType x == Pawn, y <- pawnControlledSquares x, any (==y) centralSquares ]) * 4
+
 totalVal :: Colour -> AllPieces -> Float
-totalVal a ps = (totalMobility a ps) + (totalMaterial a ps) + (totalBonus a ps)  + (allPawns a ps) + fromIntegral(castleBonus a ps)
+totalVal a ps = (totalMobility a ps) + (totalMaterial a ps) + (totalBonus a ps)  + (allPawns a ps) + fromIntegral(castleBonus a ps) + (pawnCenterControl c ps)
 
 pieceVal :: Piece -> Float
 pieceVal (Pawn,_,_,_)   = 1.0
@@ -98,8 +101,8 @@ threatenEvaluation p ps = analyzePieces p (threatening p ps)
 -- crude central square evaluation - if a piece controls 1 or more central squares the return value is 1.5
 evaluationCentralSquares :: Piece -> AllPieces -> Float
 evaluationCentralSquares p ps | null (doesPieceControlCentralSquares p ps) = 0.0
-                              | getGamePoint ps == Opening = fromIntegral (length (doesPieceControlCentralSquares p ps)) * 40.0
-                              | otherwise = 5.0
+                              | getGamePoint ps == Opening = fromIntegral (length (doesPieceControlCentralSquares p ps)) * 60.0
+                              | otherwise = 40.0
 
 centralSquares :: [Pos]
 centralSquares = [(row,col) | row <- [3..4], col <- [3..4]]
