@@ -26,7 +26,7 @@ allPawns :: Colour -> AllPieces -> Float
 allPawns c ps = (sum [passPawnScore x ps | x <- ps, getColour x == c, getPieceType x == Pawn]) - (sum[passPawnScore y ps | y <- ps, getColour y /= c, getPieceType y == Pawn])
 
 totalVal :: Colour -> AllPieces -> Float
-totalVal a ps = (totalMobility a ps) + (totalMaterial a ps) + (totalBonus a ps)  + (allPawns a ps)
+totalVal a ps = (totalMobility a ps) + (totalMaterial a ps) + (totalBonus a ps)  + (allPawns a ps) + fromIntegral(castleBonus a ps)
 
 pieceVal :: Piece -> Float
 pieceVal (Pawn,_,_,_)   = 1.0
