@@ -8,7 +8,8 @@ evaluation
 ----------
 -> tweak weights of different elements
 -> dont bring the queen out so early
-->
+-> deduction for doubled pawns
+-> bonus for connected rooks
 
 move searching
 --------------
