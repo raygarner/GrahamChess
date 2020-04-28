@@ -34,11 +34,6 @@ pieceVal (Rook,_,_,_)   = 5.0
 pieceVal (Queen,_,_,_)  = 9.0
 pieceVal (King,_,_,_)   = 0.0
 
--- add bonus for moving multiple pieces.
-movePieceBonus :: Colour -> AllPieces -> Int
-movePieceBonus c ps = (length [x | x <- ps, getMovecount x == 0, getPieceType x /= Pawn, getPieceType x /= Queen]) * (-20)
-
-
 -- returns true if the king is surrounded by friendly pieces.
 isKingSurrounded :: Piece -> AllPieces -> Bool
 isKingSurrounded p ps = length x == length y

@@ -213,6 +213,12 @@ findKing colour ps | null l = trace (show colour ++ "\n" ++ show ps) (-7,-7)
                    where
                      l = [(x,y) | (t, c, (x,y), m) <- ps, t == King, c == colour, x > -1, y > -1, x < 8, y < 8 ]
 
+findRooks :: Colour -> AllPieces -> [Pos]
+findRooks colour ps | null l = trace (show colour ++ "\n" ++ show ps) [(-7,-7)]
+                    | otherwise = l
+                      where
+                        l = [(x,y) | (t, c, (x,y), m) <- ps, t == Rook, c == colour, x > -1, y > -1, x < 8, y < 8]
+
 
 -- returns whether a king move is valid WORKING
 validKingMove :: Piece -> Move -> AllPieces -> Bool

@@ -25,7 +25,7 @@ allPawns :: Colour -> AllPieces -> Float
 allPawns c ps = (sum [passPawnScore x ps | x <- ps, getColour x == c, getPieceType x == Pawn]) - (sum[passPawnScore y ps | y <- ps, getColour y /= c, getPieceType y == Pawn])
 
 totalMiddleVal :: Colour -> AllPieces -> Float
-totalMiddleVal a ps = (totalMobility a ps) + (totalMaterial a ps) + (totalBonus a ps)  + (allPawns a ps) + fromIntegral((castleBonus a ps))
+totalMiddleVal a ps = (totalMobility a ps) + (totalMaterial a ps) + (totalBonus a ps)  + (allPawns a ps) + fromIntegral(castleBonus a ps + pawnCenterControl a ps + movePieceBonus a ps) + (cornerKingBonus a ps) 
 
 pieceVal :: Piece -> Float
 pieceVal (Pawn,_,_,_)   = 1.0
@@ -34,6 +34,22 @@ pieceVal (Bishop,_,_,_) = 3.5
 pieceVal (Rook,_,_,_)   = 5.0
 pieceVal (Queen,_,_,_)  = 9.0
 pieceVal (King,_,_,_)   = 0.0
+
+pawnCenterControl :: Colour -> AllPieces -> Int
+pawnCenterControl colour ps = (length [ x | x <- ps, getPieceType x == Pawn, y <- pawnControlledSquares x, any (==y) centralSquares ]) * 40
+
+-- actually perform castling
+
+isKingInCorner :: Colour -> Pos -> Bool
+isKingInCorner colour pos | colour == White = any (== pos) [(7,6), (7,2), (7,1)]
+                          | otherwise = any (== pos) [(0,6),(0,2),(0,1)]
+
+cornerKingBonus :: Colour -> AllPieces -> Float
+cornerKingBonus c ps | isKingInCorner c kingPos = 25.0
+                     | otherwise = 0.0
+                       where
+                         kingPos = (findKing c ps)
+
 
 -- castling bonus functions
 

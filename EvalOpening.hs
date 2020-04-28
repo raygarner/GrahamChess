@@ -24,7 +24,7 @@ allPawns :: Colour -> AllPieces -> Float
 allPawns c ps = (sum [passPawnScore x ps | x <- ps, getColour x == c, getPieceType x == Pawn]) - (sum[passPawnScore y ps | y <- ps, getColour y /= c, getPieceType y == Pawn])
 
 totalOpeningVal :: Colour -> AllPieces -> Float
-totalOpeningVal a ps = (totalMobility a ps) + (totalMaterial a ps) + (totalBonus a ps)  + (allPawns a ps) + fromIntegral((castleBonus a ps))
+totalOpeningVal a ps = (totalMobility a ps) + (totalMaterial a ps) + (totalBonus a ps)  + (allPawns a ps) + (cornerKingBonus a ps)+ fromIntegral(castleBonus a ps + movePieceBonus a ps + pawnCenterControl a ps)
 
 pieceVal :: Piece -> Float
 pieceVal (Pawn,_,_,_)   = 1.0
@@ -33,6 +33,21 @@ pieceVal (Bishop,_,_,_) = 3.5
 pieceVal (Rook,_,_,_)   = 5.0
 pieceVal (Queen,_,_,_)  = 9.0
 pieceVal (King,_,_,_)   = 0.0
+
+pawnCenterControl :: Colour -> AllPieces -> Int
+pawnCenterControl colour ps = (length [ x | x <- ps, getPieceType x == Pawn, y <- pawnControlledSquares x, any (==y) centralSquares ]) * 40
+
+-- get a bonus for performing a castle
+
+isKingInCorner :: Colour -> Pos -> Bool
+isKingInCorner colour pos | colour == White = any (== pos) [(7,6), (7,2), (7,1)]
+                          | otherwise = any (== pos) [(0,6),(0,2),(0,1)]
+
+cornerKingBonus :: Colour -> AllPieces -> Float
+cornerKingBonus c ps | isKingInCorner c kingPos = 15.0
+                     | otherwise = 0.0
+                       where
+                         kingPos = (findKing c ps)
 
 -- castling bonus functions
 
@@ -51,13 +66,14 @@ castleBonus c ps | possibleToCastle c True ps && possibleToCastle c False ps = (
 
 -- add bonus for moving multiple pieces.
 movePieceBonus :: Colour -> AllPieces -> Int
-movePieceBonus c ps = (length [x | x <- ps, getMovecount x == 0, getPieceType x /= Pawn, getPieceType x /= Queen]) * (-20)
+movePieceBonus c ps = (length [x | x <- ps, getMovecount x == 0, getPieceType x /= Pawn, getPieceType x /= Queen, getPieceType x /= King, getColour x == c]) * (-20)
 
 
 -- returns true if the king is surrounded by friendly pieces.
 isKingSurrounded :: Piece -> AllPieces -> Bool
 isKingSurrounded p ps = length x == length y
-                  where y = getSurroundingPos (getPos p)
+                      where
+                        y = getSurroundingPos (getPos p)
                         x = surroundingPieces (getColour p) y ps
 
 
