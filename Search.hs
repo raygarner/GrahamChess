@@ -38,7 +38,7 @@ extractPiece (p,_,_) = p
 
 -- generates a list of all legal moves for one side with evaluations
 makeEvalList :: Colour -> AllPieces -> [(Piece, Move, Float)]
-makeEvalList c ps = [ (x,y,evalMove x y ps) | x <- ps, getColour x == c, y <- legalMoves x ps ]
+makeEvalList c ps = [ (x,y,evalMove x y ps) | x <- ps, getColour x == c, y <- legalMoves x ps, getPos x /= (-1,-1) ]
 
 -- makes a move which is stored using the format with eval
 makeSingleBestMove :: (Piece, Move, Float) -> AllPieces -> AllPieces
