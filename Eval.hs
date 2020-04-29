@@ -17,7 +17,7 @@ totalMaterial :: Colour -> AllPieces -> Float
 totalMaterial c ps = ( (sum [ 50 * pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - (sum [ 50 * pieceMaterial y ps | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
 
 totalMobility :: Colour -> AllPieces -> Float
-totalMobility c ps = ( 5 * sum [ evalPiece x ps | x <- ps, getColour x == c, getPos x /= (-1,-1) ]) - (5 * sum [ evalPiece y ps | y <- ps, getColour y /= c, getPos y /= (-1,-1) ])
+totalMobility c ps = ( 20 * sum [ evalPiece x ps | x <- ps, getColour x == c, getPos x /= (-1,-1) ]) - (20 * sum [ evalPiece y ps | y <- ps, getColour y /= c, getPos y /= (-1,-1) ])
 
 totalBonus :: Colour -> AllPieces -> Float
 totalBonus c ps = (sum [evalPieceBonus x ps | x <- ps, getColour x == c]) - (sum [evalPieceBonus y ps | y <- ps, getColour y /= c])
