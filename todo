@@ -2,7 +2,7 @@ TESTING
 
 bugs
 ----
--> head empty list error somtimes (material mult: 50, mobility mult: 20, search depth: 6, crashes while searching for move 4 in selfplay) HAPPENS WHEN CHECKMATE ENCOUNTERED IN SIMULATED MOVES
+-> head empty list error somtimes (material mult: 50, mobility mult: 20, search depth: 6, crashes while searching for move 4 in selfplay) HAPPENS WHEN CHECKMATE ENCOUNTERED IN SIMULATED MOVES (line 34 Search.hs)
 
 evaluation
 ----------
@@ -14,7 +14,7 @@ evaluation
 
 move searching
 --------------
--> make it instantly play mating move if one is detected (this will fix first bug)
+-> make it instantly play mating move if one is detected
 
 main
 ----

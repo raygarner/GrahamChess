@@ -31,7 +31,7 @@ addTrueEval (c,nc) l (p,m,f) ps | l == 6 = if isCheckmate (invertColour c) ps th
 findSingleBestMove :: Colour -> AllPieces -> (Piece, Move, Float)
 findSingleBestMove c ps = findStrongestMoveFromAll (makeEvalList c ps)
 
--- returns the stronget move from a list of moves with evaluations (error produced if there is no valid moves (checkmate))
+-- returns the stronget move from a list of moves with evaluations - NOT WORKING: (error produced if there is no valid moves (checkmate))
 findStrongestMoveFromAll :: [(Piece,Move,Float)] -> (Piece,Move,Float)
 findStrongestMoveFromAll xs = trace (show xs ++ "\n") (head [ x | x <- xs, all (\y -> (getMoveEval y) <= (getMoveEval x)) xs ])
 
@@ -56,12 +56,12 @@ makeSingleBestMove (a,b,_) ps = executeMove a b ps
 
 -- makes a move and then evaluates the new AllPieces
 evalMove :: Piece -> Move -> AllPieces -> Float
-evalMove a m ps | null (makeEvalList (invertColour (getColour a)) (executeMove a m ps)) = checkmate -- if this is a mating move
+evalMove a m ps | isCheckmate (invertColour (getColour a)) (executeMove a m ps) = checkmate -- if this is a mating move
                 | otherwise = totalVal (getColour a) (executeMove a m ps)
 
 isCheckmate :: Colour -> AllPieces -> Bool
---isCheckmate c ps = null (makeEvalList c ps)
-isCheckmate c ps = null [ y | x <- ps, getColour x == c, y <- legalMoves x ps, getPos x /= (-1,-1) ]
+isCheckmate c ps = null (makeEvalList c ps)
+--isCheckmate c ps = null [ y | x <- ps, getColour x == c, y <- legalMoves x ps, getPos x /= (-1,-1) ]
 
 checkmate :: Float
 checkmate = 1000000.0
