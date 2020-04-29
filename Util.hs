@@ -208,7 +208,7 @@ isQueenValidMove p move ps = isRookValidMove p move ps || isBishopValidMove p mo
 
 -- returns the position of the king WORKING
 findKing :: Colour -> AllPieces -> Pos
-findKing colour ps | null l = trace (show colour ++ "\n" ++ show ps) (-7,-7)
+findKing colour ps | null l = trace (show colour ++ "\n" ++ show ps) (-1,-1)
                    | otherwise = head l
                    where
                      l = [(x,y) | (t, c, (x,y), m) <- ps, t == King, c == colour, x > -1, y > -1, x < 8, y < 8 ]
@@ -351,10 +351,11 @@ legalKnightMoves p ps = [ x | x <- y, isKnightValidMove p x ps, targetNotKing p 
 
 -- returns whether teh king will be in check after a move is made
 willKingBeInCheck :: Piece -> Move -> AllPieces -> Bool
-willKingBeInCheck p m ps = isKingInCheck k n
-                           where
-                               n = executeMove p m ps
-                               k = head (findPiece (findKing (getColour p) n) n)
+willKingBeInCheck p m ps | null k = True
+                         | otherwise = isKingInCheck (head k) n
+                                       where
+                                           n = executeMove p m ps
+                                           k = findPiece (findKing (getColour p) n) n
 
 -- return a list of legal moves that a rook can make -- efficiency vs concised code?
                                                      -- 3 options shown for this function
@@ -402,9 +403,9 @@ legalMoves (King, col, pos, mc) x = legalKingMoves (King, col, pos, mc) x
 
 -- returns whether the target square is a king
 targetNotKing :: Piece -> Move -> AllPieces -> Bool
-targetNotKing p m ps = null t || getPieceType (head t) /= King
+targetNotKing p m ps =  isEmpty t ps || getPieceType (head (findPiece t ps)) /= King
                        where
-                           t = findPiece (getTarget (getPos p) m) ps
+                           t = getTarget (getPos p) m
 
 -- returns a list of positions the pawn is controlling
 pawnControlledSquares :: Piece -> [Pos]
@@ -414,7 +415,7 @@ pawnControlledSquares p = [ getTarget (getPos p) (m,n) | m <- [-1,1], n <- [-1,1
 -- returns a list containg all the surrounding friendly pieces from a position
 surroundingPieces :: Colour -> [Pos] -> AllPieces -> [Piece]
 surroundingPieces colour [] ps = []
-surroundingPieces colour xs ps | not (null p) && colour ==  getColour (head p) = head p : surroundingPieces colour (tail xs) ps
+surroundingPieces colour xs ps | not (null p) && colour == getColour (head p) = head p : surroundingPieces colour (tail xs) ps
                                | otherwise = surroundingPieces colour (tail xs) ps
                                            where p = findPiece (head xs) ps
 
