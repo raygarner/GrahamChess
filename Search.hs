@@ -5,6 +5,7 @@ import Debug
 import Init
 import Util
 import Eval
+import Debug.Trace
 
 -- returns the best move for one side (not sure how this handles checkmate????)
 findRealBestMove :: Colour -> AllPieces -> (Piece, Move, Float)
@@ -12,7 +13,7 @@ findRealBestMove c ps = findStrongestMoveFromAll [ addTrueEval (c,c) 0 x ps | x 
 
 -- updates the evaluation for moves by looking moves into the futur2
 addTrueEval :: (Colour,Colour) -> Int -> (Piece,Move,Float) -> AllPieces -> (Piece,Move,Float)
-addTrueEval (c,nc) l (p,m,f) ps | l == 6 = (p,m, (totalVal c ps) + f)
+addTrueEval (c,nc) l (p,m,f) ps | l == 1 = (p,m, (totalVal c ps) + f)
                                 | l == 0 = addTrueEval (c,(invertColour nc)) (l+1) (p,m,f) (executeMove p m ps)
                                 | otherwise = addTrueEval (c,(invertColour nc)) (l+1) (p,m,f+(totalVal c ps)) (makeSingleBestMove e ps)
                                   where
@@ -22,9 +23,10 @@ addTrueEval (c,nc) l (p,m,f) ps | l == 6 = (p,m, (totalVal c ps) + f)
 findSingleBestMove :: Colour -> AllPieces -> (Piece, Move, Float)
 findSingleBestMove c ps = findStrongestMoveFromAll (makeEvalList c ps)
 
--- returns the stronget move from a list of moves with evaluations
+-- returns the stronget move from a list of moves with evaluations (error produced if there is no valid moves (checkmate))
 findStrongestMoveFromAll :: [(Piece,Move,Float)] -> (Piece,Move,Float)
-findStrongestMoveFromAll xs = head [ x | x <- xs, all (\y -> (getMoveEval y) <= (getMoveEval x)) xs ]
+findStrongestMoveFromAll xs = trace (show xs ++ "\n") (head [ x | x <- xs, all (\y -> (getMoveEval y) <= (getMoveEval x)) xs ])
+
 
 -- extracts the evaluation element of the move tuple
 getMoveEval :: (Piece, Move, Float) -> Float
