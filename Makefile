@@ -5,4 +5,4 @@ selfplay:
 	ghc Selfplay.hs
 
 clean:
-	rm *.o *.hi
+	rm *.o *.hi Selfplay Main
