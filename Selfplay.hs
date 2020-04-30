@@ -9,6 +9,7 @@ import           Util
 import           Data.Char
 import           Search
 import           UI
+import           Debug
 
 main :: IO ()
 main = gameLoop White addAllPieces

@@ -1,9 +1,6 @@
 module Util where
 
 import           Data.List
-import           Debug
-import           Debug
-import           Init
 import           System.Directory
 import           TypeDefs
 import           Debug.Trace
@@ -351,7 +348,7 @@ legalKnightMoves p ps = [ x | x <- y, isKnightValidMove p x ps, targetNotKing p 
 
 -- returns whether teh king will be in check after a move is made
 willKingBeInCheck :: Piece -> Move -> AllPieces -> Bool
-willKingBeInCheck p m ps | null k = True
+willKingBeInCheck p m ps | null k = False
                          | otherwise = isKingInCheck (head k) n
                                        where
                                            n = executeMove p m ps

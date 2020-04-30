@@ -1,7 +1,6 @@
 module Search where
 
 import TypeDefs
-import Debug
 import Init
 import Util
 import Eval
@@ -33,8 +32,8 @@ findSingleBestMove c ps = findStrongestMoveFromAll (makeEvalList c ps)
 
 -- returns the stronget move from a list of moves with evaluations - NOT WORKING: (error produced if there is no valid moves (checkmate))
 findStrongestMoveFromAll :: [(Piece,Move,Float)] -> (Piece,Move,Float)
-findStrongestMoveFromAll xs = trace (show xs ++ "\n") (head [ x | x <- xs, all (\y -> (getMoveEval y) <= (getMoveEval x)) xs ])
-
+findStrongestMoveFromAll xs | not (null xs) = head [ x | x <- xs, all (\y -> (getMoveEval y) <= (getMoveEval x)) xs ]
+                            | otherwise = trace "empty list !!!" ((King, White, (7,4), 0), (0,0), 0-checkmate)
 
 -- extracts the evaluation element of the move tuple
 getMoveEval :: (Piece, Move, Float) -> Float

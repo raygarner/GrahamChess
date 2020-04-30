@@ -1,7 +1,8 @@
 module Debug where
 
 import TypeDefs
-
+import Util
+import Init
 
 addTestKings :: AllPieces
 addTestKings = [ (King, c, (m,3), 5) | (c, m) <- [(White, 5), (Black, 7)] ]
@@ -23,3 +24,6 @@ addTestBishops = [(Bishop, c, (m,n), 5) | (c, m, n) <- [(Black,6,1 ), (White,0,5
 
 addTestPieces :: AllPieces
 addTestPieces = addTestKings ++ addTestPawns ++ addTestKnights ++ addTestQueens ++ addTestRooks ++ addTestBishops
+
+buggedPosition :: AllPieces
+buggedPosition = executeMove (Queen, White, (7,3), 0) (-4,4) (executeMove (Pawn, Black, (1,4), 0) (2,0) (executeMove (Pawn, White, (6,4), 0) (-2,0) addAllPieces))
