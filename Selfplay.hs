@@ -1,4 +1,4 @@
-module Selfplay where
+--module Selfplay where
 
 import           Data.List
 --import           Data.List.Split

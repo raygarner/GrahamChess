@@ -89,7 +89,7 @@ isOnBoard p move = row >= 0 && row <= 7 && col >= 0 && col <= 7
 -- returns whether a square is not occupied by a friendly piece
 -- recursion problem: calls itsself through isKingInCheck
 isValidTarget :: Piece -> Move -> AllPieces -> Bool
-isValidTarget p move ps = ((isEmpty (getTarget (getPos p) move) ps) || (isEnemy p z)) && isOnBoard p move && getPos p /= (-1,-1)
+isValidTarget p move ps = ((isEmpty (getTarget (getPos p) move) ps) || (isEnemy p z)) && isOnBoard p move && getPos p /= (-1,-1)-- && getPieceType z /= King
                         where
                           z = head (findPiece (getTarget (getPos p) move) ps)
 
@@ -263,8 +263,10 @@ getPiecesFromMoves pos ms ps | not (null y) = head y : getPiecesFromMoves pos (t
 
 -- returns whether the king is in check.
 isKingInCheck :: Piece -> AllPieces -> Bool
-isKingInCheck p ps | null (threatenedBy p ps) = False
-                   | otherwise = True
+isKingInCheck (pt, colour, pos, mc) ps | null (threatenedBy np (np:removePiece (pt, colour,pos,mc) ps)) = False
+                                       | otherwise = True
+                                         where
+                                             np = (Pawn,colour,pos,mc)
 
 -- removes a piece from the board
 takePiece :: Piece -> AllPieces -> AllPieces

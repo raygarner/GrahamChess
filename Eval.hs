@@ -2,6 +2,7 @@ module Eval where
 
 import           TypeDefs
 import           Util
+import           Debug
 
 -- some crude evaluations
 

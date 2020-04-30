@@ -24,7 +24,7 @@ colourCase c s | c == White = toUpper s
 
 printBoard :: Int -> AllPieces -> IO ()
 printBoard 64 ps = return ()
-printBoard n ps = do if null (findPiece (calcPos n) ps) then
+printBoard n ps = do if isEmpty (calcPos n) ps then
                          putChar '-'
                      else
                          do putChar (pieceChar (head (findPiece (calcPos n) ps)))

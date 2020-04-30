@@ -3,6 +3,7 @@ module Debug where
 import TypeDefs
 import Util
 import Init
+import UI
 
 addTestKings :: AllPieces
 addTestKings = [ (King, c, (m,3), 5) | (c, m) <- [(White, 5), (Black, 7)] ]
