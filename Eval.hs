@@ -25,7 +25,7 @@ allPawns :: Colour -> AllPieces -> Float
 allPawns c ps = (sum [passPawnScore x ps | x <- ps, getColour x == c, getPieceType x == Pawn]) - (sum[passPawnScore y ps | y <- ps, getColour y /= c, getPieceType y == Pawn])
 
 pawnCenterControl :: Colour -> AllPieces -> Int
-pawnCenterControl colour ps = (length [ x | x <- ps, getPieceType x == Pawn, y <- pawnControlledSquares x, any (==y) centralSquares ]) + (length [ z | z <- ps, getPieceType z == Pawn, any (==getPos z) centralSquares ])* 40
+pawnCenterControl colour ps = (length [ x | x <- ps, getPieceType x == Pawn, y <- pawnControlledSquares x, any (==y) centralSquares || any (==getPos x) centralSquares ]) * 1000
 
 totalVal :: Colour -> AllPieces -> Float
 totalVal a ps = (totalMobility a ps) + (totalMaterial a ps) + (totalBonus a ps)  + (allPawns a ps) + fromIntegral(castleBonus a ps) + fromIntegral (pawnCenterControl a ps) + fromIntegral (movePieceBonus a ps)
@@ -83,7 +83,7 @@ protectedEvaluation p ps = analyzeProtection (protecting p ps)
 
 analyzeProtection :: [Piece] -> Float
 analyzeProtection [] = 0
-analyzeProtection xs = (10 - pieceVal (head xs)) + analyzeProtection (tail xs)
+analyzeProtection xs = (9.0 - pieceVal (head xs)) + analyzeProtection (tail xs)
 
 -- analyze the list of all pieces to return a float value for that list - currently used for threaten / protect
 analyzePieces :: Piece -> [Piece] -> Float
