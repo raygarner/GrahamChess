@@ -17,7 +17,12 @@ evalPieceBonus a ps = (threatenKing a ps) + (threatenEvaluation a ps) + (evaluat
 --totalMaterial c ps = 10 * ((sum [ pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - (sum [ pieceVal y  | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
 
 totalMaterial :: Colour -> AllPieces -> Float
-totalMaterial c ps = (sum [ (pieceVal (x,White,(0,0),0)) * (countPieceType c x ps) - (countPieceType (invertColour c) x ps) | x <- pieceTypes ])
+totalMaterial c ps = 2 * (sum [ (pieceVal (x,White,(0,0),0)) * (countPieceType c x ps) - (countPieceType (invertColour c) x ps) | x <- pieceTypes ])
+
+-- returns the material in danger
+materialInDanger :: Colour -> AllPieces -> Float
+materialInDanger c ps = 2 * sum [ pieceVal x | x <- ps, (length (threatenedBy x ps) > length (protectedBy x ps)) || getLowestVal (threatenedBy x ps) < pieceVal x ]
+
 
 countPieceType :: Colour -> PieceType -> AllPieces -> Float
 countPieceType c t ps = fromIntegral (length [ x | x <- ps, getColour x == c, getPieceType x == t, getPos x /= (-1,-1) ])
@@ -26,7 +31,7 @@ pieceTypes :: [PieceType]
 pieceTypes = [Pawn, Knight, Bishop, Rook, Queen, King]
 
 totalMobility :: Colour -> AllPieces -> Float
-totalMobility c ps = ( sum [ evalPiece x ps | x <- ps, getColour x == c, getPos x /= (-1,-1) ]) - ( sum [ evalPiece y ps | y <- ps, getColour y /= c, getPos y /= (-1,-1) ])
+totalMobility c ps = 0.4 * ( sum [ evalPiece x ps | x <- ps, getColour x == c, getPos x /= (-1,-1) ]) - ( sum [ evalPiece y ps | y <- ps, getColour y /= c, getPos y /= (-1,-1) ])
 
 totalBonus :: Colour -> AllPieces -> Float
 totalBonus c ps = (sum [evalPieceBonus x ps | x <- ps, getColour x == c]) - (sum [evalPieceBonus y ps | y <- ps, getColour y /= c])
@@ -38,7 +43,7 @@ pawnCenterControl :: Colour -> AllPieces -> Int
 pawnCenterControl colour ps = ( (length [ x | x <- ps, getPieceType x == Pawn, y <- pawnControlledSquares x, any (==y) centralSquares, pieceMaterial x ps /= 0 ]) + (length [ x | x <- ps, getPieceType x == Pawn, any (==getPos x) centralSquares, pieceMaterial x ps /= 0]) ) * 1
 
 totalVal :: Colour -> AllPieces -> Float
-totalVal a ps = totalMobility a ps * 0.1 + totalMaterial a ps * 1.75 + fromIntegral (movePieceBonus a ps) + fromIntegral (pawnCenterControl a ps) + fromIntegral (castleBonus a ps)-- + (totalBonus a ps)  + (allPawns a ps) + fromIntegral(castleBonus a ps) + fromIntegral (pawnCenterControl a ps)
+totalVal a ps = totalMobility a ps + totalMaterial a ps + fromIntegral (movePieceBonus a ps) + fromIntegral (pawnCenterControl a ps) + fromIntegral (castleBonus a ps)-- + (totalBonus a ps)  + (allPawns a ps) + fromIntegral(castleBonus a ps) + fromIntegral (pawnCenterControl a ps)
 
 pieceVal :: Piece -> Float
 pieceVal (Pawn,_,_,_)   = 1.0
