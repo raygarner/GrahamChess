@@ -10,10 +10,13 @@ evaluation
 -> deduction for doubled pawns
 -> bonus for connected rooks
 -> deduction for blocking pawns
+-> make it like castling
+-> mobility in danger function?
 
 move searching
 --------------
--> improve efficiency somehow
+-> only search top x moves produced by makeEvalList
+-> implement mobility in danger function?
 
 main
 ----
