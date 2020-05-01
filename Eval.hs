@@ -38,7 +38,7 @@ pawnCenterControl :: Colour -> AllPieces -> Int
 pawnCenterControl colour ps = ( (length [ x | x <- ps, getPieceType x == Pawn, y <- pawnControlledSquares x, any (==y) centralSquares, pieceMaterial x ps /= 0 ]) + (length [ x | x <- ps, getPieceType x == Pawn, any (==getPos x) centralSquares, pieceMaterial x ps /= 0]) ) * 1
 
 totalVal :: Colour -> AllPieces -> Float
-totalVal a ps = totalMobility a ps * 0.1 + totalMaterial a ps * 1.5 + fromIntegral (movePieceBonus a ps) + fromIntegral (pawnCenterControl a ps) + fromIntegral (castleBonus a ps)-- + (totalBonus a ps)  + (allPawns a ps) + fromIntegral(castleBonus a ps) + fromIntegral (pawnCenterControl a ps)
+totalVal a ps = totalMobility a ps * 0.1 + totalMaterial a ps * 1.75 + fromIntegral (movePieceBonus a ps) + fromIntegral (pawnCenterControl a ps) + fromIntegral (castleBonus a ps)-- + (totalBonus a ps)  + (allPawns a ps) + fromIntegral(castleBonus a ps) + fromIntegral (pawnCenterControl a ps)
 
 pieceVal :: Piece -> Float
 pieceVal (Pawn,_,_,_)   = 1.0

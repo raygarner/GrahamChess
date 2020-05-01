@@ -16,13 +16,13 @@ addTrueEval (c,nc) l (p,m,f) ps | l == 10 = if isCheckmate (invertColour c) ps t
                                                (p,m,checkmate)
                                            else if isCheckmate c ps then
                                                (p,m,0-checkmate)
-                                           else (p,m,(totalVal c ps)+0)
+                                           else (p,m,(totalVal c ps))
                                 | l == 0 = if f == checkmate then (p,m,f) else addTrueEval (c,(invertColour nc)) (l+1) (p,m,0) (executeMove p m ps)
                                 | otherwise = if isCheckmate (invertColour c) ps then
                                                   (p,m,checkmate)
                                               else if isCheckmate c ps then
                                                   (p,m,0-checkmate)
-                                              else addTrueEval (c,(invertColour nc)) (l+1) (p,m,(totalVal c ps)+f) (makeSingleBestMove e ps)
+                                              else addTrueEval (c,(invertColour nc)) (l+1) (p,m,0) (makeSingleBestMove e ps)
                                   where
                                       e = findSingleBestMove nc ps
 
