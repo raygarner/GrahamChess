@@ -13,7 +13,7 @@ evalPieceBonus :: Piece -> AllPieces -> Float
 evalPieceBonus a ps = (threatenKing a ps) + (threatenEvaluation a ps) + (evaluationCentralSquares a ps)
 
 totalMaterial :: Colour -> AllPieces -> Float
-totalMaterial c ps = ( (sum [ 50 * pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - (sum [ 50 * pieceMaterial y ps | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
+totalMaterial c ps = ( (sum [ 70 * pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - (sum [ 70 * pieceMaterial y ps | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
 
 totalMobility :: Colour -> AllPieces -> Float
 totalMobility c ps = ( 20 * sum [ evalPiece x ps | x <- ps, getColour x == c, getPos x /= (-1,-1) ]) - (20 * sum [ evalPiece y ps | y <- ps, getColour y /= c, getPos y /= (-1,-1) ])
@@ -56,7 +56,7 @@ castleBonus c ps | possibleToCastle c True ps && possibleToCastle c False ps = (
 
 -- add bonus for moving multiple pieces.
 movePieceBonus :: Colour -> AllPieces -> Int
-movePieceBonus c ps = (length [x | x <- ps, getColour x == c, getMovecount x == 0, getPieceType x /= Pawn, getPieceType x /= Queen]) * (-5000)
+movePieceBonus c ps = (length [x | x <- ps, getColour x == c, getMovecount x == 0, getPieceType x == Knight || getPieceType x == Bishop]) * (-2000)
 
 
 -- returns true if the king is surrounded by friendly pieces.
