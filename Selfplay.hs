@@ -10,6 +10,7 @@ import           Data.Char
 import           Search
 import           UI
 import           Debug
+import           Eval
 
 main :: IO ()
 main = gameLoop White addAllPieces
