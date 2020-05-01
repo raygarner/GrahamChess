@@ -12,7 +12,7 @@ evalPieceBonus :: Piece -> AllPieces -> Float
 evalPieceBonus a ps = (threatenKing a ps) + (threatenEvaluation a ps) + (evaluationCentralSquares a ps)
 
 totalMaterial :: Colour -> AllPieces -> Float
-totalMaterial c ps = ( (sum [ 100 * pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - (sum [ 100 * pieceMaterial y ps | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
+totalMaterial c ps = ( (sum [ 75 * pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - (sum [ 75 * pieceMaterial y ps | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
 
 totalMobility :: Colour -> AllPieces -> Float
 totalMobility c ps = ( 15 * sum [ evalPiece x ps | x <- ps, getColour x == c, getPos x /= (-1,-1), getPieceType x /= Queen]) - (15 * sum [ evalPiece y ps | y <- ps, getColour y /= c, getPos y /= (-1,-1), getPieceType y /= Queen])
@@ -52,7 +52,7 @@ isKingSurrounded p c ps = length x == length y
 
 cornerKingBonus :: Colour -> AllPieces -> Float
 cornerKingBonus c ps | (isKingInCorner c kingPos) && (isKingSurrounded kingPos c ps) = 75.0
-                     | isKingSurrounded kingPos c ps = 15.0
+                     | isKingInCorner c kingPos = 50.0
                      | otherwise = 0.0
                        where
                          kingPos = (findKing c ps)

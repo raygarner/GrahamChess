@@ -5,6 +5,7 @@ import Debug
 import Init
 import Util
 import Eval
+import Debug.Trace
 
 -- returns the best move for one side (not sure how this handles checkmate????)
 findRealBestMove :: Colour -> AllPieces -> (Piece, Move, Float)
