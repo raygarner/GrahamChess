@@ -36,4 +36,14 @@ printBoard n ps = do if isEmpty (calcPos n) ps then
 
                      printBoard (n+1) ps
 
+{-
+strBoard :: Int -> AllPieces -> String -> String
+strBoard 64 ps s = s
+strBoard n ps s = if isEmpty (calcPos n) ps then
+                      strBoard (n+1) ps (s ++ '-' : e : [])
+                  else
+                      strBoard (n+1) ps (s ++ show (pieceChar (head (findPiece (calcPos n) ps ))) : e : [])
+                  where
+                      e = if getColumn (calcPos n) == 7 then '\n' else ' '
+--}
 

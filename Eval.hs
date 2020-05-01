@@ -12,9 +12,18 @@ evalPiece a ps = fromIntegral (length (legalMoves a ps)) -- * ((10.0 - (pieceVal
 evalPieceBonus :: Piece -> AllPieces -> Float
 evalPieceBonus a ps = (threatenKing a ps) + (threatenEvaluation a ps) + (evaluationCentralSquares a ps)
 
-totalMaterial :: Colour -> AllPieces -> Float
+--totalMaterial :: Colour -> AllPieces -> Float
 --totalMaterial c ps = ( (sum [ 10 * pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - (sum [ 10 * pieceMaterial y ps | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
-totalMaterial c ps = 10 * ((sum [ pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - (sum [ pieceMaterial y ps | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
+--totalMaterial c ps = 10 * ((sum [ pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - (sum [ pieceVal y  | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
+
+totalMaterial :: Colour -> AllPieces -> Float
+totalMaterial c ps = sum [ (pieceVal (x,White,(0,0),0)) * (countPieceType c x ps) - (countPieceType (invertColour c) x ps) | x <- pieceTypes ]
+
+countPieceType :: Colour -> PieceType -> AllPieces -> Float
+countPieceType c t ps = fromIntegral (length [ x | x <- ps, getColour x == c, getPieceType x == t ])
+
+pieceTypes :: [PieceType]
+pieceTypes = [Pawn, Knight, Bishop, Rook, Queen, King]
 
 totalMobility :: Colour -> AllPieces -> Float
 totalMobility c ps = ( sum [ evalPiece x ps | x <- ps, getColour x == c, getPos x /= (-1,-1) ]) - ( sum [ evalPiece y ps | y <- ps, getColour y /= c, getPos y /= (-1,-1) ])
