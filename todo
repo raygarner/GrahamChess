@@ -13,11 +13,11 @@ evaluation
 
 move searching
 --------------
-
+-> improve efficiency somehow
 
 main
 ----
--> graham gets two moves in a row if a move mistake is made
+-> graham gets two moves in a row if user enters illegal move (user needs to be asked again for a legal move)
 
 user interface
 -------------
