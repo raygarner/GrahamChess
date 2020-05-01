@@ -5,41 +5,54 @@ import           Init
 import           TypeDefs
 import           Util
 
-evalPiece :: Piece -> AllPieces -> Float
-evalPiece a ps = fromIntegral (length (legalMoves a ps))
-
 evalPieceBonus :: Piece -> AllPieces -> Float
-evalPieceBonus a ps = (threatenKing a ps) + (threatenEvaluation a ps) + (evaluationCentralSquares a ps)
+evalPieceBonus a ps = (threatenKing a ps) + (threatenEvaluation a ps)
 
 totalMaterial :: Colour -> AllPieces -> Float
-totalMaterial c ps = ( (sum [ 50 * pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - (sum [ 50 * pieceMaterial y ps | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
-
-totalMobility :: Colour -> AllPieces -> Float
-totalMobility c ps = ( 1 * sum [ evalPiece x ps | x <- ps, getColour x == c, getPos x /= (-1,-1) ]) - (1 * sum [ evalPiece y ps | y <- ps, getColour y /= c, getPos y /= (-1,-1) ])
+totalMaterial c ps = ( (sum [ 200 * pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - (sum [ 200 * pieceMaterial y ps | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
 
 totalBonus :: Colour -> AllPieces -> Float
 totalBonus c ps = (sum [evalPieceBonus x ps | x <- ps, getColour x == c]) - (sum [evalPieceBonus y ps | y <- ps, getColour y /= c])
 
+totalColourBonus :: Colour -> AllPieces -> Float
+totalColourBonus c ps = kingProtection c ps + fromIntegral(getPawnPromotion c ps)
+
+
 allPawns :: Colour -> AllPieces -> Float
-allPawns c ps = (sum [passPawnScore x ps | x <- ps, getColour x == c, getPieceType x == Pawn]) - (sum[passPawnScore y ps | y <- ps, getColour y /= c, getPieceType y == Pawn])
+allPawns c ps = (sum [passPawnScore x ps | x <- ps, getColour x == c, getPieceType x == Pawn]) - (sum[passPawnScore y ps | y <- ps, getColour y /= c, getPieceType y == Pawn]) * 100
 
 totalEndVal :: Colour -> AllPieces -> Float
-totalEndVal a ps = (totalMobility a ps) + (totalMaterial a ps) + (totalBonus a ps)  + (allPawns a ps)
+totalEndVal a ps =  (totalMaterial a ps) + (totalBonus a ps)  + (allPawns a ps)
 
 pieceVal :: Piece -> Float
-pieceVal (Pawn,_,_,_)   = 1.0
+pieceVal (Pawn,_,_,_)   = 5.0
 pieceVal (Knight,_,_,_) = 3.0
 pieceVal (Bishop,_,_,_) = 3.5
 pieceVal (Rook,_,_,_)   = 5.0
 pieceVal (Queen,_,_,_)  = 9.0
-pieceVal (King,_,_,_)   = 0.0
+pieceVal (King,_,_,_)   = 1.0
 
 -- returns true if the king is surrounded by friendly pieces.
-isKingSurrounded :: Piece -> AllPieces -> Bool
-isKingSurrounded p ps = length x == length y
-                  where y = getSurroundingPos (getPos p)
-                        x = surroundingPieces (getColour p) y ps
+isKingSurrounded :: Pos -> Colour -> AllPieces -> Bool
+isKingSurrounded p c ps = length x == length y
+                  where y = getSurroundingPos p
+                        x = surroundingPieces c y ps
 
+-- gives bonus points if the king is surrounded by at least one piece
+kingProtection :: Colour -> AllPieces -> Float
+kingProtection c ps | length (surroundingPieces c king ps ) >= 1 = 25.0
+                    | otherwise = 0.0
+                    where
+                      king = getSurroundingPos (findKing c ps)
+
+
+pawnsNearEnd :: Colour -> AllPieces -> [Piece]
+pawnsNearEnd White ps = [x | x <- ps, getColour x == White, getRow (getPos x) == 1, getPieceType x == Pawn]
+pawnsNearEnd Black ps = [x | x <- ps, getColour x == Black, getRow (getPos x) == 6, getPieceType x == Pawn]
+
+-- TODO: bonus points for pawns closer to end
+getPawnPromotion :: Colour -> AllPieces -> Int
+getPawnPromotion c ps = length (pawnsNearEnd c ps) * 15
 
 -- returns a float value for whether a piece is aimed at the enemy king.
 threatenKing :: Piece -> AllPieces -> Float
@@ -71,27 +84,6 @@ analyzePieces a xs | pieceVal a < pieceVal y = ((pieceVal y - pieceVal a) * 2) +
 -- Tpositive evaluation for threaten
 threatenEvaluation :: Piece -> AllPieces -> Float
 threatenEvaluation p ps = analyzePieces p (threatening p ps)
-
--- crude central square evaluation - if a piece controls 1 or more central squares the return value is 1.5
-evaluationCentralSquares :: Piece -> AllPieces -> Float
-evaluationCentralSquares p ps | null (doesPieceControlCentralSquares p ps) = 0.0
-                              | otherwise = fromIntegral (length (doesPieceControlCentralSquares p ps)) * 2.0
-centralSquares :: [Pos]
-centralSquares = [(row,col) | row <- [3..4], col <- [3..4]]
-
--- returns all the squares that a piece threatens from a passed list of squares.
-doesPieceThreatenSquares :: Piece -> [Pos] -> AllPieces -> [Pos]
-doesPieceThreatenSquares p [] ps = []
-doesPieceThreatenSquares p xs ps | isValidMove p y ps = head xs : doesPieceThreatenSquares p (tail xs) ps
-                                 | otherwise = doesPieceThreatenSquares p (tail xs) ps
-                                    where
-                                      y = moveMade (getPos p) (head xs)
-
--- returns all the central squares that a piece controls
-doesPieceControlCentralSquares :: Piece -> AllPieces -> [Pos]
-doesPieceControlCentralSquares (Pawn, col, pos, mc) b = [x | x <- centralSquares, elem x (pawnControlledSquares (Pawn,col,pos,mc))]
-doesPieceControlCentralSquares a b = doesPieceThreatenSquares a centralSquares b
-
 
 
 passPawnScore :: Piece -> AllPieces -> Float
