@@ -9,6 +9,7 @@ import           Util
 import           Data.Char
 import           Search
 import           Debug
+import           UI
 
 main :: IO ()
 main = gameLoop addAllPieces
@@ -16,7 +17,8 @@ main = gameLoop addAllPieces
 
 
 gameLoop :: AllPieces -> IO ()
-gameLoop ps = do putStr "Your turn: \n"
+gameLoop ps = do printBoard 0 ps
+                 putStr "Your turn: \n"
                  m <- getLine
                  n <- getLine
                  r <- getLine
@@ -27,6 +29,7 @@ gameLoop ps = do putStr "Your turn: \n"
                  print move
                  ps <- return (movePiece piece move ps)
                  print ps
+                 printBoard 0 ps
                  putStr "Graham is thinking of a move...\n"
                  response <- return (findRealBestMove Black ps)
                  print response

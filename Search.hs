@@ -12,25 +12,29 @@ findRealBestMove c ps = findStrongestMoveFromAll [ addTrueEval (c,c) 0 x ps | x 
 
 -- updates the evaluation for moves by looking moves into the futur2
 addTrueEval :: (Colour,Colour) -> Int -> (Piece,Move,Float) -> AllPieces -> (Piece,Move,Float)
-addTrueEval (c,nc) l (p,m,f) ps | l == 6 = if isCheckmate (invertColour c) ps then
+addTrueEval (c,nc) l (p,m,f) ps | l == 8 = if isCheckmate (invertColour c) ps then
                                                (p,m,checkmate)
                                            else if isCheckmate c ps then
                                                (p,m,0-checkmate)
-                                           else (p,m, (totalVal c ps) + f)
+                                           else (p,m,(totalValDiff c ps)+ f)
                                 | l == 0 = if f == checkmate then (p,m,f) else addTrueEval (c,(invertColour nc)) (l+1) (p,m,(totalVal c ps)) (executeMove p m ps)
                                 | otherwise = if isCheckmate (invertColour c) ps then
                                                   (p,m,checkmate)
                                               else if isCheckmate c ps then
                                                   (p,m,0-checkmate)
-                                              else addTrueEval (c,(invertColour nc)) (l+1) (p,m,f+(totalVal c ps)) (makeSingleBestMove e ps)
+                                              else addTrueEval (c,(invertColour nc)) (l+1) (p,m,(totalValDiff c ps)+f) (makeSingleBestMove e ps)
                                   where
                                       e = findSingleBestMove nc ps
+
+-- returns the total val difference
+totalValDiff :: Colour -> AllPieces -> Float
+totalValDiff c ps = (totalVal c ps) - (totalVal (invertColour c) ps)
 
 -- returns the best move which can be made without looking ahead WORKING
 findSingleBestMove :: Colour -> AllPieces -> (Piece, Move, Float)
 findSingleBestMove c ps = findStrongestMoveFromAll (makeEvalList c ps)
 
--- returns the stronget move from a list of moves with evaluations - NOT WORKING: (error produced if there is no valid moves (checkmate))
+-- returns the stronget move from a list of moves with evaluations
 findStrongestMoveFromAll :: [(Piece,Move,Float)] -> (Piece,Move,Float)
 findStrongestMoveFromAll xs | not (null xs) = head [ x | x <- xs, all (\y -> (getMoveEval y) <= (getMoveEval x)) xs ]
                             | otherwise = trace "empty list !!!" ((King, White, (7,4), 0), (0,0), 0-checkmate)

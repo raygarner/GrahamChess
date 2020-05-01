@@ -7,16 +7,17 @@ import           Debug
 -- some crude evaluations
 
 evalPiece :: Piece -> AllPieces -> Float
-evalPiece a ps = fromIntegral (length (legalMoves a ps)) * ((10.0 - (pieceVal a)) * 2)
+evalPiece a ps = fromIntegral (length (legalMoves a ps)) -- * ((10.0 - (pieceVal a)) * 2)
 
 evalPieceBonus :: Piece -> AllPieces -> Float
 evalPieceBonus a ps = (threatenKing a ps) + (threatenEvaluation a ps) + (evaluationCentralSquares a ps)
 
 totalMaterial :: Colour -> AllPieces -> Float
-totalMaterial c ps = ( (sum [ 100 * pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - (sum [ 100 * pieceMaterial y ps | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
+--totalMaterial c ps = ( (sum [ 10 * pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - (sum [ 10 * pieceMaterial y ps | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
+totalMaterial c ps = 10 * ((sum [ pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - (sum [ pieceMaterial y ps | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
 
 totalMobility :: Colour -> AllPieces -> Float
-totalMobility c ps = ( 20 * sum [ evalPiece x ps | x <- ps, getColour x == c, getPos x /= (-1,-1) ]) - (20 * sum [ evalPiece y ps | y <- ps, getColour y /= c, getPos y /= (-1,-1) ])
+totalMobility c ps = ( sum [ evalPiece x ps | x <- ps, getColour x == c, getPos x /= (-1,-1) ]) - ( sum [ evalPiece y ps | y <- ps, getColour y /= c, getPos y /= (-1,-1) ])
 
 totalBonus :: Colour -> AllPieces -> Float
 totalBonus c ps = (sum [evalPieceBonus x ps | x <- ps, getColour x == c]) - (sum [evalPieceBonus y ps | y <- ps, getColour y /= c])
@@ -25,10 +26,10 @@ allPawns :: Colour -> AllPieces -> Float
 allPawns c ps = (sum [passPawnScore x ps | x <- ps, getColour x == c, getPieceType x == Pawn]) - (sum[passPawnScore y ps | y <- ps, getColour y /= c, getPieceType y == Pawn])
 
 pawnCenterControl :: Colour -> AllPieces -> Int
-pawnCenterControl colour ps = (length [ x | x <- ps, getPieceType x == Pawn, y <- pawnControlledSquares x, any (==y) centralSquares ]) + (length [ z | z <- ps, getPieceType z == Pawn, any (==getPos z) centralSquares ])* 40
+pawnCenterControl colour ps = ( (length [ x | x <- ps, getPieceType x == Pawn, y <- pawnControlledSquares x, any (==y) centralSquares, pieceMaterial x ps /= 0 ]) + (length [ x | x <- ps, getPieceType x == Pawn, any (==getPos x) centralSquares, pieceMaterial x ps /= 0]) ) * 1
 
 totalVal :: Colour -> AllPieces -> Float
-totalVal a ps = (totalMobility a ps) + (totalMaterial a ps) + (totalBonus a ps)  + (allPawns a ps) + fromIntegral(castleBonus a ps) + fromIntegral (pawnCenterControl a ps) + fromIntegral (movePieceBonus a ps)
+totalVal a ps = totalMobility a ps + totalMaterial a ps -- + fromIntegral (movePieceBonus a ps)-- + fromIntegral (pawnCenterControl a ps) -- + (totalBonus a ps)  + (allPawns a ps) + fromIntegral(castleBonus a ps) + fromIntegral (pawnCenterControl a ps)
 
 pieceVal :: Piece -> Float
 pieceVal (Pawn,_,_,_)   = 1.0
@@ -56,7 +57,7 @@ castleBonus c ps | possibleToCastle c True ps && possibleToCastle c False ps = (
 
 -- add bonus for moving multiple pieces.
 movePieceBonus :: Colour -> AllPieces -> Int
-movePieceBonus c ps = (length [x | x <- ps, getColour x == c, getMovecount x == 0, getPieceType x == Knight || getPieceType x == Bishop]) * (-2000)
+movePieceBonus c ps = (length [x | x <- ps, getColour x == c, getMovecount x == 0, getPieceType x == Knight || getPieceType x == Bishop]) * (-20)
 
 
 -- returns true if the king is surrounded by friendly pieces.
@@ -83,7 +84,7 @@ protectedEvaluation p ps = analyzeProtection (protecting p ps)
 
 analyzeProtection :: [Piece] -> Float
 analyzeProtection [] = 0
-analyzeProtection xs = (10 - pieceVal (head xs)) + analyzeProtection (tail xs)
+analyzeProtection xs = (9.0 - pieceVal (head xs)) + analyzeProtection (tail xs)
 
 -- analyze the list of all pieces to return a float value for that list - currently used for threaten / protect
 analyzePieces :: Piece -> [Piece] -> Float
@@ -145,8 +146,8 @@ isPassedPawn a ps = all (==True) [pawnClearAhead (getColour a) (y,n) ps | y <- [
 
 -- if a piece is going to be captured then it doesnt really have any material
 pieceMaterial :: Piece -> AllPieces -> Float
-pieceMaterial a ps | (length (threatenedBy a ps) > length (protectedBy a ps)) = 0 - pieceVal a
-                   | getLowestVal (threatenedBy a ps) < pieceVal a = 0 - pieceVal a
+pieceMaterial a ps | (length (threatenedBy a ps) > length (protectedBy a ps)) = 0
+                   | getLowestVal (threatenedBy a ps) < pieceVal a = 0
                    | otherwise = pieceVal a
 
 -- returns the value of the lowest value piece in a list of pieces
