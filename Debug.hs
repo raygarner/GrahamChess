@@ -28,7 +28,7 @@ addEndKings :: AllPieces
 addEndKings = [ (King, c, (m,n), 3) | (c,m,n) <- [(White,4,4), (Black,2,5)]]
 
 addBlackEndPawns :: AllPieces
-addBlackEndPawns = [ (Pawn, Black, (m,n), 4) | (m,n) <- [(2,0),(2,1),(2,7),(3,6),(3,5)]]
+addBlackEndPawns = [ (Pawn, Black, (m,n), 4) | (m,n) <- [(2,0),(2,1),(2,7),(3,6),(4,6)]]
 
 addWhiteEndPawns :: AllPieces
 addWhiteEndPawns = [ (Pawn,White,(m,n),4) | (m,n) <- [(6,0),(5,1),(4,3),(6,7)]]

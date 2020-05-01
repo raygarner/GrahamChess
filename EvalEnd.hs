@@ -5,24 +5,24 @@ import           Init
 import           TypeDefs
 import           Util
 
-evalPieceBonus :: Piece -> AllPieces -> Float
-evalPieceBonus a ps = (threatenKing a ps) + (threatenEvaluation a ps)
+--evalPieceBonus :: Piece -> AllPieces -> Float
+--evalPieceBonus a ps = (threatenKing a ps) + (threatenEvaluation a ps)
 
 totalMaterial :: Colour -> AllPieces -> Float
-totalMaterial c ps = ( (sum [ 200 * pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - (sum [ 200 * pieceMaterial y ps | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
+totalMaterial c ps = ((sum [pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - (sum [pieceVal y | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
 
-totalBonus :: Colour -> AllPieces -> Float
-totalBonus c ps = (sum [evalPieceBonus x ps | x <- ps, getColour x == c]) - (sum [evalPieceBonus y ps | y <- ps, getColour y /= c])
+--totalBonus :: Colour -> AllPieces -> Float
+--totalBonus c ps = (sum [evalPieceBonus x ps | x <- ps, getColour x == c]) - (sum [evalPieceBonus y ps | y <- ps, getColour y /= c])
 
-totalColourBonus :: Colour -> AllPieces -> Float
-totalColourBonus c ps = kingProtection c ps + fromIntegral(getPawnPromotion c ps)
+--totalColourBonus :: Colour -> AllPieces -> Float
+--totalColourBonus c ps = kingProtection c ps + fromIntegral(getPawnPromotion c ps)
 
 
-allPawns :: Colour -> AllPieces -> Float
-allPawns c ps = (sum [passPawnScore x ps | x <- ps, getColour x == c, getPieceType x == Pawn]) - (sum[passPawnScore y ps | y <- ps, getColour y /= c, getPieceType y == Pawn]) * 100
+--allPawns :: Colour -> AllPieces -> Float
+--allPawns c ps = (sum [passPawnScore x ps | x <- ps, getColour x == c, getPieceType x == Pawn]) - (sum[passPawnScore y ps | y <- ps, getColour y /= c, getPieceType y == Pawn]) * 100
 
 totalEndVal :: Colour -> AllPieces -> Float
-totalEndVal a ps =  (totalMaterial a ps) + (totalBonus a ps)  + (allPawns a ps)
+totalEndVal a ps =  (totalMaterial a ps)
 
 pieceVal :: Piece -> Float
 pieceVal (Pawn,_,_,_)   = 5.0
@@ -110,8 +110,8 @@ isPassedPawn a ps = all (==True) [pawnClearAhead (getColour a) (y,n) ps | y <- [
 
 -- if a piece is going to be captured then it doesnt really have any material
 pieceMaterial :: Piece -> AllPieces -> Float
-pieceMaterial a ps | (length (threatenedBy a ps) > length (protectedBy a ps)) = 0 - pieceVal a
-                   | getLowestVal (threatenedBy a ps) < pieceVal a = 0 - pieceVal a
+pieceMaterial a ps | (length (threatenedBy a ps) > length (protectedBy a ps)) = (0 - pieceVal a) * 20.0
+                   | getLowestVal (threatenedBy a ps) < pieceVal a = (0 - pieceVal a) * 7.5
                    | otherwise = pieceVal a
 
 -- returns the value of the lowest value piece in a list of pieces
