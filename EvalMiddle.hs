@@ -16,7 +16,7 @@ totalMaterial :: Colour -> AllPieces -> Float
 totalMaterial c ps = ( (sum [ 100 * pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - (sum [ 100 * pieceMaterial y ps | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
 
 totalMobility :: Colour -> AllPieces -> Float
-totalMobility c ps = ( 1 * sum [ evalPiece x ps | x <- ps, getColour x == c, getPos x /= (-1,-1) ]) - (1 * sum [ evalPiece y ps | y <- ps, getColour y /= c, getPos y /= (-1,-1) ])
+totalMobility c ps = ( 5 * sum [ evalPiece x ps | x <- ps, getColour x == c, getPos x /= (-1,-1) ]) - (5 * sum [ evalPiece y ps | y <- ps, getColour y /= c, getPos y /= (-1,-1) ])
 
 totalBonus :: Colour -> AllPieces -> Float
 totalBonus c ps = (sum [evalPieceBonus x ps | x <- ps, getColour x == c]) - (sum [evalPieceBonus y ps | y <- ps, getColour y /= c])
@@ -25,7 +25,7 @@ allPawns :: Colour -> AllPieces -> Float
 allPawns c ps = (sum [passPawnScore x ps | x <- ps, getColour x == c, getPieceType x == Pawn]) - (sum[passPawnScore y ps | y <- ps, getColour y /= c, getPieceType y == Pawn])
 
 totalMiddleVal :: Colour -> AllPieces -> Float
-totalMiddleVal a ps = (totalMobility a ps) + (totalMaterial a ps) + (totalBonus a ps)  + (allPawns a ps) + fromIntegral(castleBonus a ps + pawnCenterControl a ps + movePieceBonus a ps) + (cornerKingBonus a ps) 
+totalMiddleVal a ps = (totalMobility a ps) + (totalMaterial a ps) + (totalBonus a ps)  + (allPawns a ps) + fromIntegral(castleBonus a ps + pawnCenterControl a ps + movePieceBonus a ps) + (cornerKingBonus a ps)
 
 pieceVal :: Piece -> Float
 pieceVal (Pawn,_,_,_)   = 1.0
@@ -45,7 +45,7 @@ isKingInCorner colour pos | colour == White = any (== pos) [(7,6), (7,2), (7,1)]
                           | otherwise = any (== pos) [(0,6),(0,2),(0,1)]
 
 cornerKingBonus :: Colour -> AllPieces -> Float
-cornerKingBonus c ps | isKingInCorner c kingPos = 25.0
+cornerKingBonus c ps | isKingInCorner c kingPos = 20.0
                      | otherwise = 0.0
                        where
                          kingPos = (findKing c ps)

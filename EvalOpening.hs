@@ -15,7 +15,7 @@ totalMaterial :: Colour -> AllPieces -> Float
 totalMaterial c ps = ( (sum [ 100 * pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - (sum [ 100 * pieceMaterial y ps | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
 
 totalMobility :: Colour -> AllPieces -> Float
-totalMobility c ps = ( 5 * sum [ evalPiece x ps | x <- ps, getColour x == c, getPos x /= (-1,-1) ]) - (5 * sum [ evalPiece y ps | y <- ps, getColour y /= c, getPos y /= (-1,-1) ])
+totalMobility c ps = ( 15 * sum [ evalPiece x ps | x <- ps, getColour x == c, getPos x /= (-1,-1), getPieceType x /= Queen]) - (15 * sum [ evalPiece y ps | y <- ps, getColour y /= c, getPos y /= (-1,-1), getPieceType y /= Queen])
 
 totalBonus :: Colour -> AllPieces -> Float
 totalBonus c ps = (sum [evalPieceBonus x ps | x <- ps, getColour x == c]) - (sum [evalPieceBonus y ps | y <- ps, getColour y /= c])
@@ -43,8 +43,16 @@ isKingInCorner :: Colour -> Pos -> Bool
 isKingInCorner colour pos | colour == White = any (== pos) [(7,6), (7,2), (7,1)]
                           | otherwise = any (== pos) [(0,6),(0,2),(0,1)]
 
+-- returns true if the king is surrounded by friendly pieces.
+isKingSurrounded :: Pos -> Colour -> AllPieces -> Bool
+isKingSurrounded p c ps = length x == length y
+                        where
+                          y = getSurroundingPos p
+                          x = surroundingPieces c y ps
+
 cornerKingBonus :: Colour -> AllPieces -> Float
-cornerKingBonus c ps | isKingInCorner c kingPos = 15.0
+cornerKingBonus c ps | (isKingInCorner c kingPos) && (isKingSurrounded kingPos c ps) = 75.0
+                     | isKingSurrounded kingPos c ps = 15.0
                      | otherwise = 0.0
                        where
                          kingPos = (findKing c ps)
@@ -67,14 +75,6 @@ castleBonus c ps | possibleToCastle c True ps && possibleToCastle c False ps = (
 -- add bonus for moving multiple pieces.
 movePieceBonus :: Colour -> AllPieces -> Int
 movePieceBonus c ps = (length [x | x <- ps, getMovecount x == 0, getPieceType x /= Pawn, getPieceType x /= Queen, getPieceType x /= King, getColour x == c]) * (-20)
-
-
--- returns true if the king is surrounded by friendly pieces.
-isKingSurrounded :: Piece -> AllPieces -> Bool
-isKingSurrounded p ps = length x == length y
-                      where
-                        y = getSurroundingPos (getPos p)
-                        x = surroundingPieces (getColour p) y ps
 
 
 -- returns a float value for whether a piece is aimed at the enemy king.
