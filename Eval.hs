@@ -17,10 +17,10 @@ evalPieceBonus a ps = (threatenKing a ps) + (threatenEvaluation a ps) + (evaluat
 --totalMaterial c ps = 10 * ((sum [ pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - (sum [ pieceVal y  | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
 
 totalMaterial :: Colour -> AllPieces -> Float
-totalMaterial c ps = sum [ (pieceVal (x,White,(0,0),0)) * (countPieceType c x ps) - (countPieceType (invertColour c) x ps) | x <- pieceTypes ]
+totalMaterial c ps = (sum [ (pieceVal (x,White,(0,0),0)) * (countPieceType c x ps) - (countPieceType (invertColour c) x ps) | x <- pieceTypes ])
 
 countPieceType :: Colour -> PieceType -> AllPieces -> Float
-countPieceType c t ps = fromIntegral (length [ x | x <- ps, getColour x == c, getPieceType x == t ])
+countPieceType c t ps = fromIntegral (length [ x | x <- ps, getColour x == c, getPieceType x == t, getPos x /= (-1,-1) ])
 
 pieceTypes :: [PieceType]
 pieceTypes = [Pawn, Knight, Bishop, Rook, Queen, King]
@@ -38,7 +38,7 @@ pawnCenterControl :: Colour -> AllPieces -> Int
 pawnCenterControl colour ps = ( (length [ x | x <- ps, getPieceType x == Pawn, y <- pawnControlledSquares x, any (==y) centralSquares, pieceMaterial x ps /= 0 ]) + (length [ x | x <- ps, getPieceType x == Pawn, any (==getPos x) centralSquares, pieceMaterial x ps /= 0]) ) * 1
 
 totalVal :: Colour -> AllPieces -> Float
-totalVal a ps = totalMobility a ps + totalMaterial a ps -- + fromIntegral (movePieceBonus a ps)-- + fromIntegral (pawnCenterControl a ps) -- + (totalBonus a ps)  + (allPawns a ps) + fromIntegral(castleBonus a ps) + fromIntegral (pawnCenterControl a ps)
+totalVal a ps = totalMobility a ps * 0.1 + totalMaterial a ps * 1.5 + fromIntegral (movePieceBonus a ps) + fromIntegral (pawnCenterControl a ps) + fromIntegral (castleBonus a ps)-- + (totalBonus a ps)  + (allPawns a ps) + fromIntegral(castleBonus a ps) + fromIntegral (pawnCenterControl a ps)
 
 pieceVal :: Piece -> Float
 pieceVal (Pawn,_,_,_)   = 1.0
@@ -59,9 +59,9 @@ closeToCastling c True ps = [x | x <- ps, getColour x == c, castlingPiece x, get
 closeToCastling c False ps = [x | x <- ps, getColour x == c, castlingPiece x, getMovecount x == 0, getColumn (getPos x) == 1 || getColumn (getPos x) == 2 || getColumn (getPos x) == 3]
 
 castleBonus :: Colour -> AllPieces -> Int
-castleBonus c ps | possibleToCastle c True ps && possibleToCastle c False ps = (min (length (closeToCastling c True ps)) (length (closeToCastling c False ps))) * (-15)
-                  | possibleToCastle c True ps = (length (closeToCastling c True ps)) * (-15)
-                  | possibleToCastle c False ps = (length (closeToCastling c False ps)) * (-15)
+castleBonus c ps | possibleToCastle c True ps && possibleToCastle c False ps = (min (length (closeToCastling c True ps)) (length (closeToCastling c False ps))) * (-5)
+                  | possibleToCastle c True ps = (length (closeToCastling c True ps)) * (-5)
+                  | possibleToCastle c False ps = (length (closeToCastling c False ps)) * (-5)
                   | otherwise = 0
 
 -- add bonus for moving multiple pieces.

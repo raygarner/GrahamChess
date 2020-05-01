@@ -154,7 +154,7 @@ upgradeToQueen (piece,colour,(m,n),mc) ps = (Queen, colour, (m,n), mc) : (remove
 promotePawn :: Piece -> Move -> AllPieces -> AllPieces
 promotePawn p move ps = upgradeToQueen piece board
                       where
-                        board = executeMove p move ps
+                        board = updatePosition p move : removePiece p ps
                         piece = head (findPiece (getTarget (getPos p) move) board)
 
 
@@ -285,7 +285,8 @@ movePiece p move ps | isValidMove p move ps && not (willKingBeInCheck p move ps)
 
 --execute move
 executeMove :: Piece -> Move -> AllPieces -> AllPieces
-executeMove p move ps | not (isTargetEnemy p move ps) = updatePosition p move : removePiece p ps
+executeMove p move ps | isValidPromotion p move ps = promotePawn p move ps
+                      | not (isTargetEnemy p move ps) = updatePosition p move : removePiece p ps
                       | otherwise = takePiece y z
                                 where
                                     y = head (findPiece (getTarget (getPos p) move) ps)

@@ -8,6 +8,7 @@ import           TypeDefs
 import           Util
 import           Data.Char
 import           Search
+import           Debug
 import           UI
 
 main :: IO ()
