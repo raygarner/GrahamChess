@@ -21,6 +21,8 @@ getLowestVal ps | null a = 10.0
                   a = [pieceVal x | x <- ps, all (\y -> (pieceVal y) >= pieceVal x) ps]
 
 
+totalColourBonus :: Colour -> AllPieces -> Float
+totalColourBonus c ps = fromIntegral (getPawnPromotion c ps)
 --evalPieceBonus :: Piece -> AllPieces -> Float
 --evalPieceBonus a ps = (threatenKing a ps) + (threatenEvaluation a ps)
 
@@ -36,7 +38,7 @@ getLowestVal ps | null a = 10.0
 --allPawns c ps = (sum [passPawnScore x ps | x <- ps, getColour x == c, getPieceType x == Pawn]) - (sum[passPawnScore y ps | y <- ps, getColour y /= c, getPieceType y == Pawn]) * 100
 
 totalEndVal :: Colour -> AllPieces -> Float
-totalEndVal a ps =  (totalMaterial a ps)
+totalEndVal a ps =  (totalMaterial a ps) + (totalColourBonus a ps)
 
 pieceVal :: Piece -> Float
 pieceVal (Pawn,_,_,_)   = 2.5
@@ -60,13 +62,13 @@ pieceVal (King,_,_,_)   = 1.0
 --                       king = getSurroundingPos (findKing c ps)
 --
 --
--- pawnsNearEnd :: Colour -> AllPieces -> [Piece]
--- pawnsNearEnd White ps = [x | x <- ps, getColour x == White, getRow (getPos x) == 1, getPieceType x == Pawn]
--- pawnsNearEnd Black ps = [x | x <- ps, getColour x == Black, getRow (getPos x) == 6, getPieceType x == Pawn]
+pawnsNearEnd :: Colour -> AllPieces -> [Piece]
+pawnsNearEnd White ps = [x | x <- ps, getColour x == White, getRow (getPos x) == 1, getPieceType x == Pawn]
+pawnsNearEnd Black ps = [x | x <- ps, getColour x == Black, getRow (getPos x) == 6, getPieceType x == Pawn]
 --
--- -- TODO: bonus points for pawns closer to end
--- getPawnPromotion :: Colour -> AllPieces -> Int
--- getPawnPromotion c ps = length (pawnsNearEnd c ps) * 15
+-- TODO: bonus points for pawns closer to end
+getPawnPromotion :: Colour -> AllPieces -> Int
+getPawnPromotion c ps = length (pawnsNearEnd c ps) * 15
 --
 -- -- returns a float value for whether a piece is aimed at the enemy king.
 -- threatenKing :: Piece -> AllPieces -> Float
