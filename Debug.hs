@@ -28,3 +28,18 @@ addTestPieces = addTestKings ++ addTestPawns ++ addTestKnights ++ addTestQueens 
 
 buggedPosition :: AllPieces
 buggedPosition = executeMove (Queen, White, (7,3), 0) (-4,4) (executeMove (Pawn, Black, (1,4), 0) (2,0) (executeMove (Pawn, White, (6,4), 0) (-2,0) addAllPieces))
+
+addEndKings :: AllPieces
+addEndKings = [ (King, c, (m,n), 3) | (c,m,n) <- [(White,4,4), (Black,2,5)]]
+
+addBlackEndPawns :: AllPieces
+addBlackEndPawns = [ (Pawn, Black, (m,n), 4) | (m,n) <- [(2,0),(2,1),(2,7),(3,6),(4,6)]]
+
+addWhiteEndPawns :: AllPieces
+addWhiteEndPawns = [ (Pawn,White,(m,n),4) | (m,n) <- [(6,0),(5,1),(4,3),(6,7)]]
+
+addEndBishops :: AllPieces
+addEndBishops = [(Bishop, c, (m,n),4) | (c,m,n) <- [(White,0,1), (Black,1,4)]]
+
+addEndPieces :: AllPieces
+addEndPieces = addEndKings ++ addBlackEndPawns ++ addWhiteEndPawns ++ addEndBishops
