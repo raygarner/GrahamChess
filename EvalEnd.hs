@@ -6,13 +6,7 @@ import           TypeDefs
 import           Util
 
 totalMaterial :: Colour -> AllPieces -> Float
-totalMaterial c ps = 200 * (sum [ (pieceVal (x,White,(0,0),0)) * (countPieceType c x ps) - (pieceVal (x,Black,(0,0),0)) * (countPieceType (invertColour c) x ps) | x <- pieceTypes ])
-
-countPieceType :: Colour -> PieceType -> AllPieces -> Float
-countPieceType c t ps = fromIntegral (length [ x | x <- ps, getColour x == c, getPieceType x == t, getPos x /= (-1,-1) ])
-
-pieceTypes :: [PieceType]
-pieceTypes = [Pawn, Knight, Bishop, Rook, Queen, King]
+totalMaterial c ps = ((sum [pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - (sum [pieceVal y | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
 
 --evalPieceBonus :: Piece -> AllPieces -> Float
 --evalPieceBonus a ps = (threatenKing a ps) + (threatenEvaluation a ps)
