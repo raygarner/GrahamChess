@@ -12,7 +12,7 @@ import           Debug
 import           UI
 
 main :: IO ()
-main = gameLoop addAllPieces
+main = gameLoop addEndPieces
 
 
 
