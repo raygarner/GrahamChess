@@ -10,7 +10,7 @@ import Debug.Trace
 findRealBestMove :: Colour -> AllPieces -> (Piece, Move, Float)
 findRealBestMove c ps = findStrongestMoveFromAll [ addTrueEval (c,c) 0 x ps | x <- makeEvalList c ps]
 
--- updates the evaluation for moves by looking moves into the futur2 NOTE: L LIMIT MUST BE EVEN
+-- updates the evaluation for moves by looking moves into the futur2 NOTE: L LIMIT MUST BE EVEN (12 works nicely imo)
 addTrueEval :: (Colour,Colour) -> Int -> (Piece,Move,Float) -> AllPieces -> (Piece,Move,Float)
 addTrueEval (c,nc) l (p,m,f) ps | l == 12 = if isCheckmate (invertColour c) ps then
                                                (p,m,checkmate)
