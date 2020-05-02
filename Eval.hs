@@ -17,7 +17,7 @@ evalPieceBonus a ps = (threatenKing a ps) + (threatenEvaluation a ps) + (evaluat
 --totalMaterial c ps = 10 * ((sum [ pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - (sum [ pieceVal y  | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
 
 totalMaterial :: Colour -> AllPieces -> Float
-totalMaterial c ps = 10 * (sum [ (pieceVal (x,White,(0,0),0)) * (countPieceType c x ps) - (pieceVal (x,Black,(0,0),0)) * (countPieceType (invertColour c) x ps) | x <- pieceTypes ])
+totalMaterial c ps = 20 * (sum [ (pieceVal (x,White,(0,0),0)) * (countPieceType c x ps) - (pieceVal (x,Black,(0,0),0)) * (countPieceType (invertColour c) x ps) | x <- pieceTypes ])
 
 --totalMaterial c ps = (sum [ (pieceVal (x,White,(0,0),0)) * (countPieceType c x ps) | x <- pieceTypes ])
 
@@ -36,7 +36,7 @@ pieceTypes :: [PieceType]
 pieceTypes = [Pawn, Knight, Bishop, Rook, Queen, King]
 
 totalMobility :: Colour -> AllPieces -> Float
-totalMobility c ps = 1 * ( sum [ evalPiece x ps | x <- ps, getColour x == c, getPos x /= (-1,-1) ]) -- - ( sum [ evalPiece y ps | y <- ps, getColour y /= c, getPos y /= (-1,-1) ])
+totalMobility c ps = 0.5 * ( sum [ evalPiece x ps | x <- ps, getColour x == c, getPos x /= (-1,-1) ]) -- - ( sum [ evalPiece y ps | y <- ps, getColour y /= c, getPos y /= (-1,-1) ])
 
 totalBonus :: Colour -> AllPieces -> Float
 totalBonus c ps = (sum [evalPieceBonus x ps | x <- ps, getColour x == c]) - (sum [evalPieceBonus y ps | y <- ps, getColour y /= c])
