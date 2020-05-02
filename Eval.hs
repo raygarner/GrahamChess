@@ -17,7 +17,7 @@ evalPieceBonus a ps = (threatenKing a ps) + (threatenEvaluation a ps) + (evaluat
 --totalMaterial c ps = 10 * ((sum [ pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - (sum [ pieceVal y  | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
 
 totalMaterial :: Colour -> AllPieces -> Float
-totalMaterial c ps = 20 * (sum [ (pieceVal (x,White,(0,0),0)) * (countPieceType c x ps) - (pieceVal (x,Black,(0,0),0)) * (countPieceType (invertColour c) x ps) | x <- pieceTypes ])
+totalMaterial c ps = 200 * (sum [ (pieceVal (x,White,(0,0),0)) * (countPieceType c x ps) - (pieceVal (x,Black,(0,0),0)) * (countPieceType (invertColour c) x ps) | x <- pieceTypes ])
 
 --totalMaterial c ps = (sum [ (pieceVal (x,White,(0,0),0)) * (countPieceType c x ps) | x <- pieceTypes ])
 
@@ -48,7 +48,7 @@ pawnCenterControl :: Colour -> AllPieces -> Int
 pawnCenterControl colour ps = ( (length [ x | x <- ps, getPieceType x == Pawn, y <- pawnControlledSquares x, any (==y) centralSquares, pieceMaterial x ps /= 0 ]) + (length [ x | x <- ps, getPieceType x == Pawn, any (==getPos x) centralSquares, pieceMaterial x ps /= 0]) ) * 1
 
 totalVal :: Colour -> AllPieces -> Float
-totalVal a ps = (totalMobility a ps - totalMobility (invertColour a) ps) + totalMaterial a ps-- + fromIntegral (movePieceBonus a ps) -- -(movePieceBonus (invertColour a) ps))-- + fromIntegral ((pawnCenterControl a ps)-(pawnCenterControl (invertColour a) ps)) + fromIntegral ((castleBonus a ps)-(castleBonus (invertColour a) ps))-- + (totalBonus a ps)  + (allPawns a ps) + fromIntegral(castleBonus a ps) + fromIntegral (pawnCenterControl a ps)
+totalVal a ps = (totalMobility a ps - totalMobility (invertColour a) ps) + totalMaterial a ps -- + fromIntegral ((movePieceBonus a ps) - (movePieceBonus (invertColour a) ps))-- + fromIntegral ((pawnCenterControl a ps)-(pawnCenterControl (invertColour a) ps)) + fromIntegral ((castleBonus a ps)-(castleBonus (invertColour a) ps))-- + (totalBonus a ps)  + (allPawns a ps) + fromIntegral(castleBonus a ps) + fromIntegral (pawnCenterControl a ps)
 
 pieceVal :: Piece -> Float
 pieceVal (Pawn,_,_,_)   = 1.0
