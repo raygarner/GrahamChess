@@ -10,9 +10,9 @@ import Debug.Trace
 findRealBestMove :: Colour -> AllPieces -> (Piece, Move, Float)
 findRealBestMove c ps = findStrongestMoveFromAll [ addTrueEval (c,c) 0 x ps | x <- makeEvalList c ps]
 
--- updates the evaluation for moves by looking moves into the futur2
+-- updates the evaluation for moves by looking moves into the futur2 NOTE: L LIMIT MUST BE EVEN
 addTrueEval :: (Colour,Colour) -> Int -> (Piece,Move,Float) -> AllPieces -> (Piece,Move,Float)
-addTrueEval (c,nc) l (p,m,f) ps | l == 5 = if isCheckmate (invertColour c) ps then
+addTrueEval (c,nc) l (p,m,f) ps | l == 8 = if isCheckmate (invertColour c) ps then
                                                (p,m,checkmate)
                                            else if isCheckmate c ps then
                                                (p,m,0-checkmate)
@@ -25,7 +25,8 @@ addTrueEval (c,nc) l (p,m,f) ps | l == 5 = if isCheckmate (invertColour c) ps th
                                               else addTrueEval (c,(invertColour nc)) (l+1) (p,m,0) (makeSingleBestMove e ps)
                                   where
                                       e = findSingleBestMove nc ps
-                                      v = if nc == c then (totalVal c ps) + materialInDanger (invertColour c) ps else (totalVal c ps) - materialInDanger c ps
+                                      --v = if nc == c then (totalVal c ps) + materialInDanger (invertColour c) ps else (totalVal c ps) - materialInDanger c ps
+                                      v = totalVal c ps
 
 -- returns the total val difference
 totalValDiff :: Colour -> AllPieces -> Float
