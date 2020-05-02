@@ -36,7 +36,7 @@ pieceTypes :: [PieceType]
 pieceTypes = [Pawn, Knight, Bishop, Rook, Queen, King]
 
 totalMobility :: Colour -> AllPieces -> Float
-totalMobility c ps = 0.5 * ( sum [ evalPiece x ps | x <- ps, getColour x == c, getPos x /= (-1,-1) ]) -- - ( sum [ evalPiece y ps | y <- ps, getColour y /= c, getPos y /= (-1,-1) ])
+totalMobility c ps = 1 * ( sum [ evalPiece x ps | x <- ps, getColour x == c, getPos x /= (-1,-1) ]) -- - ( sum [ evalPiece y ps | y <- ps, getColour y /= c, getPos y /= (-1,-1) ])
 
 totalBonus :: Colour -> AllPieces -> Float
 totalBonus c ps = (sum [evalPieceBonus x ps | x <- ps, getColour x == c]) - (sum [evalPieceBonus y ps | y <- ps, getColour y /= c])
@@ -48,7 +48,7 @@ pawnCenterControl :: Colour -> AllPieces -> Int
 pawnCenterControl colour ps = ( (length [ x | x <- ps, getPieceType x == Pawn, y <- pawnControlledSquares x, any (==y) centralSquares, pieceMaterial x ps /= 0 ]) + (length [ x | x <- ps, getPieceType x == Pawn, any (==getPos x) centralSquares, pieceMaterial x ps /= 0]) ) * 1
 
 totalVal :: Colour -> AllPieces -> Float
-totalVal a ps = totalMobility a ps + totalMaterial a ps --  + fromIntegral (movePieceBonus a ps) -- -(movePieceBonus (invertColour a) ps))-- + fromIntegral ((pawnCenterControl a ps)-(pawnCenterControl (invertColour a) ps)) + fromIntegral ((castleBonus a ps)-(castleBonus (invertColour a) ps))-- + (totalBonus a ps)  + (allPawns a ps) + fromIntegral(castleBonus a ps) + fromIntegral (pawnCenterControl a ps)
+totalVal a ps = (totalMobility a ps - totalMobility (invertColour a) ps) + totalMaterial a ps-- + fromIntegral (movePieceBonus a ps) -- -(movePieceBonus (invertColour a) ps))-- + fromIntegral ((pawnCenterControl a ps)-(pawnCenterControl (invertColour a) ps)) + fromIntegral ((castleBonus a ps)-(castleBonus (invertColour a) ps))-- + (totalBonus a ps)  + (allPawns a ps) + fromIntegral(castleBonus a ps) + fromIntegral (pawnCenterControl a ps)
 
 pieceVal :: Piece -> Float
 pieceVal (Pawn,_,_,_)   = 1.0
@@ -76,7 +76,7 @@ castleBonus c ps | possibleToCastle c True ps && possibleToCastle c False ps = (
 
 -- add bonus for moving multiple pieces.
 movePieceBonus :: Colour -> AllPieces -> Int
-movePieceBonus c ps = (length [x | x <- ps, getColour x == c, getMovecount x == 0, getPieceType x == Knight || getPieceType x == Bishop]) * (-100)
+movePieceBonus c ps = (length [x | x <- ps, getColour x == c, getMovecount x == 0, getPieceType x == Knight || getPieceType x == Bishop]) * (-60)
 
 
 -- returns true if the king is surrounded by friendly pieces.
