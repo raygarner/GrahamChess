@@ -8,6 +8,19 @@ import           Util
 totalMaterial :: Colour -> AllPieces -> Float
 totalMaterial c ps = ((sum [pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - (sum [pieceVal y | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
 
+-- if a piece is going to be captured then it doesnt really have any material
+pieceMaterial :: Piece -> AllPieces -> Float
+pieceMaterial a ps | (length (threatenedBy a ps) > length (protectedBy a ps)) = (0 - pieceVal a) * 20.0
+                   | getLowestVal (threatenedBy a ps) < pieceVal a = (0 - pieceVal a) * 7.5
+                   | otherwise = pieceVal a
+
+getLowestVal :: [Piece] -> Float
+getLowestVal ps | null a = 10.0
+                | otherwise = head a
+                where
+                  a = [pieceVal x | x <- ps, all (\y -> (pieceVal y) >= pieceVal x) ps]
+
+
 --evalPieceBonus :: Piece -> AllPieces -> Float
 --evalPieceBonus a ps = (threatenKing a ps) + (threatenEvaluation a ps)
 
@@ -26,7 +39,7 @@ totalEndVal :: Colour -> AllPieces -> Float
 totalEndVal a ps =  (totalMaterial a ps)
 
 pieceVal :: Piece -> Float
-pieceVal (Pawn,_,_,_)   = 5.0
+pieceVal (Pawn,_,_,_)   = 2.5
 pieceVal (Knight,_,_,_) = 3.0
 pieceVal (Bishop,_,_,_) = 3.5
 pieceVal (Rook,_,_,_)   = 5.0
