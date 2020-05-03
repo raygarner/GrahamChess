@@ -283,9 +283,17 @@ movePiece p move ps | isValidMove p move ps && not (willKingBeInCheck p move ps)
 --hasKingNotMoved White a b = not b
 --hasKingNotMoved Black a b = not a
 
+-- executes a castle move -- WORKING
+executeCastle :: Piece -> Move -> AllPieces -> AllPieces
+--executeCastle p (0,2) ps = executeMove p (0,2) (executeMove (head (findPiece (getKingsCastle (getColour p)) ps)) (0,-2) ps)
+--executeCastle p (0,-2) ps = executeMove p (0,-2) (executeMove (head (findPiece (getQueensCastle (getColour p)) ps)) (0,3) ps)
+executeCastle p (0,2) ps = updatePosition p (0,2) : removePiece p (executeMove (head (findPiece (getKingsCastle (getColour p)) ps)) (0,-2) ps)
+executeCastle p (0,-2) ps = updatePosition p (0,-2) : removePiece p (executeMove (head (findPiece (getQueensCastle (getColour p)) ps)) (0,3) ps)
+
 --execute move
 executeMove :: Piece -> Move -> AllPieces -> AllPieces
 executeMove p move ps | isValidPromotion p move ps = promotePawn p move ps
+                      | validCastle p move ps = trace "epic" executeCastle p move ps
                       | not (isTargetEnemy p move ps) = updatePosition p move : removePiece p ps
                       | otherwise = takePiece y z
                                 where
@@ -336,11 +344,6 @@ validCastle :: Piece -> Move -> AllPieces -> Bool
 validCastle p (0,2) ps  = isStraightMovePathEmpty (getPos p) (0,2) ps && possibleToCastle (getColour p) True ps
 validCastle p (0,-2) ps = isStraightMovePathEmpty (getPos p) (0,-3) ps && possibleToCastle (getColour p) False ps
 validCastle _ _ _ = False
-
--- executes a castle move -- WORKING
-executeCastle :: Piece -> Move -> AllPieces -> AllPieces
-executeCastle p (0,2) ps = executeMove p (0,2) (executeMove (head (findPiece (getKingsCastle (getColour p)) ps)) (0,-2) ps)
-executeCastle p (0,-2) ps = executeMove p (0,-2) (executeMove (head (findPiece (getQueensCastle (getColour p)) ps)) (0,3) ps)
 
 -- return a list of legal moves that a knight can make
 legalKnightMoves :: Piece -> AllPieces -> [Move]

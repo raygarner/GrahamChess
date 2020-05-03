@@ -19,7 +19,7 @@ addTrueEval (c,nc) l (p,m,f) ps | l == 12 = if isCheckmate (invertColour c) ps t
                                            else if isCheckmate c ps then
                                                (p,m,0-checkmate-(fromIntegral l))
                                            else (p,m,v+f)
-                                | l == 0 = if f == checkmate then (p,m,v) else addTrueEval (c,(invertColour nc)) (l+1) (p,m,v) (executeMove p m ps)
+                                | l == 0 = if f == checkmate then (p,m,f) else addTrueEval (c,(invertColour nc)) (l+1) (p,m,v) (executeMove p m ps)
                                 | otherwise = if isCheckmate (invertColour c) ps then
                                                   (p,m,checkmate-(fromIntegral l))
                                               else if isCheckmate c ps then

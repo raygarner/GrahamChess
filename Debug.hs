@@ -61,3 +61,7 @@ addEnd2Rooks = [ (Rook, White, (m,n),3) | (m,n) <- [(5,7),(6,1)]]
 
 addEnd2Pieces :: AllPieces
 addEnd2Pieces = addEnd2Kings ++ addEnd2Pawns ++ addEnd2Rooks
+
+-- pieces for testing castling
+addCastleTest :: AllPieces
+addCastleTest = addKings ++ addRooks

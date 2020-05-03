@@ -12,7 +12,7 @@ import           Debug
 import           UI
 
 main :: IO ()
-main = gameLoop addEnd2Pieces
+main = gameLoop addAllPieces
 
 
 
@@ -35,7 +35,7 @@ gameLoop ps = do printBoard (-1) ps
                        print ps
                        printBoard (-1) ps
                        putStr "Graham is thinking of a move...\n"
-                       response <- return (findRealBestMove White ps)
+                       response <- return (findRealBestMove Black ps)
                        print response
                        putStr "Graham has made his move...\n"
                        move <- return (extractMove response)
