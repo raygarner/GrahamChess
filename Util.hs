@@ -293,7 +293,7 @@ executeCastle p (0,-2) ps = updatePosition p (0,-2) : removePiece p (executeMove
 --execute move
 executeMove :: Piece -> Move -> AllPieces -> AllPieces
 executeMove p move ps | isValidPromotion p move ps = promotePawn p move ps
-                      | validCastle p move ps = trace "epic" executeCastle p move ps
+                      | validCastle p move ps = executeCastle p move ps
                       | not (isTargetEnemy p move ps) = updatePosition p move : removePiece p ps
                       | otherwise = takePiece y z
                                 where

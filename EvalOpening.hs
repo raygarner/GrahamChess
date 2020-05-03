@@ -52,7 +52,8 @@ pawnCenterControl :: Colour -> AllPieces -> Int
 pawnCenterControl colour ps = ( (length [ x | x <- ps, getPieceType x == Pawn, y <- pawnControlledSquares x, any (==y) centralSquares, pieceMaterial x ps /= 0 ]) + (length [ x | x <- ps, getPieceType x == Pawn, any (==getPos x) centralSquares, pieceMaterial x ps /= 0]) ) * 1
 
 totalOpeningVal :: Colour -> AllPieces -> Float
-totalOpeningVal a ps = (totalMobility a ps - totalMobility (invertColour a) ps) + totalMaterial a ps + fromIntegral (castleBonus a ps - castleBonus (invertColour a) ps)-- + fromIntegral ((movePieceBonus a ps) - (movePieceBonus (invertColour a) ps))-- + fromIntegral ((pawnCenterControl a ps)-(pawnCenterControl (invertColour a) ps)) + fromIntegral ((castleBonus a ps)-(castleBonus (invertColour a) ps))-- + (totalBonus a ps)  + (allPawns a ps) + fromIntegral(castleBonus a ps) + fromIntegral (pawnCenterControl a ps)
+--totalOpeningVal a ps = (totalMobility a ps - totalMobility (invertColour a) ps) + totalMaterial a ps -- + fromIntegral (castleBonus a ps - castleBonus (invertColour a) ps)-- + fromIntegral ((movePieceBonus a ps) - (movePieceBonus (invertColour a) ps))-- + fromIntegral ((pawnCenterControl a ps)-(pawnCenterControl (invertColour a) ps)) + fromIntegral ((castleBonus a ps)-(castleBonus (invertColour a) ps))-- + (totalBonus a ps)  + (allPawns a ps) + fromIntegral(castleBonus a ps) + fromIntegral (pawnCenterControl a ps)
+totalOpeningVal a ps = (totalMobility a ps - totalMobility (invertColour a) ps) + totalMaterial a ps + fromIntegral ((movePieceBonus a ps) - (movePieceBonus (invertColour a) ps))
 
 pieceVal :: Piece -> Float
 pieceVal (Pawn,_,_,_)   = 1.0
@@ -80,7 +81,7 @@ castleBonus c ps | possibleToCastle c True ps && possibleToCastle c False ps = (
 
 -- add bonus for moving multiple pieces.
 movePieceBonus :: Colour -> AllPieces -> Int
-movePieceBonus c ps = (length [x | x <- ps, getColour x == c, getMovecount x == 0, getPieceType x == Knight || getPieceType x == Bishop]) * (-60)
+movePieceBonus c ps = (length [x | x <- ps, getColour x == c, getMovecount x == 0, getPieceType x == Knight || getPieceType x == Bishop]) * (-20)
 
 
 -- returns true if the king is surrounded by friendly pieces.
