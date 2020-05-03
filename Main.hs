@@ -23,27 +23,33 @@ gameLoop ps = do printBoard 0 ps
                  n <- getLine
                  r <- getLine
                  c <- getLine
-                 piece <- return ( head (findPiece (read m, read n) ps))
-                 print piece
-                 move <- return (buildMove (r,c))
-                 print move
-                 if (isMoveOk piece move ps) then
+                 piece <- return (findPiece (read m, read n) ps)
+                 if (not (null piece)) then
                    do
-                     ps <- return (executeMove piece move ps)
-                     print ps
-                     printBoard 0 ps
-                     putStr "Graham is thinking of a move...\n"
-                     response <- return (findRealBestMove Black ps)
-                     print response
-                     putStr "Graham has made his move...\n"
-                     move <- return (extractMove response)
-                     print move
-                     piece <- return (extractPiece response)
-                     print piece
-                     gameLoop (executeMove piece move ps)
+                   print (head piece)
+                   move <- return (buildMove (r,c))
+                   print move
+                   if (isMoveOk (head piece) move ps) then
+                     do
+                       ps <- return (executeMove (head piece) move ps)
+                       print ps
+                       printBoard 0 ps
+                       putStr "Graham is thinking of a move...\n"
+                       response <- return (findRealBestMove Black ps)
+                       print response
+                       putStr "Graham has made his move...\n"
+                       move <- return (extractMove response)
+                       print move
+                       piece <- return (extractPiece response)
+                       print piece
+                       gameLoop (executeMove piece move ps)
+                   else
+                     do
+                       putStr ("Move is invalid - either your king is in check or your piece cannot move there.\n")
+                       gameLoop ps
                  else
                    do
-                     putStr ("Move is invalid - either your king is in check or your piece cannot move there.\n")
+                     putStr ("A piece does not exist at that position.\n")
                      gameLoop ps
 
 
