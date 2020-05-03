@@ -17,7 +17,7 @@ main = gameLoop addAllPieces
 
 
 gameLoop :: AllPieces -> IO ()
-gameLoop ps = do printBoard 0 ps
+gameLoop ps = do printBoard (-1) ps
                  if (not (isEitherCheckmate ps)) then
                    do
                      putStr "Your turn: \n"
@@ -35,7 +35,7 @@ gameLoop ps = do printBoard 0 ps
                            do
                              ps <- return (executeMove (head piece) move ps)
                              print ps
-                             printBoard 0 ps
+                             printBoard (-1) ps
                              if (not (isEitherCheckmate ps)) then
                                do
                                  putStr "Graham is thinking of a move...\n"

@@ -53,7 +53,11 @@ pawnCenterControl colour ps = ( (length [ x | x <- ps, getPieceType x == Pawn, y
 
 totalOpeningVal :: Colour -> AllPieces -> Float
 --totalOpeningVal a ps = (totalMobility a ps - totalMobility (invertColour a) ps) + totalMaterial a ps -- + fromIntegral (castleBonus a ps - castleBonus (invertColour a) ps)-- + fromIntegral ((movePieceBonus a ps) - (movePieceBonus (invertColour a) ps))-- + fromIntegral ((pawnCenterControl a ps)-(pawnCenterControl (invertColour a) ps)) + fromIntegral ((castleBonus a ps)-(castleBonus (invertColour a) ps))-- + (totalBonus a ps)  + (allPawns a ps) + fromIntegral(castleBonus a ps) + fromIntegral (pawnCenterControl a ps)
-totalOpeningVal a ps = (totalMobility a ps - totalMobility (invertColour a) ps) + totalMaterial a ps + fromIntegral ((movePieceBonus a ps) - (movePieceBonus (invertColour a) ps))
+totalOpeningVal a ps = (totalMobility a ps - totalMobility (invertColour a) ps) + totalMaterial a ps + castleMotive a ps -- + fromIntegral ((movePieceBonus a ps) - (movePieceBonus (invertColour a) ps))
+
+castleMotive :: Colour -> AllPieces -> Float
+castleMotive c ps | possibleToCastle c True ps || possibleToCastle c False ps && any (==getColumn (findKing c ps)) [3..5] = (-60)
+                  | otherwise = 0
 
 pieceVal :: Piece -> Float
 pieceVal (Pawn,_,_,_)   = 1.0
