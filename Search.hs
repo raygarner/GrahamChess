@@ -4,6 +4,7 @@ import TypeDefs
 import Init
 import Util
 import Eval
+import EvalOpening
 import Debug.Trace
 import Debug
 
@@ -18,7 +19,7 @@ addTrueEval (c,nc) l (p,m,f) ps | l == 12 = if isCheckmate (invertColour c) ps t
                                            else if isCheckmate c ps then
                                                (p,m,0-checkmate)
                                            else (p,m,v+f)
-                                | l == 0 = if f == checkmate then (p,m,f) else addTrueEval (c,(invertColour nc)) (l+1) (p,m,v) (executeMove p m ps)
+                                | l == 0 = if f == checkmate then (p,m,v) else addTrueEval (c,(invertColour nc)) (l+1) (p,m,v) (executeMove p m ps)
                                 | otherwise = if isCheckmate (invertColour c) ps then
                                                   (p,m,checkmate)
                                               else if isCheckmate c ps then
@@ -27,7 +28,7 @@ addTrueEval (c,nc) l (p,m,f) ps | l == 12 = if isCheckmate (invertColour c) ps t
                                   where
                                       e = findSingleBestMove nc ps
                                       --v = if nc == c then (totalVal c ps) + materialInDanger (invertColour c) ps else (totalVal c ps) - materialInDanger c ps
-                                      v = totalVal c ps
+                                      v = if c /= nc then totalVal c ps else 0 - totalVal nc ps
 
 -- returns the total val difference
 totalValDiff :: Colour -> AllPieces -> Float
