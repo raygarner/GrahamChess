@@ -17,7 +17,7 @@ main = gameLoop addAllPieces
 
 
 gameLoop :: AllPieces -> IO ()
-gameLoop ps = do printBoard 0 ps
+gameLoop ps = do printBoard (-1) ps
                  putStr "Your turn: \n"
                  m <- getLine
                  n <- getLine
@@ -33,7 +33,7 @@ gameLoop ps = do printBoard 0 ps
                      do
                        ps <- return (executeMove (head piece) move ps)
                        print ps
-                       printBoard 0 ps
+                       printBoard (-1) ps
                        putStr "Graham is thinking of a move...\n"
                        response <- return (findRealBestMove Black ps)
                        print response
