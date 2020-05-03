@@ -205,7 +205,7 @@ isQueenValidMove p move ps = isRookValidMove p move ps || isBishopValidMove p mo
 
 -- returns the position of the king WORKING
 findKing :: Colour -> AllPieces -> Pos
-findKing colour ps | null l = trace (show colour ++ "\n" ++ show ps) (-1,-1)
+findKing colour ps | null l = (-1,-1)
                    | otherwise = head l
                    where
                      l = [(x,y) | (t, c, (x,y), m) <- ps, t == King, c == colour, x > -1, y > -1, x < 8, y < 8 ]
@@ -431,4 +431,7 @@ colourLegalMoves c ps = [legalMoves x ps | x <- ps, getColour x == c]
 
 -- returns true if either colour is in checkmate
 isEitherCheckmate :: AllPieces -> Bool
-isEitherCheckmate ps = all (null) (colourLegalMoves White ps) || all (null) (colourLegalMoves Black ps)
+isEitherCheckmate ps = (all (null) (colourLegalMoves White ps) && isKingInCheck whiteKing ps) || (all (null) (colourLegalMoves Black ps) && isKingInCheck blackKing ps)
+                       where
+                         whiteKing = head (findPiece (findKing White ps) ps)
+                         blackKing = head (findPiece (findKing Black ps) ps)

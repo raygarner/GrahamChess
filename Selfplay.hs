@@ -19,7 +19,7 @@ main = gameLoop White addAllPieces
 
 gameLoop :: Colour -> AllPieces -> IO ()
 gameLoop c ps = do putStr "Graham is thinking of a move...\n"
-                   printBoard 0 ps
+                   printBoard (-1) ps
                    response <- return (findRealBestMove c ps)
                    print response
                    --putStr "Graham has made his move...\n"

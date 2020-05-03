@@ -23,8 +23,9 @@ colourCase c s | c == White = toUpper s
                | otherwise  = toLower s
 
 printBoard :: Int -> AllPieces -> IO ()
-printBoard 64 ps = do printCapturedPieces White ps
-                      printCapturedPieces Black ps
+printBoard 64 ps = do printCapturedPieces Black ps
+printBoard (-1) ps = do printCapturedPieces White ps
+                        printBoard 0 ps
 printBoard n ps = do if isEmpty (calcPos n) ps then
                          putChar '-'
                      else
@@ -38,7 +39,8 @@ printBoard n ps = do if isEmpty (calcPos n) ps then
                      printBoard (n+1) ps
 
 printCapturedPieces :: Colour -> AllPieces -> IO ()
-printCapturedPieces c ps = printPieceList (getCapturedPieces c ps)
+printCapturedPieces c ps = do printPieceList (getCapturedPieces c ps)
+                              putStr "===============\n"
 
 printPieceList :: [Piece] -> IO ()
 printPieceList [] = return ()
