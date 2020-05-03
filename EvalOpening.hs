@@ -56,7 +56,9 @@ totalOpeningVal :: Colour -> AllPieces -> Float
 totalOpeningVal a ps = (totalMobility a ps - totalMobility (invertColour a) ps) + totalMaterial a ps + castleMotive a ps -- + fromIntegral ((movePieceBonus a ps) - (movePieceBonus (invertColour a) ps))
 
 castleMotive :: Colour -> AllPieces -> Float
-castleMotive c ps | possibleToCastle c True ps || possibleToCastle c False ps && any (==getColumn (findKing c ps)) [3..5] = (-60)
+--castleMotive c ps | possibleToCastle c True ps || possibleToCastle c False ps && any (==getColumn (findKing c ps)) [3..5] = 0
+ --                 | otherwise = 30
+castleMotive c ps | any (==getColumn (findKing c ps)) [3..5] = (-20)
                   | otherwise = 0
 
 pieceVal :: Piece -> Float
