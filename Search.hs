@@ -12,6 +12,9 @@ import Debug
 findRealBestMove :: Colour -> AllPieces -> (Piece, Move, Float)
 findRealBestMove c ps = findStrongestMoveFromAll [ addTrueEval (c,c) 0 x ps | x <- makeEvalList c ps]
 
+getScores :: Colour -> AllPieces -> [(Piece,Move,Float)]
+getScores c ps = [ addTrueEval (c,c) 0 x ps | x <- makeEvalList c ps]
+
 -- updates the evaluation for moves by looking moves into the futur2 NOTE: L LIMIT MUST BE EVEN (12 works nicely imo)
 addTrueEval :: (Colour,Colour) -> Int -> (Piece,Move,Float) -> AllPieces -> (Piece,Move,Float)
 addTrueEval (c,nc) l (p,m,f) ps | l == 12 = if isCheckmate (invertColour c) ps then
@@ -19,7 +22,7 @@ addTrueEval (c,nc) l (p,m,f) ps | l == 12 = if isCheckmate (invertColour c) ps t
                                            else if isCheckmate c ps then
                                                (p,m,0-checkmate-(fromIntegral l))
                                            else (p,m,v+f)
-                                | l == 0 = if f == checkmate then (p,m,v) else addTrueEval (c,(invertColour nc)) (l+1) (p,m,v) (executeMove p m ps)
+                                | l == 0 = if f == checkmate then (p,m,f) else addTrueEval (c,(invertColour nc)) (l+1) (p,m,v) (executeMove p m ps)
                                 | otherwise = if isCheckmate (invertColour c) ps then
                                                   (p,m,checkmate-(fromIntegral l))
                                               else if isCheckmate c ps then
@@ -72,4 +75,4 @@ isCheckmate c ps = null (makeEvalList c ps)
 --isCheckmate c ps = null [ y | x <- ps, getColour x == c, y <- legalMoves x ps, getPos x /= (-1,-1) ]
 
 checkmate :: Float
-checkmate = 1000000.0
+checkmate = 10000.0

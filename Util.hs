@@ -331,7 +331,7 @@ possibleToCastle c True ps = not (null (findPiece (getKingsCastle c) ps)) && get
 possibleToCastle c False ps = not (null (findPiece (getQueensCastle c) ps)) && getMovecount (head (findPiece (findKing c ps) ps)) == 0 && getMovecount (head (findPiece (getQueensCastle c) ps)) == 0
 
 
---returns whether a castle is valid or not
+--returns whether a castle is valid or not TODO: king can still castle through check
 validCastle :: Piece -> Move -> AllPieces -> Bool
 validCastle p (0,2) ps  = isStraightMovePathEmpty (getPos p) (0,2) ps && possibleToCastle (getColour p) True ps
 validCastle p (0,-2) ps = isStraightMovePathEmpty (getPos p) (0,-3) ps && possibleToCastle (getColour p) False ps
@@ -425,3 +425,10 @@ isIntOnBoard a | a < 0 || a > 7 = False
 
 getSurroundingPos :: Pos -> [Pos]
 getSurroundingPos (m,n) = [ (row,col) | row <- [m-1..m+1], col <- [n-1..n+1], isIntOnBoard row, isIntOnBoard col, (row,col) /= (m,n)]
+
+colourLegalMoves :: Colour -> AllPieces -> [[Move]]
+colourLegalMoves c ps = [legalMoves x ps | x <- ps, getColour x == c]
+
+-- returns true if either colour is in checkmate
+isEitherCheckmate :: AllPieces -> Bool
+isEitherCheckmate ps = all (null) (colourLegalMoves White ps) || all (null) (colourLegalMoves Black ps)
