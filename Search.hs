@@ -12,6 +12,9 @@ import Debug
 findRealBestMove :: Colour -> AllPieces -> (Piece, Move, Float)
 findRealBestMove c ps = findStrongestMoveFromAll [ addTrueEval (c,c) 0 x ps | x <- makeEvalList c ps]
 
+getScores :: Colour -> AllPieces -> [(Piece,Move,Float)]
+getScores c ps = [ addTrueEval (c,c) 0 x ps | x <- makeEvalList c ps]
+
 -- updates the evaluation for moves by looking moves into the futur2 NOTE: L LIMIT MUST BE EVEN (12 works nicely imo)
 addTrueEval :: (Colour,Colour) -> Int -> (Piece,Move,Float) -> AllPieces -> (Piece,Move,Float)
 addTrueEval (c,nc) l (p,m,f) ps | l == 12 = if isCheckmate (invertColour c) ps then
@@ -42,7 +45,7 @@ findSingleBestMove c ps = findStrongestMoveFromAll (makeEvalList c ps)
 -- returns the stronget move from a list of moves with evaluations
 findStrongestMoveFromAll :: [(Piece,Move,Float)] -> (Piece,Move,Float)
 findStrongestMoveFromAll xs | not (null xs) = head [ x | x <- xs, all (\y -> (getMoveEval y) <= (getMoveEval x)) xs ]
-                            | otherwise = trace "empty list !!!" ((King, White, (7,4), 0), (0,0), 0-checkmate)
+                            | otherwise = ((King, White, (7,4), 0), (0,0), 0-checkmate)
 
 -- extracts the evaluation element of the move tuple
 getMoveEval :: (Piece, Move, Float) -> Float
@@ -68,8 +71,10 @@ evalMove a m ps | isCheckmate (invertColour (getColour a)) (executeMove a m ps) 
                 | otherwise = totalVal (getColour a) (executeMove a m ps)
 
 isCheckmate :: Colour -> AllPieces -> Bool
-isCheckmate c ps = null (makeEvalList c ps)
+isCheckmate c ps = null (makeEvalList c ps) && isKingInCheck king ps
+                   where
+                     king = head (findPiece (findKing c ps) ps)
 --isCheckmate c ps = null [ y | x <- ps, getColour x == c, y <- legalMoves x ps, getPos x /= (-1,-1) ]
 
 checkmate :: Float
-checkmate = 1000000.0
+checkmate = 10000.0

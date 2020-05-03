@@ -205,7 +205,7 @@ isQueenValidMove p move ps = isRookValidMove p move ps || isBishopValidMove p mo
 
 -- returns the position of the king WORKING
 findKing :: Colour -> AllPieces -> Pos
-findKing colour ps | null l = trace (show colour ++ "\n" ++ show ps) (-1,-1)
+findKing colour ps | null l = (-1,-1)
                    | otherwise = head l
                    where
                      l = [(x,y) | (t, c, (x,y), m) <- ps, t == King, c == colour, x > -1, y > -1, x < 8, y < 8 ]
@@ -339,7 +339,7 @@ possibleToCastle c True ps = not (null (findPiece (getKingsCastle c) ps)) && get
 possibleToCastle c False ps = not (null (findPiece (getQueensCastle c) ps)) && getMovecount (head (findPiece (findKing c ps) ps)) == 0 && getMovecount (head (findPiece (getQueensCastle c) ps)) == 0
 
 
---returns whether a castle is valid or not
+--returns whether a castle is valid or not TODO: king can still castle through check
 validCastle :: Piece -> Move -> AllPieces -> Bool
 validCastle p (0,2) ps  = isStraightMovePathEmpty (getPos p) (0,2) ps && possibleToCastle (getColour p) True ps
 validCastle p (0,-2) ps = isStraightMovePathEmpty (getPos p) (0,-3) ps && possibleToCastle (getColour p) False ps
@@ -428,3 +428,13 @@ isIntOnBoard a | a < 0 || a > 7 = False
 
 getSurroundingPos :: Pos -> [Pos]
 getSurroundingPos (m,n) = [ (row,col) | row <- [m-1..m+1], col <- [n-1..n+1], isIntOnBoard row, isIntOnBoard col, (row,col) /= (m,n)]
+
+colourLegalMoves :: Colour -> AllPieces -> [[Move]]
+colourLegalMoves c ps = [legalMoves x ps | x <- ps, getColour x == c]
+
+-- returns true if either colour is in checkmate
+isEitherCheckmate :: AllPieces -> Bool
+isEitherCheckmate ps = (all (null) (colourLegalMoves White ps) && isKingInCheck whiteKing ps) || (all (null) (colourLegalMoves Black ps) && isKingInCheck blackKing ps)
+                       where
+                         whiteKing = head (findPiece (findKing White ps) ps)
+                         blackKing = head (findPiece (findKing Black ps) ps)
