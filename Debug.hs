@@ -29,17 +29,35 @@ addTestPieces = addTestKings ++ addTestPawns ++ addTestKnights ++ addTestQueens 
 buggedPosition :: AllPieces
 buggedPosition = executeMove (Queen, White, (7,3), 0) (-4,4) (executeMove (Pawn, Black, (1,4), 0) (2,0) (executeMove (Pawn, White, (6,4), 0) (-2,0) addAllPieces))
 
-addEndKings :: AllPieces
-addEndKings = [ (King, c, (m,n), 3) | (c,m,n) <- [(White,4,4), (Black,2,5)]]
 
-addBlackEndPawns :: AllPieces
-addBlackEndPawns = [ (Pawn, Black, (m,n), 4) | (m,n) <- [(2,0),(2,1),(2,7),(3,6),(4,6)]]
+-- pieces for endgameboard.png
 
-addWhiteEndPawns :: AllPieces
-addWhiteEndPawns = [ (Pawn,White,(m,n),4) | (m,n) <- [(6,0),(5,1),(4,3),(6,7)]]
+addEnd1Kings :: AllPieces
+addEnd1Kings = [ (King, c, (m,n), 3) | (c,m,n) <- [(White,4,4), (Black,2,5)]]
 
-addEndBishops :: AllPieces
-addEndBishops = [(Bishop, c, (m,n),4) | (c,m,n) <- [(White,0,1), (Black,1,4)]]
+addBlackEnd1Pawns :: AllPieces
+addBlackEnd1Pawns = [ (Pawn, Black, (m,n), 4) | (m,n) <- [(2,0),(2,1),(2,7),(3,6),(4,6)]]
 
-addEndPieces :: AllPieces
-addEndPieces = addEndKings ++ addBlackEndPawns ++ addWhiteEndPawns ++ addEndBishops
+addWhiteEnd1Pawns :: AllPieces
+addWhiteEnd1Pawns = [ (Pawn,White,(m,n),4) | (m,n) <- [(6,0),(5,1),(4,3),(6,7)]]
+
+addEnd1Bishops :: AllPieces
+addEnd1Bishops = [(Bishop, c, (m,n),4) | (c,m,n) <- [(White,0,1), (Black,1,4)]]
+
+addEnd1Pieces :: AllPieces
+addEnd1Pieces = addEnd1Kings ++ addBlackEnd1Pawns ++ addWhiteEnd1Pawns ++ addEnd1Bishops
+
+
+-- pieces for endgameboard2.png
+
+addEnd2Kings :: AllPieces
+addEnd2Kings = [ (King,c,(m,n),3) | (c,m,n) <- [(White,0,0), (Black,7,6)]]
+
+addEnd2Pawns :: AllPieces
+addEnd2Pawns = [ (Pawn,White,(m,n),3) | (m,n) <- [(1,5),(1,7),(3,6)]]
+
+addEnd2Rooks :: AllPieces
+addEnd2Rooks = [ (Rook, White, (m,n),3) | (m,n) <- [(5,7),(6,1)]]
+
+addEnd2Pieces :: AllPieces
+addEnd2Pieces = addEnd2Kings ++ addEnd2Pawns ++ addEnd2Rooks
