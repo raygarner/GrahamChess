@@ -39,8 +39,10 @@ printBoard n ps = do if isEmpty (calcPos n) ps then
                      printBoard (n+1) ps
 
 printCapturedPieces :: Colour -> AllPieces -> IO ()
-printCapturedPieces c ps = do printPieceList (getCapturedPieces c ps)
-                              putStr "===============\n"
+printCapturedPieces White ps = do printPieceList (getCapturedPieces White ps)
+                                  putStr "===============\n"
+printCapturedPieces Black ps = do putStr "===============\n"
+                                  printPieceList (getCapturedPieces Black ps)
 
 printPieceList :: [Piece] -> IO ()
 printPieceList [] = return ()

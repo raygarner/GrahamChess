@@ -8,7 +8,8 @@ import           Debug.Trace
 -- some crude evaluations
 
 evalPiece :: Piece -> AllPieces -> Float
-evalPiece a ps = fromIntegral (length (legalMoves a ps)) -- * (if getPieceType a == Knight then 1.75 else 1)-- * ((10.0 - (pieceVal a)) * 2)
+evalPiece a ps = fromIntegral (length (legalMoves a ps)) * (if getPieceType a == Knight then 2 else 1)
+
 
 evalPieceBonus :: Piece -> AllPieces -> Float
 evalPieceBonus a ps = (threatenKing a ps) + (threatenEvaluation a ps) + (evaluationCentralSquares a ps)
