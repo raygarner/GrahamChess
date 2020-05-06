@@ -6,6 +6,7 @@ import           Debug
 import           EvalOpening
 import           EvalMiddle
 import           EvalEnd
+import           Debug.Trace
 
 totalVal :: Colour -> AllPieces -> Float
 totalVal c ps | getGamePoint ps == Opening = totalOpeningVal c ps
@@ -28,5 +29,5 @@ lowMaterial ps = length [ x | x <- ps, getPos x /= (-1,-1), getPieceType x /= Pa
 getGamePoint :: AllPieces -> GamePoint
 --getGamePoint ps | (noQueens ps || lowMaterial ps) = End
 getGamePoint ps | lowMaterial ps = End
-                | allPiecesMoved ps = Opening
+                | allPiecesMoved ps = Middle
                 | otherwise = Opening
