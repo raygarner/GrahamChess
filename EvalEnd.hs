@@ -22,7 +22,7 @@ getLowestVal ps | null a = 10.0
 
 
 totalColourBonus :: Colour -> AllPieces -> Float
-totalColourBonus c ps = fromIntegral (getPawnPromotion c ps) + isOpposingKingInCheck c ps
+totalColourBonus c ps = getPawnPromotion c ps + isOpposingKingInCheck c ps
 
 allPawns :: Colour -> AllPieces -> Float
 allPawns c ps = (sum [passPawnScore x ps | x <- ps, getColour x == c, getPieceType x == Pawn]) - (sum[passPawnScore y ps | y <- ps, getColour y /= c, getPieceType y == Pawn])
@@ -38,14 +38,18 @@ pieceVal (Rook,_,_,_)   = 5.0
 pieceVal (Queen,_,_,_)  = 9.0
 pieceVal (King,_,_,_)   = 1.0
 
+-- TODO: king shouldn't be in a discovered check oppurtunity.
+
+-- TODO: push opposing king to corner/sides
+
 
 pawnsNearEnd :: Colour -> AllPieces -> [Piece]
 pawnsNearEnd White ps = [x | x <- ps, getColour x == White, getRow (getPos x) == 1, getPieceType x == Pawn]
 pawnsNearEnd Black ps = [x | x <- ps, getColour x == Black, getRow (getPos x) == 6, getPieceType x == Pawn]
 
 -- bonus points for pawns closer to end
-getPawnPromotion :: Colour -> AllPieces -> Int
-getPawnPromotion c ps = length (pawnsNearEnd c ps)
+getPawnPromotion :: Colour -> AllPieces -> Float
+getPawnPromotion c ps = fromIntegral (length (pawnsNearEnd c ps)) * 1.25
 
 
 

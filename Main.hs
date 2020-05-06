@@ -39,7 +39,7 @@ gameLoop ps = do printBoard (-1) ps
                              if (not (isEitherCheckmate ps)) then
                                do
                                  putStr "Graham is thinking of a move...\n"
-                                 response <- return (findRealBestMove Black ps)
+                                 response <- return (findRealBestMove White ps)
                                  print response
                                  putStr "Graham has made his move...\n"
                                  move <- return (extractMove response)
