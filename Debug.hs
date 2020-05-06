@@ -62,6 +62,27 @@ addEnd2Rooks = [ (Rook, White, (m,n),3) | (m,n) <- [(5,7),(6,1)]]
 addEnd2Pieces :: AllPieces
 addEnd2Pieces = addEnd2Kings ++ addEnd2Pawns ++ addEnd2Rooks
 
+-- pieces for endgameboard3.png
+
+addEnd3Kings :: AllPieces
+addEnd3Kings = [(King,c,(m,n),3) | (c,m,n) <- [(White,7,6),(Black,0,5)]]
+
+addEnd3Bishops :: AllPieces
+addEnd3Bishops = [(Bishop,c,(m,n),3) | (c,m,n) <- [(White,1,3),(Black,1,1)]]
+
+addEnd3Rooks :: AllPieces
+addEnd3Rooks = [(Rook,c,(m,n),3) | (c,m,n) <- [(White,7,4), (White,7,5), (Black,2,7)]]
+
+addEnd3WhitePawns :: AllPieces
+addEnd3WhitePawns = [(Pawn,White,(m,n),3) | (m,n) <- [(2,1),(6,1),(6,2),(5,3),(4,4),(6,5),(6,6),(6,7)]]
+
+addEnd3BlackPawns :: AllPieces
+addEnd3BlackPawns = [(Pawn,Black,(m,n),3) | (m,n) <- [(1,6),(2,5),(3,4),(4,7)]]
+
+addEnd3Pieces :: AllPieces
+addEnd3Pieces = addEnd3Kings ++ addEnd3Bishops ++ addEnd3Rooks ++ addEnd3WhitePawns ++ addEnd3BlackPawns
+
+
 -- pieces for testing castling
 addCastleTest :: AllPieces
 addCastleTest = addKings ++ addRooks

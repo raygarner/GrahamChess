@@ -59,8 +59,10 @@ printCapturedPieces Black ps = do putStr " ================\n"
 printPieceList :: [Piece] -> IO ()
 printPieceList [] = return ()
 printPieceList (x:[]) = do putChar (pieceChar x)
+                           putChar ' '
                            putChar '\n'
 printPieceList (x:xs) = do putChar (pieceChar x)
+                           putChar ' '
                            printPieceList xs
 
 getCapturedPieces :: Colour -> AllPieces -> [Piece]
