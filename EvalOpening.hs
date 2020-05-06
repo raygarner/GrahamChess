@@ -12,9 +12,11 @@ evalPiece a ps = fromIntegral (length (legalMoves a ps)) * pieceMobMult a
 
 pieceMobMult :: Piece -> Float
 pieceMobMult (Pawn,_,_,_) = 0.0
-pieceMobMult (Knight,_,_,_) = 1.0
-pieceMobMult (Queen,_,_,_) = 0.5
-pieceMobMult _ = 1.0
+pieceMobMult (Knight,_,_,_) = 1.5
+pieceMobMult (Queen,_,_,_) = 0.25
+pieceMobMult (Rook,_,_,_) = 0.5
+pieceMobMult (King,_,_,_) = 0.0
+pieceMobMult (Bishop,_,_,_) = 1
 
 
 evalPieceBonus :: Piece -> AllPieces -> Float
@@ -26,7 +28,7 @@ evalPieceBonus a ps = (threatenKing a ps) + (threatenEvaluation a ps) + (evaluat
 
 totalMaterial :: Colour -> AllPieces -> Float
 --totalMaterial c ps =  20 * (sum [ ((pieceVal (x,White,(0,0),0)) * (countPieceType c x ps)) - ((pieceVal (x,Black,(0,0),0)) * (countPieceType (invertColour c) x ps)) | x <- pieceTypes ])
-totalMaterial c ps = 20 * ((sum [pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - (sum [pieceVal y | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
+totalMaterial c ps = 12 * ((sum [pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - (sum [pieceVal y | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
 
 
 
@@ -56,11 +58,12 @@ allPawns :: Colour -> AllPieces -> Float
 allPawns c ps = (sum [passPawnScore x ps | x <- ps, getColour x == c, getPieceType x == Pawn]) - (sum[passPawnScore y ps | y <- ps, getColour y /= c, getPieceType y == Pawn])
 
 pawnCenterControl :: Colour -> AllPieces -> Int
-pawnCenterControl colour ps = ( (length [ x | x <- ps, getPieceType x == Pawn, y <- pawnControlledSquares x, any (==y) centralSquares, pieceMaterial x ps /= 0 ]) + (length [ x | x <- ps, getPieceType x == Pawn, any (==getPos x) centralSquares, pieceMaterial x ps /= 0]) ) * 2
+--pawnCenterControl colour ps = ( (length [ x | x <- ps, getPieceType x == Pawn, y <- pawnControlledSquares x, any (==y) centralSquares, pieceMaterial x ps /= 0 ]) + (length [ x | x <- ps, getPieceType x == Pawn, any (==getPos x) centralSquares, pieceMaterial x ps /= 0]) ) * 10
+pawnCenterControl colour ps = (length [ x | x <- ps, getPieceType x == Pawn, any (==getPos x) centralSquares, pieceMaterial x ps /= 0]) * 10
 
 totalOpeningVal :: Colour -> AllPieces -> Float
 --totalOpeningVal a ps = (totalMobility a ps - totalMobility (invertColour a) ps) + totalMaterial a ps -- + fromIntegral (castleBonus a ps - castleBonus (invertColour a) ps)-- + fromIntegral ((movePieceBonus a ps) - (movePieceBonus (invertColour a) ps))-- + fromIntegral ((pawnCenterControl a ps)-(pawnCenterControl (invertColour a) ps)) + fromIntegral ((castleBonus a ps)-(castleBonus (invertColour a) ps))-- + (totalBonus a ps)  + (allPawns a ps) + fromIntegral(castleBonus a ps) + fromIntegral (pawnCenterControl a ps)
-totalOpeningVal a ps = (totalMobility a ps - totalMobility (invertColour a) ps) + totalMaterial a ps + fromIntegral (movePieceBonus a ps) + fromIntegral (pawnCenterControl a ps)-- + castleMotive a ps -- + fromIntegral ((movePieceBonus a ps) - (movePieceBonus (invertColour a) ps))
+totalOpeningVal a ps = (totalMobility a ps - totalMobility (invertColour a) ps) + totalMaterial a ps {- fromIntegral (movePieceBonus a ps)--} -- + fromIntegral (pawnCenterControl a ps)-- + castleMotive a ps -- + fromIntegral ((movePieceBonus a ps) - (movePieceBonus (invertColour a) ps))
 
 castleMotive :: Colour -> AllPieces -> Float
 --castleMotive c ps | possibleToCastle c True ps || possibleToCastle c False ps && any (==getColumn (findKing c ps)) [3..5] = 0
@@ -94,7 +97,7 @@ castleBonus c ps | possibleToCastle c True ps && possibleToCastle c False ps = (
 
 -- add bonus for moving multiple pieces.
 movePieceBonus :: Colour -> AllPieces -> Int
-movePieceBonus c ps = (length [x | x <- ps, getColour x == c, getMovecount x == 0, getPieceType x == Knight || getPieceType x == Bishop]) * (-10)
+movePieceBonus c ps = (length [x | x <- ps, getColour x == c, getMovecount x == 0, getPieceType x == Knight || getPieceType x == Bishop]) * (3 * 20)
 
 
 -- returns true if the king is surrounded by friendly pieces.
