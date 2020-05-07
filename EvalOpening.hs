@@ -28,7 +28,7 @@ evalPieceBonus a ps = (threatenKing a ps) + (threatenEvaluation a ps) + (evaluat
 
 totalMaterial :: Colour -> AllPieces -> Float
 --totalMaterial c ps =  40 * (sum [ ((pieceVal (x,White,(0,0),0)) * (countPieceType c x ps)) - ((pieceVal (x,Black,(0,0),0)) * (countPieceType (invertColour c) x ps)) | x <- pieceTypes ])
-totalMaterial c ps = 40 * ((sum [pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - (sum [pieceVal y | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
+totalMaterial c ps = 60 * ((sum [pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - (sum [pieceVal y | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
 --totalMaterial c ps = 20 * (sum [pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ])
 
 
@@ -64,13 +64,21 @@ pawnCenterControl colour ps = (length [ x | x <- ps, getPieceType x == Pawn, any
 
 totalOpeningVal :: Colour -> AllPieces -> Float
 --totalOpeningVal a ps = (totalMobility a ps - totalMobility (invertColour a) ps) + totalMaterial a ps -- + fromIntegral (castleBonus a ps - castleBonus (invertColour a) ps)-- + fromIntegral ((movePieceBonus a ps) - (movePieceBonus (invertColour a) ps))-- + fromIntegral ((pawnCenterControl a ps)-(pawnCenterControl (invertColour a) ps)) + fromIntegral ((castleBonus a ps)-(castleBonus (invertColour a) ps))-- + (totalBonus a ps)  + (allPawns a ps) + fromIntegral(castleBonus a ps) + fromIntegral (pawnCenterControl a ps)
-totalOpeningVal a ps = totalMobility a ps + totalMaterial a ps -- + movePieceBonus a ps--} -- + fromIntegral (pawnCenterControl a ps)-- + castleMotive a ps -- + fromIntegral ((movePieceBonus a ps) - (movePieceBonus (invertColour a) ps))
+totalOpeningVal a ps = totalMobility a ps + totalMaterial a ps + kingSafety a ps-- + movePieceBonus a ps--} -- + fromIntegral (pawnCenterControl a ps)-- + castleMotive a ps -- + fromIntegral ((movePieceBonus a ps) - (movePieceBonus (invertColour a) ps))
 
 castleMotive :: Colour -> AllPieces -> Float
 --castleMotive c ps | possibleToCastle c True ps || possibleToCastle c False ps && any (==getColumn (findKing c ps)) [3..5] = 0
  --                 | otherwise = 30
 castleMotive c ps | any (==getColumn (findKing c ps)) [3..5] = (-5)
                   | otherwise = 0
+
+staticKingMotive :: Colour -> AllPieces -> Float
+staticKingMotive c ps | getRow (findKing c ps) /= r = (-5.0)
+                      | otherwise = 0
+                        where r = if c == White then 7 else 0
+
+kingSafety :: Colour -> AllPieces -> Float
+kingSafety c ps = castleMotive c ps + staticKingMotive c ps
 
 pieceVal :: Piece -> Float
 pieceVal (Pawn,_,_,_)   = 1.0
