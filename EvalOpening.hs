@@ -27,8 +27,8 @@ evalPieceBonus a ps = (threatenKing a ps) + (threatenEvaluation a ps) + (evaluat
 --totalMaterial c ps = 10 * ((sum [ pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - (sum [ pieceVal y  | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
 
 totalMaterial :: Colour -> AllPieces -> Float
---totalMaterial c ps =  20 * (sum [ ((pieceVal (x,White,(0,0),0)) * (countPieceType c x ps)) - ((pieceVal (x,Black,(0,0),0)) * (countPieceType (invertColour c) x ps)) | x <- pieceTypes ])
-totalMaterial c ps = 40 * ((sum [pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - (sum [pieceVal y | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
+--totalMaterial c ps =  40 * (sum [ ((pieceVal (x,White,(0,0),0)) * (countPieceType c x ps)) - ((pieceVal (x,Black,(0,0),0)) * (countPieceType (invertColour c) x ps)) | x <- pieceTypes ])
+totalMaterial c ps = 30 * ((sum [pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - (sum [pieceVal y | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
 --totalMaterial c ps = 20 * (sum [pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ])
 
 

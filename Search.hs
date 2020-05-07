@@ -60,7 +60,7 @@ extractPiece (p,_,_) = p
 --takes the top n rated moves from evalList
 takeTopMoves :: Int -> [(Piece,Move,Float)] -> [(Piece,Move,Float)]
 takeTopMoves n [] = []
-takeTopMoves 6 xs = []
+takeTopMoves 4 xs = []
 takeTopMoves n xs = m : takeTopMoves (n+1) (removeMove m xs)
                   where
                       m = findStrongestMoveFromAll xs
