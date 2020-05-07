@@ -10,7 +10,7 @@ import Debug
 
 -- returns the best move for one side (not sure how this handles checkmate????)
 findRealBestMove :: Colour -> AllPieces -> (Piece, Move, Float)
-findRealBestMove c ps = findStrongestMoveFromAll [ addTrueEval (c,c) 0 x ps | x <- makeEvalList c ps]
+findRealBestMove c ps = findStrongestMoveFromAll [ addTrueEval (c,c) 0 x ps | x <- takeTopMoves 0 (makeEvalList c ps)]
 
 getScores :: Colour -> AllPieces -> [(Piece,Move,Float)]
 getScores c ps = [ addTrueEval (c,c) 0 x ps | x <- makeEvalList c ps]
@@ -56,6 +56,19 @@ extractMove (_,m,_) = m
 
 extractPiece :: (Piece, Move, Float) -> Piece
 extractPiece (p,_,_) = p
+
+--takes the top n rated moves from evalList
+takeTopMoves :: Int -> [(Piece,Move,Float)] -> [(Piece,Move,Float)]
+takeTopMoves n [] = []
+takeTopMoves 6 xs = []
+takeTopMoves n xs = m : takeTopMoves (n+1) (removeMove m xs)
+                  where
+                      m = findStrongestMoveFromAll xs
+
+-- removes a move from a list
+removeMove :: (Piece,Move,Float) -> [(Piece,Move,Float)] -> [(Piece,Move,Float)]
+removeMove x [y] = []
+removeMove a bs = [x | x <- bs, x /= a]
 
 -- generates a list of all legal moves for one side with evaluations
 makeEvalList :: Colour -> AllPieces -> [(Piece, Move, Float)]
