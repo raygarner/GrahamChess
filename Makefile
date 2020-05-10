@@ -1,12 +1,16 @@
-all: main selfplay
+all: Opening Endgame selfplay clean
 
-main:
-	ghc Main.hs
-	rm *.o *.hi
+Opening:
+	ghc Opening.hs
+
+Endgame:
+	ghc Endgame.hs
 
 selfplay:
 	ghc Selfplay.hs
-	rm *.o *.hi
 
 clean:
-	rm *.o *.hi Selfplay Main
+	rm -f *.o *.hi
+
+remove: clean
+	rm -f Opening Endgame Selfplay

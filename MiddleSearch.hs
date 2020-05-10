@@ -47,16 +47,6 @@ findStrongestMoveFromAll :: [(Piece,Move,Float)] -> (Piece,Move,Float)
 findStrongestMoveFromAll xs | not (null xs) = head [ x | x <- xs, all (\y -> (getMoveEval y) <= (getMoveEval x)) xs ]
                             | otherwise = ((King, White, (7,4), 0), (0,0), 0-checkmate)
 
--- extracts the evaluation element of the move tuple
-getMoveEval :: (Piece, Move, Float) -> Float
-getMoveEval (_,_,f) = f
-
-extractMove :: (Piece, Move, Float) -> Move
-extractMove (_,m,_) = m
-
-extractPiece :: (Piece, Move, Float) -> Piece
-extractPiece (p,_,_) = p
-
 --takes the top n rated moves from evalList
 takeTopMoves :: Int -> [(Piece,Move,Float)] -> [(Piece,Move,Float)]
 takeTopMoves n [] = []

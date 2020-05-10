@@ -7,6 +7,17 @@ import           Debug.Trace
 
 -- GETTERS
 
+-- extracts the evaluation element of the move tuple
+getMoveEval :: (Piece, Move, Float) -> Float
+getMoveEval (_,_,f) = f
+
+extractMove :: (Piece, Move, Float) -> Move
+extractMove (_,m,_) = m
+
+extractPiece :: (Piece, Move, Float) -> Piece
+extractPiece (p,_,_) = p
+
+
 -- return what point the game is in
 getGamePoint :: AllPieces -> GamePoint
 --getGamePoint ps | (noQueens ps || lowMaterial ps) = End
