@@ -13,10 +13,8 @@ totalVal c ps | getGamePoint ps == Opening = totalOpeningVal c ps
               | getGamePoint ps == Middle = totalOpeningVal c ps --totalMiddleVal c ps (temporary to make testing easier)
               | otherwise = totalEndVal c ps
 
--- returns whether all pieces have moved at least once
-allPiecesMoved :: AllPieces -> Bool
-allPiecesMoved ps = length [ x | x <- ps, getMovecount x > 0, getPieceType x /= Pawn ] >= 16
 
+<<<<<<< HEAD
 -- returns whether there are no queens on the board
 noQueens :: AllPieces -> Bool
 noQueens ps = null [ x | x <- ps, getPieceType x == Queen, getPos x /= (-1,-1) ]
@@ -31,3 +29,5 @@ getGamePoint :: AllPieces -> GamePoint
 getGamePoint ps | lowMaterial ps = End
                 | allPiecesMoved ps = Opening
                 | otherwise = Opening
+=======
+>>>>>>> 60785291929df4edc009493c950959392256af45
