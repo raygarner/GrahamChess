@@ -6,7 +6,7 @@ import           TypeDefs
 import           Util
 
 totalMaterial :: Colour -> AllPieces -> Float
-totalMaterial c ps = ((sum [pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - (sum [pieceVal y | y <- ps, getPos y /= (-1,-1), getColour y /= c ])) * 1.5
+totalMaterial c ps = ((sum [pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]))
 
 -- if a piece is going to be captured then it doesnt really have any material
 pieceMaterial :: Piece -> AllPieces -> Float
@@ -28,7 +28,7 @@ totalColourBonus :: Colour -> AllPieces -> Float
 totalColourBonus c ps = getPawnPromotion c ps + isOpposingKingInCheck c ps + isKingOnEdges c ps
 
 allPawns :: Colour -> AllPieces -> Float
-allPawns c ps = (sum [passPawnScore x ps | x <- ps, getColour x == c, getPieceType x == Pawn]) - (sum[passPawnScore y ps | y <- ps, getColour y /= c, getPieceType y == Pawn])
+allPawns c ps = (sum [passPawnScore x ps | x <- ps, getColour x == c, getPieceType x == Pawn]) - (sum[passPawnScore y ps | y <- ps, getColour y /= c, getPieceType y == Pawn]) * 2.0
 
 totalEndVal :: Colour -> AllPieces -> Float
 totalEndVal a ps =  (totalMaterial a ps) + (totalColourBonus a ps) + (allPawns a ps) + (perPieceBonus a ps)
@@ -47,7 +47,7 @@ isPieceAimedAtEnemyKing p ps = isValidMove p (moveMade (getPos p) k) (p : [])
                                  k = findKing (invertColour (getColour p)) ps
 
 threatenKingBonus :: Piece -> AllPieces -> Float
-threatenKingBonus p ps | isPieceAimedAtEnemyKing p ps = 3.0
+threatenKingBonus p ps | isPieceAimedAtEnemyKing p ps = 2.5
                        | otherwise = 0.0
 
 isKingOnEdges :: Colour -> AllPieces -> Float
@@ -71,7 +71,7 @@ getPawnPromotion :: Colour -> AllPieces -> Float
 getPawnPromotion c ps = fromIntegral (length (pawnsNearEnd c ps)) * 1.75
 
 passPawnScore :: Piece -> AllPieces -> Float
-passPawnScore a ps | isPassedPawn a ps = 2.5
+passPawnScore a ps | isPassedPawn a ps = 5.0
                    | otherwise = 0
 
 -- returns whether a position doesnt contain an enemy pawn
@@ -93,6 +93,6 @@ isPassedPawn a ps = all (==True) [pawnClearAhead (getColour a) (y,n) ps | y <- [
                         e = if getColour a == White then 1 else 6
 
 isOpposingKingInCheck :: Colour -> AllPieces -> Float
-isOpposingKingInCheck c ps | isKingInCheck king ps = 2.5
+isOpposingKingInCheck c ps | isKingInCheck king ps = 3.0
                            | otherwise = 0.0
                              where king = head (findPiece (findKing (invertColour c) ps) ps)
