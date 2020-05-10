@@ -50,6 +50,18 @@ threatenKingBonus :: Piece -> AllPieces -> Float
 threatenKingBonus p ps | isPieceAimedAtEnemyKing p ps = 3.0
                        | otherwise = 0.0
 
+-- TODO : trap enemy king in corner?
+isKingOnEdges :: Colour -> AllPieces -> Float
+isKingOnEdges c ps = isKingSideCol king + isKingSideRow king
+                     where king = findKing (invertColour c) ps
+
+isKingSideCol :: Pos -> Float
+isKingSideCol p | getColumn p == 0 || getColumn p == 7 = 2.0
+                | otherwise = 0
+
+isKingSideRow :: Pos -> Float
+isKingSideRow p | getRow p == 0 || getRow p == 7 = 2.0
+                | otherwise = 0
 
 pawnsNearEnd :: Colour -> AllPieces -> [Piece]
 pawnsNearEnd White ps = [x | x <- ps, getColour x == White, getRow (getPos x) == 1, getPieceType x == Pawn]
@@ -58,8 +70,6 @@ pawnsNearEnd Black ps = [x | x <- ps, getColour x == Black, getRow (getPos x) ==
 -- bonus points for pawns closer to end
 getPawnPromotion :: Colour -> AllPieces -> Float
 getPawnPromotion c ps = fromIntegral (length (pawnsNearEnd c ps)) * 1.25
-
-
 
 passPawnScore :: Piece -> AllPieces -> Float
 passPawnScore a ps | isPassedPawn a ps = 2.5

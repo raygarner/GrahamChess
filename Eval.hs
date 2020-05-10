@@ -29,9 +29,5 @@ lowMaterial ps = length [ x | x <- ps, getPos x /= (-1,-1), getPieceType x /= Pa
 getGamePoint :: AllPieces -> GamePoint
 --getGamePoint ps | (noQueens ps || lowMaterial ps) = End
 getGamePoint ps | lowMaterial ps = End
-<<<<<<< HEAD
                 | allPiecesMoved ps = Opening
-=======
-                | allPiecesMoved ps = Middle
->>>>>>> c932c6bdd3e0954c211f66ddbf5dfe1d5b8d5e9b
                 | otherwise = Opening
