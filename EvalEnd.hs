@@ -6,7 +6,7 @@ import           TypeDefs
 import           Util
 
 totalMaterial :: Colour -> AllPieces -> Float
-totalMaterial c ps = ((sum [pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - (sum [pieceVal y | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
+totalMaterial c ps = ((sum [pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - (sum [pieceVal y | y <- ps, getPos y /= (-1,-1), getColour y /= c ])) * 1.25
 
 -- if a piece is going to be captured then it doesnt really have any material
 pieceMaterial :: Piece -> AllPieces -> Float
@@ -21,14 +21,17 @@ getLowestVal ps | null a = 10.0
                   a = [pieceVal x | x <- ps, all (\y -> (pieceVal y) >= pieceVal x) ps]
 
 
+perPieceBonus :: Colour -> AllPieces -> Float
+perPieceBonus c ps = (sum[threatenKingBonus x ps | x <- ps, getPos x /= (-1,-1), getColour x == c])
+
 totalColourBonus :: Colour -> AllPieces -> Float
-totalColourBonus c ps = getPawnPromotion c ps + isOpposingKingInCheck c ps
+totalColourBonus c ps = getPawnPromotion c ps + isOpposingKingInCheck c ps + kingOnSideBonus c ps
 
 allPawns :: Colour -> AllPieces -> Float
 allPawns c ps = (sum [passPawnScore x ps | x <- ps, getColour x == c, getPieceType x == Pawn]) - (sum[passPawnScore y ps | y <- ps, getColour y /= c, getPieceType y == Pawn])
 
 totalEndVal :: Colour -> AllPieces -> Float
-totalEndVal a ps =  (totalMaterial a ps) + (totalColourBonus a ps) + (allPawns a ps)
+totalEndVal a ps =  (totalMaterial a ps) + (totalColourBonus a ps) + (allPawns a ps) + (perPieceBonus a ps)
 
 pieceVal :: Piece -> Float
 pieceVal (Pawn,_,_,_)   = 2.5
@@ -38,14 +41,28 @@ pieceVal (Rook,_,_,_)   = 5.0
 pieceVal (Queen,_,_,_)  = 9.0
 pieceVal (King,_,_,_)   = 1.0
 
--- TODO: king shouldn't be in a discovered check oppurtunity.
+-- TODO: try to a piece trapped due to check
+isPieceAimedAtEnemyKing :: Piece -> AllPieces -> Bool
+isPieceAimedAtEnemyKing p ps = isValidMove p (moveMade (getPos p) k) (p : [])
+                               where
+                                 k = findKing (invertColour (getColour p)) ps
 
--- TODO: push opposing king to corner/sides
+threatenKingBonus :: Piece -> AllPieces -> Float
+threatenKingBonus p ps | isPieceAimedAtEnemyKing p ps = 3.0
+                       | otherwise = 0.0
+
 kingOnSideBonus :: Colour -> AllPieces -> Float
-kingOnSideBonus c ps = kingSideColumn king + kingSideRow king
+kingOnSideBonus c ps = (kingSideColumn king) + (kingSideRow king)
                        where
                          king = findKing (invertColour c) ps
 
+kingSideColumn :: Pos -> Float
+kingSideColumn p | getColumn p == 0 || getColumn p == 7 = 1.5
+                 | otherwise = 0.0
+
+kingSideRow :: Pos -> Float
+kingSideRow p | getRow p == 0 || getRow p == 7 = 1.5
+                 |  otherwise = 0.0
 
 pawnsNearEnd :: Colour -> AllPieces -> [Piece]
 pawnsNearEnd White ps = [x | x <- ps, getColour x == White, getRow (getPos x) == 1, getPieceType x == Pawn]
