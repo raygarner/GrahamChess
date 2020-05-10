@@ -95,7 +95,7 @@ noQueens ps = null [ x | x <- ps, getPieceType x == Queen, getPos x /= (-1,-1) ]
 
 -- returns whether there is a low ammount of material on the board
 lowMaterial :: AllPieces -> Bool
-lowMaterial ps = length [ x | x <- ps, getPos x /= (-1,-1), getPieceType x /= Pawn, getPieceType x /= King ] <= 8
+lowMaterial ps = length [ x | x <- ps, getPos x /= (-1,-1), getPieceType x /= Pawn, getPieceType x /= King ] <= 6
 
 
 

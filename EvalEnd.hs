@@ -6,7 +6,7 @@ import           TypeDefs
 import           Util
 
 totalMaterial :: Colour -> AllPieces -> Float
-totalMaterial c ps = ((sum [pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - (sum [pieceVal y | y <- ps, getPos y /= (-1,-1), getColour y /= c ])) * 1.25
+totalMaterial c ps = ((sum [pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - (sum [pieceVal y | y <- ps, getPos y /= (-1,-1), getColour y /= c ])) * 1.5
 
 -- if a piece is going to be captured then it doesnt really have any material
 pieceMaterial :: Piece -> AllPieces -> Float
@@ -25,7 +25,7 @@ perPieceBonus :: Colour -> AllPieces -> Float
 perPieceBonus c ps = (sum[threatenKingBonus x ps | x <- ps, getPos x /= (-1,-1), getColour x == c])
 
 totalColourBonus :: Colour -> AllPieces -> Float
-totalColourBonus c ps = getPawnPromotion c ps + isOpposingKingInCheck c ps
+totalColourBonus c ps = getPawnPromotion c ps + isOpposingKingInCheck c ps + isKingOnEdges c ps
 
 allPawns :: Colour -> AllPieces -> Float
 allPawns c ps = (sum [passPawnScore x ps | x <- ps, getColour x == c, getPieceType x == Pawn]) - (sum[passPawnScore y ps | y <- ps, getColour y /= c, getPieceType y == Pawn])
@@ -50,7 +50,6 @@ threatenKingBonus :: Piece -> AllPieces -> Float
 threatenKingBonus p ps | isPieceAimedAtEnemyKing p ps = 3.0
                        | otherwise = 0.0
 
--- TODO : trap enemy king in corner?
 isKingOnEdges :: Colour -> AllPieces -> Float
 isKingOnEdges c ps = isKingSideCol king + isKingSideRow king
                      where king = findKing (invertColour c) ps
@@ -69,7 +68,7 @@ pawnsNearEnd Black ps = [x | x <- ps, getColour x == Black, getRow (getPos x) ==
 
 -- bonus points for pawns closer to end
 getPawnPromotion :: Colour -> AllPieces -> Float
-getPawnPromotion c ps = fromIntegral (length (pawnsNearEnd c ps)) * 1.25
+getPawnPromotion c ps = fromIntegral (length (pawnsNearEnd c ps)) * 1.75
 
 passPawnScore :: Piece -> AllPieces -> Float
 passPawnScore a ps | isPassedPawn a ps = 2.5
