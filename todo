@@ -20,7 +20,7 @@ move searching
 
 main
 ----
--> king can castle through check and when in check
+->
 
 user interface
 -------------
@@ -28,3 +28,7 @@ user interface
 -> ask user for piece
 -> ask user for move
 -> convert that into a format that can be used by our functions
+
+util
+----
+-> test whether king can castle through check since patch was added

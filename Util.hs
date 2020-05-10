@@ -373,9 +373,16 @@ possibleToCastle c False ps = not (null (findPiece (getQueensCastle c) ps)) && g
 
 --returns whether a castle is valid or not TODO: king can still castle through check
 validCastle :: Piece -> Move -> AllPieces -> Bool
-validCastle p (0,2) ps  = isStraightMovePathEmpty (getPos p) (0,2) ps && possibleToCastle (getColour p) True ps
-validCastle p (0,-2) ps = isStraightMovePathEmpty (getPos p) (0,-3) ps && possibleToCastle (getColour p) False ps
+validCastle p (0,2) ps  = isStraightMovePathEmpty (getPos p) (0,2) ps && possibleToCastle (getColour p) True ps && clearCastlePath p ps True
+validCastle p (0,-2) ps = isStraightMovePathEmpty (getPos p) (0,-3) ps && possibleToCastle (getColour p) False ps && clearCastlePath p ps False
 validCastle _ _ _ = False
+
+-- make sure that the king can't castle through check or while in check (true == kingside)
+clearCastlePath :: Piece -> AllPieces -> Bool -> Bool
+clearCastlePath p ps s = null [(m,n) | m <- ys, not (null (threatenedBy (Pawn, getColour p, (m,n),0) ps)) ] -- dummy piece to keep threatenedBy happy
+                           where
+                               n = if getColour p == White then 7 else 0
+                               ys = if s then [4..6] else [2..4]
 
 -- return a list of legal moves that a knight can make
 legalKnightMoves :: Piece -> AllPieces -> [Move]
