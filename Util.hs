@@ -7,6 +7,13 @@ import           Debug.Trace
 
 -- GETTERS
 
+-- return what point the game is in
+getGamePoint :: AllPieces -> GamePoint
+--getGamePoint ps | (noQueens ps || lowMaterial ps) = End
+getGamePoint ps | lowMaterial ps = End
+                | allPiecesMoved ps = Middle
+                | otherwise = Opening
+
 -- returns the column of a position
 getColumn :: Pos -> Int
 getColumn (_,col) = col
@@ -66,6 +73,20 @@ getMovecount :: Piece -> Movecount
 getMovecount (_,_,_,mc) = mc
 
 -- UTILITIES AND RULES
+
+-- returns whether all pieces have moved at least once
+allPiecesMoved :: AllPieces -> Bool
+allPiecesMoved ps = length [ x | x <- ps, getMovecount x > 0, getPieceType x /= Pawn ] >= 16
+
+-- returns whether there are no queens on the board
+noQueens :: AllPieces -> Bool
+noQueens ps = null [ x | x <- ps, getPieceType x == Queen, getPos x /= (-1,-1) ]
+
+-- returns whether there is a low ammount of material on the board
+lowMaterial :: AllPieces -> Bool
+lowMaterial ps = length [ x | x <- ps, getPos x /= (-1,-1), getPieceType x /= Pawn, getPieceType x /= King ] <= 8
+
+
 
 -- returns true if there is no piece on pos WORKING
 isEmpty :: Pos -> AllPieces -> Bool

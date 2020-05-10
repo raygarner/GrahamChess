@@ -1,4 +1,4 @@
-module Search where
+module OpeningSearch where
 
 import TypeDefs
 import Init
@@ -9,8 +9,8 @@ import Debug.Trace
 import Debug
 
 -- returns the best move for one side (not sure how this handles checkmate????)
-findRealBestMove :: Colour -> AllPieces -> (Piece, Move, Float)
-findRealBestMove c ps = findStrongestMoveFromAll [ addTrueEval (c,c) 0 x ps | x <- takeTopMoves 0 (makeEvalList c ps)]
+findRealBestOpeningMove :: Colour -> AllPieces -> (Piece, Move, Float)
+findRealBestOpeningMove c ps = findStrongestMoveFromAll [ addTrueEval (c,c) 0 x ps | x <- takeTopMoves 0 (makeEvalList c ps)]
 
 getScores :: Colour -> AllPieces -> [(Piece,Move,Float)]
 getScores c ps = [ addTrueEval (c,c) 0 x ps | x <- makeEvalList c ps]
