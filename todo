@@ -20,7 +20,7 @@ move searching
 
 main
 ----
--> graham gets two moves in a row if user enters illegal move (user needs to be asked again for a legal move)
+-> king can castle through check and when in check
 
 user interface
 -------------
