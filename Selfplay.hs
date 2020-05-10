@@ -13,7 +13,7 @@ import           Debug
 import           Eval
 
 main :: IO ()
-main = gameLoop White addEnd3Pieces
+main = gameLoop White addEnd1Pieces
 
 
 

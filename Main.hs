@@ -12,7 +12,7 @@ import           Debug
 import           UI
 
 main :: IO ()
-main = gameLoop addEnd3Pieces
+main = gameLoop addEnd1Pieces
 
 
 
@@ -39,7 +39,7 @@ gameLoop ps = do printBoard (-1) ps
                              if (not (isEitherCheckmate ps)) then
                                do
                                  putStr "Graham is thinking of a move...\n"
-                                 response <- return (findRealBestMove White ps)
+                                 response <- return (findRealBestMove Black ps)
                                  print response
                                  putStr "Graham has made his move...\n"
                                  move <- return (extractMove response)

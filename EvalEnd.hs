@@ -25,7 +25,7 @@ perPieceBonus :: Colour -> AllPieces -> Float
 perPieceBonus c ps = (sum[threatenKingBonus x ps | x <- ps, getPos x /= (-1,-1), getColour x == c])
 
 totalColourBonus :: Colour -> AllPieces -> Float
-totalColourBonus c ps = getPawnPromotion c ps + isOpposingKingInCheck c ps + kingOnSideBonus c ps
+totalColourBonus c ps = getPawnPromotion c ps + isOpposingKingInCheck c ps
 
 allPawns :: Colour -> AllPieces -> Float
 allPawns c ps = (sum [passPawnScore x ps | x <- ps, getColour x == c, getPieceType x == Pawn]) - (sum[passPawnScore y ps | y <- ps, getColour y /= c, getPieceType y == Pawn])
@@ -41,7 +41,6 @@ pieceVal (Rook,_,_,_)   = 5.0
 pieceVal (Queen,_,_,_)  = 9.0
 pieceVal (King,_,_,_)   = 1.0
 
--- TODO: try to a piece trapped due to check
 isPieceAimedAtEnemyKing :: Piece -> AllPieces -> Bool
 isPieceAimedAtEnemyKing p ps = isValidMove p (moveMade (getPos p) k) (p : [])
                                where
@@ -51,18 +50,6 @@ threatenKingBonus :: Piece -> AllPieces -> Float
 threatenKingBonus p ps | isPieceAimedAtEnemyKing p ps = 3.0
                        | otherwise = 0.0
 
-kingOnSideBonus :: Colour -> AllPieces -> Float
-kingOnSideBonus c ps = (kingSideColumn king) + (kingSideRow king)
-                       where
-                         king = findKing (invertColour c) ps
-
-kingSideColumn :: Pos -> Float
-kingSideColumn p | getColumn p == 0 || getColumn p == 7 = 1.5
-                 | otherwise = 0.0
-
-kingSideRow :: Pos -> Float
-kingSideRow p | getRow p == 0 || getRow p == 7 = 1.5
-                 |  otherwise = 0.0
 
 pawnsNearEnd :: Colour -> AllPieces -> [Piece]
 pawnsNearEnd White ps = [x | x <- ps, getColour x == White, getRow (getPos x) == 1, getPieceType x == Pawn]
