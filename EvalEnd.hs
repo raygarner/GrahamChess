@@ -41,6 +41,10 @@ pieceVal (King,_,_,_)   = 1.0
 -- TODO: king shouldn't be in a discovered check oppurtunity.
 
 -- TODO: push opposing king to corner/sides
+kingOnSideBonus :: Colour -> AllPieces -> Float
+kingOnSideBonus c ps = kingSideColumn king + kingSideRow king
+                       where
+                         king = findKing (invertColour c) ps
 
 
 pawnsNearEnd :: Colour -> AllPieces -> [Piece]
