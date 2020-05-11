@@ -27,8 +27,8 @@ evalPieceBonus a ps = (threatenKing a ps) + (threatenEvaluation a ps) + (evaluat
 --totalMaterial c ps = 10 * ((sum [ pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - (sum [ pieceVal y  | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
 
 totalMaterial :: Colour -> AllPieces -> Float
---totalMaterial c ps =  40 * (sum [ ((pieceVal (x,White,(0,0),0)) * (countPieceType c x ps)) - ((pieceVal (x,Black,(0,0),0)) * (countPieceType (invertColour c) x ps)) | x <- pieceTypes ])
-totalMaterial c ps = 5 * ((sum [pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - (sum [pieceVal y | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
+--totalMaterial c ps =  20 * (sum [ ((pieceVal (x,White,(0,0),0)) * (countPieceType c x ps)) - ((pieceVal (x,Black,(0,0),0)) * (countPieceType (invertColour c) x ps)) | x <- pieceTypes ])
+totalMaterial c ps = 20 * ((sum [pieceMaterial c x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - (sum [ pieceVal y | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
 --totalMaterial c ps = 20 * (sum [pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ])
 
 
@@ -58,9 +58,9 @@ totalBonus c ps = (sum [evalPieceBonus x ps | x <- ps, getColour x == c]) - (sum
 allPawns :: Colour -> AllPieces -> Float
 allPawns c ps = (sum [passPawnScore x ps | x <- ps, getColour x == c, getPieceType x == Pawn]) - (sum[passPawnScore y ps | y <- ps, getColour y /= c, getPieceType y == Pawn])
 
-pawnCenterControl :: Colour -> AllPieces -> Int
+--pawnCenterControl :: Colour -> AllPieces -> Int
 --pawnCenterControl colour ps = ( (length [ x | x <- ps, getPieceType x == Pawn, y <- pawnControlledSquares x, any (==y) centralSquares, pieceMaterial x ps /= 0 ]) + (length [ x | x <- ps, getPieceType x == Pawn, any (==getPos x) centralSquares, pieceMaterial x ps /= 0]) ) * 10
-pawnCenterControl colour ps = (length [ x | x <- ps, getPieceType x == Pawn, any (==getPos x) centralSquares, pieceMaterial x ps /= 0]) * 10
+--pawnCenterControl colour ps = (length [ x | x <- ps, getPieceType x == Pawn, any (==getPos x) centralSquares, pieceMaterial x ps /= 0]) * 10
 
 totalOpeningVal :: Colour -> AllPieces -> Float
 --totalOpeningVal a ps = (totalMobility a ps - totalMobility (invertColour a) ps) + totalMaterial a ps -- + fromIntegral (castleBonus a ps - castleBonus (invertColour a) ps)-- + fromIntegral ((movePieceBonus a ps) - (movePieceBonus (invertColour a) ps))-- + fromIntegral ((pawnCenterControl a ps)-(pawnCenterControl (invertColour a) ps)) + fromIntegral ((castleBonus a ps)-(castleBonus (invertColour a) ps))-- + (totalBonus a ps)  + (allPawns a ps) + fromIntegral(castleBonus a ps) + fromIntegral (pawnCenterControl a ps)
@@ -193,10 +193,10 @@ isPassedPawn a ps = all (==True) [pawnClearAhead (getColour a) (y,n) ps | y <- [
                         e = if getColour a == White then 1 else 6
 
 -- if a piece is going to be captured then it doesnt really have any material
-pieceMaterial :: Piece -> AllPieces -> Float
-pieceMaterial a ps | (length (threatenedBy a ps) > length (protectedBy a ps)) = 0
-                   | getLowestVal (threatenedBy a ps) < pieceVal a = 0
-                   | otherwise = pieceVal a
+pieceMaterial :: Colour -> Piece -> AllPieces -> Float
+pieceMaterial c a ps | (length (threatenedBy a ps) > length (protectedBy a ps)) = 0
+                     | getLowestVal (threatenedBy a ps) < pieceVal a = 0
+                     | otherwise = pieceVal a
 
 -- returns the value of the lowest value piece in a list of pieces
 getLowestVal :: [Piece] -> Float
