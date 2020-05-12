@@ -1,4 +1,4 @@
-all: remove Opening Endgame selfplay clean
+all: Opening Endgame selfplay clean
 
 Opening:
 	ghc Opening.hs
