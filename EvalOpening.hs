@@ -29,7 +29,7 @@ evalPieceBonus a ps = (threatenKing a ps) + (threatenEvaluation a ps) + (evaluat
 totalMaterial :: Colour -> AllPieces -> Float
 --totalMaterial c ps =  20 * (sum [ ((pieceVal (x,White,(0,0),0)) * (countPieceType c x ps)) - ((pieceVal (x,Black,(0,0),0)) * (countPieceType (invertColour c) x ps)) | x <- pieceTypes ])
 --totalMaterial c ps = 20 * ((sum [pieceMaterial c x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - (sum [ pieceVal y | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
-totalMaterial c ps = 2 * ((sum [pieceMaterial c x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - (sum [ pieceVal y | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
+totalMaterial c ps = 100 * ((sum [pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - (sum [ pieceVal y | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
 --totalMaterial c ps = 20 * (sum [pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ])
 
 
@@ -68,9 +68,7 @@ totalOpeningVal :: Colour -> AllPieces -> Float
 totalOpeningVal a ps = totalMobility a ps + totalMaterial a ps + kingSafety a ps -- + movePieceBonus a ps-- + movePieceBonus a ps--} -- + fromIntegral (pawnCenterControl a ps)-- + castleMotive a ps -- + fromIntegral ((movePieceBonus a ps) - (movePieceBonus (invertColour a) ps))
 
 castleMotive :: Colour -> AllPieces -> Float
---castleMotive c ps | possibleToCastle c True ps || possibleToCastle c False ps && any (==getColumn (findKing c ps)) [3..5] = 0
- --                 | otherwise = 30
-castleMotive c ps | any (==getColumn (findKing c ps)) [3..5] = (-15)
+castleMotive c ps | any (==getColumn (findKing c ps)) [3..5] = (-0)
                   | otherwise = 0
 
 staticKingMotive :: Colour -> AllPieces -> Float
@@ -194,10 +192,11 @@ isPassedPawn a ps = all (==True) [pawnClearAhead (getColour a) (y,n) ps | y <- [
                         e = if getColour a == White then 1 else 6
 
 -- if a piece is going to be captured then it doesnt really have any material
-pieceMaterial :: Colour -> Piece -> AllPieces -> Float
-pieceMaterial c a ps | (length (threatenedBy a ps) > length (protectedBy a ps)) = 0
-                     | getLowestVal (threatenedBy a ps) < pieceVal a = 0
+pieceMaterial :: Piece -> AllPieces -> Float
+pieceMaterial a ps | (length t > length (protectedBy a ps)) = 0
+                     | getLowestVal t < pieceVal a = 0
                      | otherwise = pieceVal a
+                       where t = threatenedBy a ps
 
 -- returns the value of the lowest value piece in a list of pieces
 getLowestVal :: [Piece] -> Float
