@@ -12,7 +12,7 @@ import MiddleSearch
 import EndSearch
 
 findRealBestMove :: Colour -> AllPieces -> (Piece,Move,Float)
-findRealBestMove c ps | getGamePoint ps == Opening = findRealBestOpeningMove c ps
-                      | getGamePoint ps == Middle = findRealBestOpeningMove c ps --totalMiddleVal c ps (temporary to make testing easier)
+findRealBestMove c ps | getGamePoint ps == Opening = trace "findRealBestMove called" findRealBestOpeningMove 12 c ps
+                      | getGamePoint ps == Middle = findRealBestOpeningMove 12 c ps --totalMiddleVal c ps (temporary to make testing easier)
                       | otherwise = findRealBestEndMove c ps
 
