@@ -3,6 +3,7 @@ TESTING
 bugs
 ----
 -> fails to make a move when game point changes
+-> cant castle (since adding cant castle through check change)
 
 evaluation
 ----------
