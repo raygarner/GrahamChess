@@ -4,18 +4,26 @@ import TypeDefs
 import Init
 import Util
 import Data.Char
+import Text.Show.Unicode
 
 calcPos :: Int -> Pos
 calcPos a = (a `div` 8, a `mod` 8)
 
 
 pieceChar :: Piece -> Char
-pieceChar (Pawn,c,_,_) = colourCase c 'p'
-pieceChar (Knight,c,_,_) = colourCase c 'n'
-pieceChar (Bishop,c,_,_) = colourCase c 'b'
-pieceChar (Rook,c,_,_) = colourCase c 'r'
-pieceChar (Queen,c,_,_) = colourCase c 'q'
-pieceChar (King,c,_,_) = colourCase c 'k'
+pieceChar (Pawn,Black,_,_) = '♙'
+pieceChar (Pawn,White,_,_) = '♟'
+pieceChar (Knight,White,_,_) = '♞'
+pieceChar (Knight,Black,_,_) = '♘'
+pieceChar (Bishop,Black,_,_) ='♗'
+pieceChar (Bishop,White,_,_) = '♝'
+pieceChar (Rook,Black,_,_) = '♖'
+pieceChar (Rook,White,_,_) = '♜'
+pieceChar (Queen,Black,_,_) = '♕'
+pieceChar (Queen,White,_,_) = '♛'
+pieceChar (King,Black,_,_) = '♔'
+pieceChar (King,White,_,_) = '♚'
+
 
 -- white pieces shown in upper case, black pieces in lower case
 colourCase :: Colour -> Char -> Char
