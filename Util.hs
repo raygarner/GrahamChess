@@ -21,9 +21,9 @@ extractPiece (p,_,_) = p
 -- return what point the game is in
 getGamePoint :: AllPieces -> GamePoint
 --getGamePoint ps | (noQueens ps || lowMaterial ps) = End
-getGamePoint ps | lowMaterial ps = End
-                | allPiecesMoved ps = Middle
-                | otherwise = Opening
+getGamePoint ps | lowMaterial ps = trace "end" End
+                | allPiecesMoved ps = trace "mid" Middle
+                | otherwise = trace "opening" Opening
 
 -- returns the column of a position
 getColumn :: Pos -> Int

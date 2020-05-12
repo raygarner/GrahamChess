@@ -1,5 +1,9 @@
 TESTING
 
+bugs
+----
+-> fails to make a move when game point changes
+
 evaluation
 ----------
 -> tweak weights of different elements
