@@ -326,6 +326,7 @@ executeCastle p (0,-2) ps = updatePosition p (0,-2) : removePiece p (executeMove
 executeMove :: Piece -> Move -> AllPieces -> AllPieces
 executeMove p move ps | isValidPromotion p move ps = promotePawn p move ps
                       | validCastle p move ps = executeCastle p move ps
+                      | isValidEnPassant p move ps = captureEnPassant p move ps
                       | not (isTargetEnemy p move ps) = updatePosition p move : removePiece p ps
                       | otherwise = takePiece y z
                                 where
@@ -373,8 +374,8 @@ possibleToCastle c False ps = not (null (findPiece (getQueensCastle c) ps)) && g
 
 --returns whether a castle is valid or not TODO: king can still castle through check
 validCastle :: Piece -> Move -> AllPieces -> Bool
-validCastle p (0,2) ps  = isStraightMovePathEmpty (getPos p) (0,2) ps && possibleToCastle (getColour p) True ps -- && clearCastlePath p ps True
-validCastle p (0,-2) ps = isStraightMovePathEmpty (getPos p) (0,-3) ps && possibleToCastle (getColour p) False ps -- && clearCastlePath p ps False
+validCastle p (0,2) ps  = isStraightMovePathEmpty (getPos p) (0,2) ps && possibleToCastle (getColour p) True ps && clearCastlePath p ps True
+validCastle p (0,-2) ps = isStraightMovePathEmpty (getPos p) (0,-3) ps && possibleToCastle (getColour p) False ps && clearCastlePath p ps False
 validCastle _ _ _ = False
 
 -- make sure that the king can't castle through check or while in check (true == kingside)

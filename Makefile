@@ -1,4 +1,4 @@
-all: Opening Endgame selfplay clean
+all: Opening Endgame selfplay userselfplay clean
 
 Opening:
 	ghc Opening.hs
@@ -9,8 +9,11 @@ Endgame:
 selfplay:
 	ghc Selfplay.hs
 
+userselfplay:
+	ghc UserSelfplay.hs
+
 clean:
 	rm -f *.o *.hi
 
 remove: clean
-	rm -f Opening Endgame Selfplay
+	rm -f Opening Endgame Selfplay UserSelfplay

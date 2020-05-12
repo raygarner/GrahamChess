@@ -1,8 +1,5 @@
 TESTING
 
-bugs
-----
-
 evaluation
 ----------
 -> tweak weights of different elements
@@ -31,5 +28,4 @@ user interface
 
 util
 ----
--> test whether king can castle through check since patch was added
--> en passant doesnt remove other pawn
+-> you can capture en passant even if the victim pawn moved forward 2 at an earlier point and not the very latest move
