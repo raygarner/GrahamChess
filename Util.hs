@@ -373,8 +373,8 @@ possibleToCastle c False ps = not (null (findPiece (getQueensCastle c) ps)) && g
 
 --returns whether a castle is valid or not TODO: king can still castle through check
 validCastle :: Piece -> Move -> AllPieces -> Bool
-validCastle p (0,2) ps  = isStraightMovePathEmpty (getPos p) (0,2) ps && possibleToCastle (getColour p) True ps && clearCastlePath p ps True
-validCastle p (0,-2) ps = isStraightMovePathEmpty (getPos p) (0,-3) ps && possibleToCastle (getColour p) False ps && clearCastlePath p ps False
+validCastle p (0,2) ps  = isStraightMovePathEmpty (getPos p) (0,2) ps && possibleToCastle (getColour p) True ps -- && clearCastlePath p ps True
+validCastle p (0,-2) ps = isStraightMovePathEmpty (getPos p) (0,-3) ps && possibleToCastle (getColour p) False ps -- && clearCastlePath p ps False
 validCastle _ _ _ = False
 
 -- make sure that the king can't castle through check or while in check (true == kingside)
