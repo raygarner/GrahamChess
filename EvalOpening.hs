@@ -29,7 +29,7 @@ evalPieceBonus a ps = (threatenKing a ps) + (threatenEvaluation a ps) + (evaluat
 totalMaterial :: Colour -> AllPieces -> Float
 --totalMaterial c ps =  20 * (sum [ ((pieceVal (x,White,(0,0),0)) * (countPieceType c x ps)) - ((pieceVal (x,Black,(0,0),0)) * (countPieceType (invertColour c) x ps)) | x <- pieceTypes ])
 --totalMaterial c ps = 20 * ((sum [pieceMaterial c x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - (sum [ pieceVal y | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
-totalMaterial c ps = 100 * ((sum [pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - (sum [ pieceVal y | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
+totalMaterial c ps = 250 * (1.1 * (sum [pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - (sum [ pieceMaterial y ps| y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
 --totalMaterial c ps = 20 * (sum [pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ])
 
 
@@ -193,10 +193,11 @@ isPassedPawn a ps = all (==True) [pawnClearAhead (getColour a) (y,n) ps | y <- [
 
 -- if a piece is going to be captured then it doesnt really have any material
 pieceMaterial :: Piece -> AllPieces -> Float
-pieceMaterial a ps | (length t > length (protectedBy a ps)) = 0
+pieceMaterial a ps   | (length t > length (protectedBy a ps)) = 0
                      | getLowestVal t < pieceVal a = 0
                      | otherwise = pieceVal a
                        where t = threatenedBy a ps
+
 
 -- returns the value of the lowest value piece in a list of pieces
 getLowestVal :: [Piece] -> Float

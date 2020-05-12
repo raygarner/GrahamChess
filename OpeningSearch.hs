@@ -17,7 +17,7 @@ getScores c ps = [ addTrueEval (c,c) 0 x ps | x <- makeEvalList c ps]
 
 -- updates the evaluation for moves by looking moves into the futur2
 addTrueEval :: (Colour,Colour) -> Int -> (Piece,Move,Float) -> AllPieces -> (Piece,Move,Float)
-addTrueEval (c,nc) l (p,m,f) ps | l == 24 = if isCheckmate (invertColour c) ps then
+addTrueEval (c,nc) l (p,m,f) ps | l == 40 = if isCheckmate (invertColour c) ps then
                                                (p,m,checkmate-(fromIntegral l))
                                            else if isCheckmate c ps then
                                                (p,m,0-checkmate-(fromIntegral l))
@@ -50,7 +50,7 @@ findStrongestMoveFromAll xs | not (null xs) = head [ x | x <- xs, all (\y -> (ge
 --takes the top n rated moves from evalList
 takeTopMoves :: Int -> [(Piece,Move,Float)] -> [(Piece,Move,Float)]
 takeTopMoves n [] = []
-takeTopMoves 8 xs = []
+takeTopMoves 4 xs = []
 takeTopMoves n xs = m : takeTopMoves (n+1) (removeMove m xs)
                   where
                       m = findStrongestMoveFromAll xs
