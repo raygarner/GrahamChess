@@ -4,7 +4,7 @@ import TypeDefs
 import Init
 import Util
 import Data.Char
-import Text.Show.Unicode
+--import Text.Show.Unicode
 
 calcPos :: Int -> Pos
 calcPos a = (a `div` 8, a `mod` 8)
