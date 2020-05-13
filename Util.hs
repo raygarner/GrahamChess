@@ -263,7 +263,7 @@ isValidMove (Rook, col, pos, mc) move ps   = isRookValidMove (Rook, col, pos, mc
 isValidMove (Queen, col, pos, mc) move ps  = isQueenValidMove (Queen, col, pos, mc) move ps
 isValidMove (King, col, pos, mc) move ps   = validKingMove (King, col, pos, mc) move ps
 
--- returns a list of the pieces which can capture piece a
+-- returns a list of the pieces which can capture piece p
 threatenedBy :: Piece -> AllPieces -> [Piece]
 threatenedBy p ps = [ x | x <- ps, isValidMove x (m - getRow (getPos x), n - getColumn (getPos x)) ps ]
                   where
