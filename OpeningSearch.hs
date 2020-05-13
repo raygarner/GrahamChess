@@ -39,7 +39,7 @@ addTrueEval (c,nc) l d (p,m,f) ps | l == d = if isCheckmate (invertColour c) ps 
                                       e = findRealBestOpeningMove2 (d-l) nc ps
                                       --v = if nc == c then (totalVal c ps) + materialInDanger (invertColour c) ps else (totalVal c ps) - materialInDanger c ps
                                       --v = if c == nc then totalVal c ps else 0 - totalVal nc ps
-                                      v = totalOpeningValSafe c ps
+                                      v = totalVal c ps
 
 -- updates the evaluation for moves by looking moves into the futur2
 addTrueEval2 :: (Colour,Colour) -> Int -> Int -> (Piece,Move,Float) -> AllPieces -> (Piece,Move,Float)
@@ -59,7 +59,7 @@ addTrueEval2 (c,nc) l d (p,m,f) ps | l == d = if isCheckmate (invertColour c) ps
                                       --e = findRealBestOpeningMove (d-1) nc ps
                                       --v = if nc == c then (totalVal c ps) + materialInDanger (invertColour c) ps else (totalVal c ps) - materialInDanger c ps
                                       --v = if c == nc then totalVal c ps else 0 - totalVal nc ps
-                                      v = totalOpeningValSafe c ps
+                                      v = totalVal c ps
 
 
 
