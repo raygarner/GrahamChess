@@ -55,7 +55,9 @@ moveMade (a,b) (c,d) = (c - a, d - b)
 
 -- returns a piece with an updated position
 updatePosition :: Piece -> Move -> Piece
-updatePosition (p,colour,pos,mc) move = (p, colour, (getTarget pos move), mc+1)
+updatePosition (p,colour,pos,mc) (m,n) = (p, colour, (getTarget pos (m,n)), mc+2)
+                                        where
+                                            x = if p == Pawn && abs m == 2 then 2 else 1
 
 -- returns the starting position of a move
 --getStart :: Move -> Pos
@@ -208,7 +210,7 @@ isPawnValidMove p move ps = isValidTarget p move ps && ( (isEmpty (getTarget (ge
 
 -- returns whether a move is a valid en passant move
 isValidEnPassant :: Piece -> Move -> AllPieces -> Bool
-isValidEnPassant a (m,n) ps = isPawnCapture a (m,n) && getRow (getPos a) == r && not (isEmpty (getTarget (getPos a) (0,n)) ps) && p == (Pawn, invertColour (getColour a), (getRow (getPos a), getColumn (getPos a) + n), 1)
+isValidEnPassant a (m,n) ps = isPawnCapture a (m,n) && getRow (getPos a) == r && not (isEmpty (getTarget (getPos a) (0,n)) ps) && p == (Pawn, invertColour (getColour a), (getRow (getPos a), getColumn (getPos a) + n), 2)
                               where
                                   p = head (findPiece (getTarget (getPos a) (0,n)) ps)
                                   r = if getColour a == White then 3 else 4
@@ -324,15 +326,21 @@ executeCastle p (0,-2) ps = updatePosition p (0,-2) : removePiece p (executeMove
 
 --execute move
 executeMove :: Piece -> Move -> AllPieces -> AllPieces
-executeMove p move ps | isValidPromotion p move ps = promotePawn p move ps
-                      | validCastle p move ps = executeCastle p move ps
-                      | not (isTargetEnemy p move ps) = updatePosition p move : removePiece p ps
-                      | otherwise = takePiece y z
+executeMove p move ps | isValidPromotion p move ps = resetEnemyPawns c (promotePawn p move ps)
+                      | validCastle p move ps = resetEnemyPawns c (executeCastle p move ps)
+                      | isValidEnPassant p move ps = resetEnemyPawns c (captureEnPassant p move ps)
+                      | not (isTargetEnemy p move ps) = resetEnemyPawns c (updatePosition p move : removePiece p ps)
+                      | otherwise = resetEnemyPawns c (takePiece y z)
                                 where
                                     y = head (findPiece (getTarget (getPos p) move) ps)
                                     z = updatePosition p move : removePiece p ps
+                                    c = getColour p
 
+resetMoveCount :: Piece -> Piece
+resetMoveCount (t,c,p,_) = (t,c,p,0)
 
+resetEnemyPawns :: Colour -> AllPieces -> AllPieces
+resetEnemyPawns c ps = [if getPieceType x == Pawn && getColour x /= c then resetMoveCount x else x | x <- ps]
 
 -- writes a move to the pgn file WORKING
 writeMove :: Piece -> Move -> IO ()
@@ -373,9 +381,16 @@ possibleToCastle c False ps = not (null (findPiece (getQueensCastle c) ps)) && g
 
 --returns whether a castle is valid or not TODO: king can still castle through check
 validCastle :: Piece -> Move -> AllPieces -> Bool
-validCastle p (0,2) ps  = isStraightMovePathEmpty (getPos p) (0,2) ps && possibleToCastle (getColour p) True ps
-validCastle p (0,-2) ps = isStraightMovePathEmpty (getPos p) (0,-3) ps && possibleToCastle (getColour p) False ps
+validCastle p (0,2) ps  = isStraightMovePathEmpty (getPos p) (0,2) ps && possibleToCastle (getColour p) True ps && clearCastlePath p ps True
+validCastle p (0,-2) ps = isStraightMovePathEmpty (getPos p) (0,-3) ps && possibleToCastle (getColour p) False ps && clearCastlePath p ps False
 validCastle _ _ _ = False
+
+-- make sure that the king can't castle through check or while in check (true == kingside)
+clearCastlePath :: Piece -> AllPieces -> Bool -> Bool
+clearCastlePath p ps s = null [(m,n) | n <- ys, not (null (threatenedBy (Pawn, getColour p, (m,n),0) ((Pawn,getColour p, (m,n), 0):ps))) ] && not (isKingInCheck p ps)-- dummy piece to keep threatenedBy happy
+                           where
+                               m = if getColour p == White then 7 else 0
+                               ys = if s then [5,6] else [2,3]
 
 -- return a list of legal moves that a knight can make
 legalKnightMoves :: Piece -> AllPieces -> [Move]

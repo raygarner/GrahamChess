@@ -1,16 +1,24 @@
-all: Opening Endgame selfplay clean
+FLAGS=-O2 -optc-O3 -funfolding-use-threshold=16 -fexcess-precision -optc-ffast-math
+FLAGS=-O2
+
+
+all: remove clean
 
 Opening:
-	ghc Opening.hs
+	ghc $(FLAGS) Opening.hs
 
 Endgame:
-	ghc Endgame.hs
+	ghc $(FLAGS) Endgame.hs
 
 selfplay:
-	ghc Selfplay.hs
+	ghc $(FLAGS) Selfplay.hs
 
-clean:
+userselfplay:
+	ghc $(FLAGS) UserSelfplay.hs
+
+clean: Opening Endgame selfplay userselfplay
 	rm -f *.o *.hi
 
-remove: clean
-	rm -f Opening Endgame Selfplay
+remove:
+	rm -f *.o *.hi
+	rm -f Opening Endgame Selfplay UserSelfplay

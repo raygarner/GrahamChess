@@ -16,7 +16,7 @@ pieceMobMult (Knight,_,_,_) = 1.5
 pieceMobMult (Queen,_,_,_) = 0.1
 pieceMobMult (Rook,_,_,_) = 0.5
 pieceMobMult (King,_,_,_) = 0.0
-pieceMobMult (Bishop,_,_,_) = 1
+pieceMobMult (Bishop,_,_,_) = 0.75
 
 
 evalPieceBonus :: Piece -> AllPieces -> Float
@@ -27,11 +27,13 @@ evalPieceBonus a ps = (threatenKing a ps) + (threatenEvaluation a ps) + (evaluat
 --totalMaterial c ps = 10 * ((sum [ pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - (sum [ pieceVal y  | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
 
 totalMaterial :: Colour -> AllPieces -> Float
---totalMaterial c ps =  40 * (sum [ ((pieceVal (x,White,(0,0),0)) * (countPieceType c x ps)) - ((pieceVal (x,Black,(0,0),0)) * (countPieceType (invertColour c) x ps)) | x <- pieceTypes ])
-totalMaterial c ps = 5 * ((sum [pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - (sum [pieceVal y | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
+--totalMaterial c ps =  100 * (sum [ ((pieceVal (x,White,(0,0),0)) * (countPieceType c x ps)) - ((pieceVal (x,Black,(0,0),0)) * (countPieceType (invertColour c) x ps)) | x <- pieceTypes ])
+--totalMaterial c ps = 20 * ((sum [pieceMaterial c x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - (sum [ pieceVal y | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
+totalMaterial c ps = 10 * ((sum [pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - ( sum [ pieceMaterial y ps| y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
 --totalMaterial c ps = 20 * (sum [pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ])
 
-
+totalMaterialSafe :: Colour -> AllPieces -> Float
+totalMaterialSafe c ps = 10 * ((sum [pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - ( sum [ pieceVal y | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
 
 --totalMaterial c ps = (sum [ (pieceVal (x,White,(0,0),0)) * (countPieceType c x ps) | x <- pieceTypes ])
 
@@ -58,18 +60,18 @@ totalBonus c ps = (sum [evalPieceBonus x ps | x <- ps, getColour x == c]) - (sum
 allPawns :: Colour -> AllPieces -> Float
 allPawns c ps = (sum [passPawnScore x ps | x <- ps, getColour x == c, getPieceType x == Pawn]) - (sum[passPawnScore y ps | y <- ps, getColour y /= c, getPieceType y == Pawn])
 
-pawnCenterControl :: Colour -> AllPieces -> Int
+--pawnCenterControl :: Colour -> AllPieces -> Int
 --pawnCenterControl colour ps = ( (length [ x | x <- ps, getPieceType x == Pawn, y <- pawnControlledSquares x, any (==y) centralSquares, pieceMaterial x ps /= 0 ]) + (length [ x | x <- ps, getPieceType x == Pawn, any (==getPos x) centralSquares, pieceMaterial x ps /= 0]) ) * 10
-pawnCenterControl colour ps = (length [ x | x <- ps, getPieceType x == Pawn, any (==getPos x) centralSquares, pieceMaterial x ps /= 0]) * 10
+--pawnCenterControl colour ps = (length [ x | x <- ps, getPieceType x == Pawn, any (==getPos x) centralSquares, pieceMaterial x ps /= 0]) * 10
 
 totalOpeningVal :: Colour -> AllPieces -> Float
---totalOpeningVal a ps = (totalMobility a ps - totalMobility (invertColour a) ps) + totalMaterial a ps -- + fromIntegral (castleBonus a ps - castleBonus (invertColour a) ps)-- + fromIntegral ((movePieceBonus a ps) - (movePieceBonus (invertColour a) ps))-- + fromIntegral ((pawnCenterControl a ps)-(pawnCenterControl (invertColour a) ps)) + fromIntegral ((castleBonus a ps)-(castleBonus (invertColour a) ps))-- + (totalBonus a ps)  + (allPawns a ps) + fromIntegral(castleBonus a ps) + fromIntegral (pawnCenterControl a ps)
 totalOpeningVal a ps = totalMobility a ps + totalMaterial a ps + kingSafety a ps -- + movePieceBonus a ps-- + movePieceBonus a ps--} -- + fromIntegral (pawnCenterControl a ps)-- + castleMotive a ps -- + fromIntegral ((movePieceBonus a ps) - (movePieceBonus (invertColour a) ps))
 
+totalOpeningValSafe :: Colour -> AllPieces -> Float
+totalOpeningValSafe a ps = totalMobility a ps + totalMaterialSafe a ps + kingSafety a ps -- + movePieceBonus a ps-- + movePieceBonus a ps--} -- + fromIntegral (pawnCenterControl a ps)-- + castleMotive a ps -- + fromIntegral ((movePieceBonus a ps) - (movePieceBonus (invertColour a) ps))
+
 castleMotive :: Colour -> AllPieces -> Float
---castleMotive c ps | possibleToCastle c True ps || possibleToCastle c False ps && any (==getColumn (findKing c ps)) [3..5] = 0
- --                 | otherwise = 30
-castleMotive c ps | any (==getColumn (findKing c ps)) [3..5] = (-15)
+castleMotive c ps | any (==getColumn (findKing c ps)) [3..5] = (-9)
                   | otherwise = 0
 
 staticKingMotive :: Colour -> AllPieces -> Float
@@ -194,9 +196,11 @@ isPassedPawn a ps = all (==True) [pawnClearAhead (getColour a) (y,n) ps | y <- [
 
 -- if a piece is going to be captured then it doesnt really have any material
 pieceMaterial :: Piece -> AllPieces -> Float
-pieceMaterial a ps | (length (threatenedBy a ps) > length (protectedBy a ps)) = 0
-                   | getLowestVal (threatenedBy a ps) < pieceVal a = 0
-                   | otherwise = pieceVal a
+pieceMaterial a ps   | (length t > length (protectedBy a ps)) = 0
+                     | getLowestVal t < pieceVal a = 0
+                     | otherwise = pieceVal a
+                       where t = threatenedBy a ps
+
 
 -- returns the value of the lowest value piece in a list of pieces
 getLowestVal :: [Piece] -> Float
