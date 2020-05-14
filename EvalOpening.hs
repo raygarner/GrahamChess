@@ -12,7 +12,7 @@ evalPiece a ps = fromIntegral (length (legalMoves a ps)) * pieceMobMult a
 
 pieceMobMult :: Piece -> Float
 pieceMobMult (Pawn,_,_,_) = 1.0
-pieceMobMult (Knight,_,_,_) = 1.0
+pieceMobMult (Knight,_,_,_) = 1.3
 pieceMobMult (Queen,_,_,_) = 0.0
 pieceMobMult (Rook,_,_,_) = 0.5
 pieceMobMult (King,_,_,_) = 0.0
