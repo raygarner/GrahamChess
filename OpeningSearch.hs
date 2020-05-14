@@ -79,7 +79,7 @@ findStrongestMoveFromAll xs | not (null xs) = head [ x | x <- xs, all (\y -> (ge
 --takes the top n rated moves from evalList
 takeTopMoves :: Int -> [(Piece,Move,Float)] -> [(Piece,Move,Float)]
 takeTopMoves n [] = []
-takeTopMoves 20 xs = []
+takeTopMoves 99 xs = []
 takeTopMoves n xs = m : takeTopMoves (n+1) (removeMove m xs)
                   where
                       m = findStrongestMoveFromAll xs
@@ -100,7 +100,7 @@ makeSingleBestMove (a,b,_) ps = executeMove a b ps
 -- makes a move and then evaluates the new AllPieces
 evalMove :: Piece -> Move -> AllPieces -> Float
 evalMove a m ps | isCheckmate (invertColour (getColour a)) (executeMove a m ps) = checkmate -- if this is a mating move
-                | otherwise = totalVal (getColour a) (executeMove a m ps)
+                | otherwise = totalVal (getColour a) (executeMove a m ps) -- make use unsafe
 
 isCheckmate :: Colour -> AllPieces -> Bool
 isCheckmate c ps = null (makeEvalList c ps) && isKingInCheck king ps

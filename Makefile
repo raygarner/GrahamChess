@@ -1,5 +1,5 @@
 FLAGS=-O2 -optc-O3 -funfolding-use-threshold=16 -fexcess-precision -optc-ffast-math
-FLAGS=-O2
+FLAGS=-O2 -threaded
 
 
 all: remove clean

@@ -11,12 +11,12 @@ evalPiece :: Piece -> AllPieces -> Float
 evalPiece a ps = fromIntegral (length (legalMoves a ps)) * pieceMobMult a
 
 pieceMobMult :: Piece -> Float
-pieceMobMult (Pawn,_,_,_) = 0.0
-pieceMobMult (Knight,_,_,_) = 1.5
+pieceMobMult (Pawn,_,_,_) = 1.0
+pieceMobMult (Knight,_,_,_) = 1.3
 pieceMobMult (Queen,_,_,_) = 0.0
 pieceMobMult (Rook,_,_,_) = 0.5
 pieceMobMult (King,_,_,_) = 0.0
-pieceMobMult (Bishop,_,_,_) = 0.5
+pieceMobMult (Bishop,_,_,_) = 0.1
 
 
 evalPieceBonus :: Piece -> AllPieces -> Float
@@ -32,6 +32,8 @@ totalMaterial :: Colour -> AllPieces -> Float
 totalMaterial c ps = 10 * ((sum [pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - ( sum [ pieceVal y | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
 --totalMaterial c ps = 20 * (sum [pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ])
 
+totalMaterialUnsafe :: Colour -> AllPieces -> Float
+totalMaterialUnsafe c ps = 10 * ((sum [pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - ( sum [ pieceMaterial y ps | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
 
 --totalMaterial c ps = (sum [ (pieceVal (x,White,(0,0),0)) * (countPieceType c x ps) | x <- pieceTypes ])
 
@@ -65,6 +67,8 @@ allPawns c ps = (sum [passPawnScore x ps | x <- ps, getColour x == c, getPieceTy
 totalOpeningVal :: Colour -> AllPieces -> Float
 totalOpeningVal a ps = (totalMobility a ps - totalMobility (invertColour a) ps) + totalMaterial a ps + kingSafety a ps -- + movePieceBonus a ps-- + movePieceBonus a ps--} -- + fromIntegral (pawnCenterControl a ps)-- + castleMotive a ps -- + fromIntegral ((movePieceBonus a ps) - (movePieceBonus (invertColour a) ps))
 
+totalOpeningValUnsafe :: Colour -> AllPieces -> Float
+totalOpeningValUnsafe a ps = (totalMobility a ps - totalMobility (invertColour a) ps) + totalMaterialUnsafe a ps + kingSafety a ps -- + movePieceBonus a ps-- + movePieceBonus a ps--} -- + fromIntegral (pawnCenterControl a ps)-- + castleMotive a ps -- + fromIntegral ((movePieceBonus a ps) - (movePieceBonus (invertColour a) ps))
 
 castleMotive :: Colour -> AllPieces -> Float
 castleMotive c ps | any (==getColumn (findKing c ps)) [3..5] = (-9)
