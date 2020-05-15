@@ -23,5 +23,5 @@ clean: Opening Endgame selfplay userselfplay
 	rm -f *.o *.hi
 
 remove:
-	rm -f *.o *.hi
+	make clean
 	rm -f Opening Endgame Selfplay UserSelfplay
