@@ -3,16 +3,11 @@ TESTING
 bugs
 ----
 -> fails to make a move when game point changes?
+-> can't castle queenside?
 
 evaluation
 ----------
--> tweak weights of different elements
--> dont bring the queen out so early
--> deduction for doubled pawns
--> bonus for connected rooks
--> deduction for blocking pawns
--> make it like castling
--> mobility in danger function?
+-> evaluate pawn structure (blocked pawns, connected pawns etc)
 
 move searching
 --------------
