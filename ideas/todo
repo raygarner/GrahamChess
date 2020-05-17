@@ -11,8 +11,7 @@ evaluation
 
 move searching
 --------------
--> only search top x moves produced by makeEvalList
--> implement mobility in danger function?
+-> multithreading
 
 main
 ----
