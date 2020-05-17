@@ -14,22 +14,22 @@ import Control.Parallel
 findRealBestOpeningMove :: Int -> Colour -> AllPieces -> (Piece, Move, Float)
 findRealBestOpeningMove d c ps = findStrongestMoveFromAll [ addTrueEval (c,c) 0 d x ps | x <- makeEvalList c ps]
 --findRealBestOpeningMove d c ps = findStrongestMoveFromAll (par l (r++l))
---findRealBestOpeningMove d c ps = findStrongestMoveFromAll (l `pseq` (r++l))
+--findRealBestOpeningMove d c ps = findStrongestMoveFromAll (l `par` (r++l))
 --findRealBestOpeningMove d c ps = findStrongestMoveFromAll (r `par` (l `pseq` (l++r)))
---findRealBestOpeningMove d c ps = findStrongestMoveFromAll (first `pseq` (first ++ second))
-{-
+--findRealBestOpeningMove d c ps = findStrongestMoveFromAll (first `par` (second ++ first))
+{--
                                  where
                                      b = makeEvalList c ps
-                                     --n = length b `div` 4
+                                     n = length b `div` 4
                                      n2 = (length b `div` 2)
-                                     --l = trace "l" [ addTrueEval (c,c) 0 d x ps | x <- take n (take n2 b)]
-                                     --r = trace "r" [ addTrueEval (c,c) 0 d x ps | x <- take n (drop n2 b)]
-                                     l = trace "l" [ addTrueEval (c,c) 0 d x ps | x <- take (n2+1) b]
-                                     r = trace "r" [ addTrueEval (c,c) 0 d x ps | x <- drop n2 b]
-                                     --l2 = trace "l2" [ addTrueEval (c,c) 0 d x ps | x <- drop n (take n2 b)]
-                                     --r2 = trace "r2" [ addTrueEval (c,c) 0 d x ps | x <- drop n (drop n2 b)]
-                                     --first = r `pseq` (l++r)
-                                     --second = r2 `pseq` (l2++r2)
+                                     l = trace "l" [ addTrueEval (c,c) 0 d x ps | x <- take (n+1) (take (n2+1) b)]
+                                     r = trace "r" [ addTrueEval (c,c) 0 d x ps | x <- take (n+1) (drop n2 b)]
+                                     --l = trace "l" [ addTrueEval (c,c) 0 d x ps | x <- take (n2+1) b]
+                                     --r = trace "r" [ addTrueEval (c,c) 0 d x ps | x <- drop n2 b]
+                                     l2 = trace "l2" [ addTrueEval (c,c) 0 d x ps | x <- drop n (take (n2+1) b)]
+                                     r2 = trace "r2" [ addTrueEval (c,c) 0 d x ps | x <- drop n (drop n2 b)]
+                                     first = r `par` (l++r)
+                                     second = r2 `par` (l2++r2)
 --}
 
 
