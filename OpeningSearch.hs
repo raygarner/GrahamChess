@@ -12,31 +12,38 @@ import Control.Parallel
 
 -- returns the best move for one side (not sure how this handles checkmate????)
 findRealBestOpeningMove :: Int -> Colour -> AllPieces -> (Piece, Move, Float)
---findRealBestOpeningMove d c ps = findStrongestMoveFromAll [ addTrueEval (c,c) 0 d x ps | x <- takeTopMoves 0 (makeEvalList c ps)]
+findRealBestOpeningMove d c ps = findStrongestMoveFromAll [ addTrueEval (c,c) 0 d x ps | x <- makeEvalList c ps]
 --findRealBestOpeningMove d c ps = findStrongestMoveFromAll (par l (r++l))
+--findRealBestOpeningMove d c ps = findStrongestMoveFromAll (l `pseq` (r++l))
 --findRealBestOpeningMove d c ps = findStrongestMoveFromAll (r `par` (l `pseq` (l++r)))
-findRealBestOpeningMove d c ps = findStrongestMoveFromAll (first `par` (first `par` second))
+--findRealBestOpeningMove d c ps = findStrongestMoveFromAll (first `pseq` (first ++ second))
+{-
                                  where
                                      b = makeEvalList c ps
-                                     n = length b `div` 4
-                                     n2 = length b `div` 2
-                                     l = trace "l" [ addTrueEval (c,c) 0 d x ps | x <- take n (take n2 b)]
-                                     r = trace "r" [ addTrueEval (c,c) 0 d x ps | x <- take n (drop n2 b)]
-                                     l2 = trace "l2" [ addTrueEval (c,c) 0 d x ps | x <- drop n (take n2 b)]
-                                     r2 = trace "r2" [ addTrueEval (c,c) 0 d x ps | x <- drop n (drop n2 b)]
-                                     first = r `par` (l++r)
-                                     second = r2 `par` (l2++r2)
+                                     --n = length b `div` 4
+                                     n2 = (length b `div` 2)
+                                     --l = trace "l" [ addTrueEval (c,c) 0 d x ps | x <- take n (take n2 b)]
+                                     --r = trace "r" [ addTrueEval (c,c) 0 d x ps | x <- take n (drop n2 b)]
+                                     l = trace "l" [ addTrueEval (c,c) 0 d x ps | x <- take (n2+1) b]
+                                     r = trace "r" [ addTrueEval (c,c) 0 d x ps | x <- drop n2 b]
+                                     --l2 = trace "l2" [ addTrueEval (c,c) 0 d x ps | x <- drop n (take n2 b)]
+                                     --r2 = trace "r2" [ addTrueEval (c,c) 0 d x ps | x <- drop n (drop n2 b)]
+                                     --first = r `pseq` (l++r)
+                                     --second = r2 `pseq` (l2++r2)
+--}
 
 
 -- returns the best move for one side (not sure how this handles checkmate????)
 findRealBestOpeningMove2 :: Int -> Colour -> AllPieces -> (Piece, Move, Float)
-findRealBestOpeningMove2 d c ps = findStrongestMoveFromAll [ addTrueEval2 (c,c) 0 d x ps | x <- takeTopMoves 0 (makeEvalList c ps)]
---findRealBestOpeningMove2 d c ps = findStrongestMoveFromAll (r `par` (l++r))
---                                 where
---                                     b = makeEvalList c ps
---                                     l = [ addTrueEval2 (c,c) 0 d x ps | x <- trace "l" take (length b `div` 2) b]
---                                     r = [ addTrueEval2 (c,c) 0 d x ps | x <- trace "r" drop (length b `div` 2) b]
-
+findRealBestOpeningMove2 d c ps = findStrongestMoveFromAll [ addTrueEval2 (c,c) 0 d x ps | x <- makeEvalList c ps]
+{-
+findRealBestOpeningMove2 d c ps = findStrongestMoveFromAll (r `pseq` (l++r))
+                                 where
+                                     b = makeEvalList c ps
+                                     n2 = (length b `div` 2)
+                                     l = trace "l" [ addTrueEval2 (c,c) 0 d x ps | x <- take (n2+1) b]
+                                     r = trace "r" [ addTrueEval2 (c,c) 0 d x ps | x <- drop n2 b]
+--}
 
 
 --getScores :: Colour -> AllPieces -> [(Piece,Move,Float)]
