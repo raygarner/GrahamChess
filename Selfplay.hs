@@ -11,6 +11,7 @@ import           Search
 import           UI
 import           Debug
 import           Eval
+import Data.Time.Clock
 
 main :: IO ()
 main = gameLoop White addAllPieces
@@ -20,6 +21,7 @@ main = gameLoop White addAllPieces
 gameLoop :: Colour -> AllPieces -> IO ()
 gameLoop c ps = do putStr "Graham is thinking of a move...\n"
                    printBoard (-1) ps
+                   start <- getCurrentTime
                    response <- return (findRealBestMove c ps)
                    print response
                    --putStr "Graham has made his move...\n"
@@ -27,6 +29,9 @@ gameLoop c ps = do putStr "Graham is thinking of a move...\n"
                    --print move
                    piece <- return (extractPiece response)
                    --print piece
+                   end <- getCurrentTime
+                   putStrLn $ show (end `diffUTCTime` start)
+
                    gameLoop (invertColour c) (movePiece piece move ps)
 
 

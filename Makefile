@@ -1,5 +1,5 @@
 
-FLAGS=-threaded -O2
+FLAGS=-O2
 
 all: remove clean
 
