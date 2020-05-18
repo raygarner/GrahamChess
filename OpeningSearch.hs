@@ -12,7 +12,7 @@ import Control.Parallel
 
 -- returns the best move for one side (not sure how this handles checkmate????)
 findRealBestOpeningMove :: Int -> Colour -> AllPieces -> (Piece, Move, Float)
-findRealBestOpeningMove d c ps = findStrongestMoveFromAll [ addTrueEval (c,c) 0 d x ps | x <- makeEvalList c ps]
+findRealBestOpeningMove d c ps = findStrongestMoveFromAll [ trace (show x) addTrueEval (c,c) 0 d x ps | x <- makeEvalList c ps]
 --findRealBestOpeningMove d c ps = findStrongestMoveFromAll (par l (r++l))
 --findRealBestOpeningMove d c ps = findStrongestMoveFromAll (l `par` (r++l))
 --findRealBestOpeningMove d c ps = findStrongestMoveFromAll (r `par` (l `pseq` (l++r)))
