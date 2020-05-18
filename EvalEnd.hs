@@ -55,11 +55,11 @@ isKingOnEdges c ps = isKingSideCol king + isKingSideRow king
                      where king = findKing (invertColour c) ps
 
 isKingSideCol :: Pos -> Float
-isKingSideCol p | getColumn p == 0 || getColumn p == 7 = 3.0
+isKingSideCol p | getColumn p == 0 || getColumn p == 7 = 1.5
                 | otherwise = 0
 
 isKingSideRow :: Pos -> Float
-isKingSideRow p | getRow p == 0 || getRow p == 7 = 3.0
+isKingSideRow p | getRow p == 0 || getRow p == 7 = 1.5
                 | otherwise = 0
 
 pawnsNearEnd :: Colour -> AllPieces -> [Piece]
