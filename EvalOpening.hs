@@ -12,7 +12,7 @@ evalPiece a ps = fromIntegral (length (legalMoves a ps)) * pieceMobMult a
 
 pieceMobMult :: Piece -> Float
 pieceMobMult (Pawn,_,_,_) = 1.5
-pieceMobMult (Knight,_,_,_) = 1.2
+pieceMobMult (Knight,_,_,_) = 1.3
 pieceMobMult (Queen,_,_,_) = 0.0
 pieceMobMult (Rook,_,_,_) = 1.0
 pieceMobMult (King,_,_,_) = 0.0
@@ -22,18 +22,12 @@ pieceMobMult (Bishop,_,_,_) = 1.0
 evalPieceBonus :: Piece -> AllPieces -> Float
 evalPieceBonus a ps = (threatenKing a ps) + (threatenEvaluation a ps) + (evaluationCentralSquares a ps)
 
---totalMaterial :: Colour -> AllPieces -> Float
---totalMaterial c ps = ( (sum [ 10 * pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - (sum [ 10 * pieceMaterial y ps | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
---totalMaterial c ps = 10 * ((sum [ pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - (sum [ pieceVal y  | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
-
 totalMaterial :: Colour -> AllPieces -> Float
 totalMaterial c ps = 10 * ((sum [pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - ( sum [ pieceVal y | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
 
+totalMaterialUnsafe :: Colour -> AllPieces -> Float
+totalMaterialUnsafe c ps = 10 * ((sum [pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - ( sum [ pieceMaterial y ps | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
 
---totalMaterial c ps = (sum [ (pieceVal (x,White,(0,0),0)) * (countPieceType c x ps) | x <- pieceTypes ])
-
---trueMaterial :: Colour -> AllPieces -> Float
---trueMaterial c ps = totalMaterial c ps - totalMaterial (invertColour c) ps
 
 -- returns the material in danger
 materialInDanger :: Colour -> AllPieces -> Float
@@ -63,8 +57,12 @@ totalOpeningVal :: Colour -> AllPieces -> Float
 totalOpeningVal a ps = (totalMobility a ps - totalMobility (invertColour a) ps) + totalMaterial a ps + kingSafety a ps -- + (fromIntegral (blockedPawns a ps - blockedPawns (invertColour a) ps))
 
 
+totalOpeningValUnsafe :: Colour -> AllPieces -> Float
+totalOpeningValUnsafe a ps = (totalMobility a ps - totalMobility (invertColour a) ps) + totalMaterialUnsafe a ps + kingSafety a ps -- + (fromIntegral (blockedPawns a ps - blockedPawns (invertColour a) ps))
+
+
 castleMotive :: Colour -> AllPieces -> Float
-castleMotive c ps | any (==getColumn (findKing c ps)) [3..5] = (-0)
+castleMotive c ps | any (==getColumn (findKing c ps)) [3..5] = (-5)
                   | otherwise = 0
 
 staticKingMotive :: Colour -> AllPieces -> Float
