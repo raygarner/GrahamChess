@@ -12,7 +12,8 @@ import Control.Parallel
 
 -- returns the best move for one side (not sure how this handles checkmate????)
 findRealBestOpeningMove :: Int -> Colour -> AllPieces -> (Piece, Move, Float)
-findRealBestOpeningMove d c ps = findStrongestMoveFromAll [ trace (show x) addTrueEval (c,c) 0 d x ps | x <- makeEvalList c ps]
+findRealBestOpeningMove d c ps = findStrongestMoveFromAll [ addTrueEval (c,c) 0 d x ps | x <- takeTopMoves 0 (makeEvalList c ps)]
+--findRealBestOpeningMove ms d c ps = findStrongestMoveFromAll [ trace (show (addTrueEval (c,c) 0 d x ps)) addTrueEval (c,c) 0 d x ps | x <- ms]
 --findRealBestOpeningMove d c ps = findStrongestMoveFromAll (par l (r++l))
 --findRealBestOpeningMove d c ps = findStrongestMoveFromAll (l `par` (r++l))
 --findRealBestOpeningMove d c ps = findStrongestMoveFromAll (r `par` (l `pseq` (l++r)))
@@ -20,16 +21,16 @@ findRealBestOpeningMove d c ps = findStrongestMoveFromAll [ trace (show x) addTr
 {--
                                  where
                                      b = makeEvalList c ps
-                                     n = length b `div` 4
+                                     --n = length b `div` 4
                                      n2 = (length b `div` 2)
-                                     l = trace "l" [ addTrueEval (c,c) 0 d x ps | x <- take (n+1) (take (n2+1) b)]
-                                     r = trace "r" [ addTrueEval (c,c) 0 d x ps | x <- take (n+1) (drop n2 b)]
-                                     --l = trace "l" [ addTrueEval (c,c) 0 d x ps | x <- take (n2+1) b]
-                                     --r = trace "r" [ addTrueEval (c,c) 0 d x ps | x <- drop n2 b]
-                                     l2 = trace "l2" [ addTrueEval (c,c) 0 d x ps | x <- drop n (take (n2+1) b)]
-                                     r2 = trace "r2" [ addTrueEval (c,c) 0 d x ps | x <- drop n (drop n2 b)]
-                                     first = r `par` (l++r)
-                                     second = r2 `par` (l2++r2)
+                                     --l = trace "l" [ addTrueEval (c,c) 0 d x ps | x <- take (n+1) (take (n2+1) b)]
+                                     --r = trace "r" [ addTrueEval (c,c) 0 d x ps | x <- take (n+1) (drop n2 b)]
+                                     l = trace "l" [ addTrueEval (c,c) 0 d x ps | x <- take (n2+1) b]
+                                     r = trace "r" [ addTrueEval (c,c) 0 d x ps | x <- drop n2 b]
+                                     --l2 = trace "l2" [ addTrueEval (c,c) 0 d x ps | x <- drop n (take (n2+1) b)]
+                                     --r2 = trace "r2" [ addTrueEval (c,c) 0 d x ps | x <- drop n (drop n2 b)]
+                                     --first = r `par` (l++r)
+                                     --second = r2 `par` (l2++r2)
 --}
 
 
@@ -64,7 +65,8 @@ addTrueEval (c,nc) l d (p,m,f) ps | l == d = if isCheckmate (invertColour c) ps 
                                               else addTrueEval (c,(invertColour nc)) (l+1) d (p,m,0) (makeSingleBestMove e ps)
                                   where
                                       --e = findSingleBestMove nc ps
-                                      e = findRealBestOpeningMove2 (d-l) nc ps
+                                      --e = findRealBestOpeningMove2 (d-l) nc ps
+                                      e = findRealBestOpeningMove (d-l) nc ps
                                       --v = if nc == c then (totalVal c ps) + materialInDanger (invertColour c) ps else (totalVal c ps) - materialInDanger c ps
                                       --v = if c == nc then totalVal c ps else 0 - totalVal nc ps
                                       v = totalVal c ps
@@ -107,7 +109,7 @@ findStrongestMoveFromAll xs | not (null xs) = head [ x | x <- xs, all (\y -> (ge
 --takes the top n rated moves from evalList
 takeTopMoves :: Int -> [(Piece,Move,Float)] -> [(Piece,Move,Float)]
 takeTopMoves n [] = []
-takeTopMoves 99 xs = []
+takeTopMoves 5 xs = []
 takeTopMoves n xs = m : takeTopMoves (n+1) (removeMove m xs)
                   where
                       m = findStrongestMoveFromAll xs

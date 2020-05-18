@@ -426,10 +426,15 @@ legalRookMoves p ps = [ (m,n) | (m,n) <- y, targetNotKing p (m,n) ps, isRookVali
 
 -- return a list of legal moves for a bishop -- same questions as legalRookMoves
 legalBishopMoves :: Piece -> AllPieces -> [Move]
-legalBishopMoves p ps = [ (m,n) | m <- [-7..7], n <- [-7..7], abs m == abs n, targetNotKing p (m,n) ps, isBishopValidMove p (m,n) ps, not (willKingBeInCheck p (m,n) ps) ]
+--legalBishopMoves p ps = [ (m,n) | m <- [-7..7], n <- [-7..7], targetNotKing p (m,n) ps, isBishopValidMove p (m,n) ps, not (willKingBeInCheck p (m,n) ps) ]
+legalBishopMoves p ps = [ (m,n) | (m,n) <- o, targetNotKing p (m,n) ps, isBishopValidMove p (m,n) ps, not (willKingBeInCheck p (m,n) ps) ]
 --legalBishopMoves a b = [ x | x <- y , isBishopValidMove a x b ]
---                     where
+                     where
 --                         y = [ (m,n) | m <- [-7..7], n <- [-7..7], isDiagonal (m,n) ]
+                         j = [(m,m) | m <- [-7..7]]
+                         k = [(m,0-m) | m <- [0..7]]
+                         l = [(0-m,m) | m <- [0..7]]
+                         o = j++k++l
 
 -- returns a list of legal moves for a queen
 legalQueenMoves :: Piece -> AllPieces -> [Move]
