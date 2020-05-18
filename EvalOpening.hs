@@ -23,7 +23,7 @@ evalPieceBonus :: Piece -> AllPieces -> Float
 evalPieceBonus a ps = (threatenKing a ps) + (threatenEvaluation a ps) + (evaluationCentralSquares a ps)
 
 totalMaterial :: Colour -> AllPieces -> Float
-totalMaterial c ps = 10 * ((sum [pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - ( sum [ pieceVal y | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
+totalMaterial c ps = 20 * ((sum [pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - ( sum [ pieceVal y | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
 
 totalMaterialUnsafe :: Colour -> AllPieces -> Float
 totalMaterialUnsafe c ps = 10 * ((sum [pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - ( sum [ pieceMaterial y ps | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
@@ -54,7 +54,7 @@ blockedPawns c ps = length [x | x <- ps, getPieceType x == Pawn, getColour x == 
 
 
 totalOpeningVal :: Colour -> AllPieces -> Float
-totalOpeningVal a ps = (totalMobility a ps - totalMobility (invertColour a) ps) + totalMaterial a ps + kingSafety a ps -- + (fromIntegral (blockedPawns a ps - blockedPawns (invertColour a) ps))
+totalOpeningVal a ps = totalMobility a ps + totalMaterial a ps + kingSafety a ps -- + (fromIntegral (blockedPawns a ps - blockedPawns (invertColour a) ps))
 
 
 totalOpeningValUnsafe :: Colour -> AllPieces -> Float

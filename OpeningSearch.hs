@@ -12,7 +12,7 @@ import Control.Parallel
 
 -- returns the best move for one side (not sure how this handles checkmate????)
 findRealBestOpeningMove :: Int -> Colour -> AllPieces -> (Piece, Move, Float)
-findRealBestOpeningMove d c ps = findStrongestMoveFromAll [ addTrueEval (c,c) 0 d x ps | x <- takeTopMoves 0 (makeEvalList c ps)]
+findRealBestOpeningMove d c ps = findStrongestMoveFromAll [ addTrueEval (c,c) 0 d x ps | x <- makeEvalList c ps]
 
 -- updates the evaluation for moves by looking moves into the futur2
 addTrueEval :: (Colour,Colour) -> Int -> Int -> (Piece,Move,Float) -> AllPieces -> (Piece,Move,Float)
@@ -47,7 +47,7 @@ findStrongestMoveFromAll xs | not (null xs) = head [ x | x <- xs, all (\y -> (ge
 --takes the top n rated moves from evalList
 takeTopMoves :: Int -> [(Piece,Move,Float)] -> [(Piece,Move,Float)]
 takeTopMoves n [] = []
-takeTopMoves 8 xs = []
+takeTopMoves 99 xs = []
 takeTopMoves n xs = m : takeTopMoves (n+1) (removeMove m xs)
                   where
                       m = findStrongestMoveFromAll xs
