@@ -17,16 +17,16 @@ getScores c ps = [ addTrueEval (c,c) 0 x ps | x <- makeEvalList c ps]
 
 -- updates the evaluation for moves by looking moves into the futur2
 addTrueEval :: (Colour,Colour) -> Int -> (Piece,Move,Float) -> AllPieces -> (Piece,Move,Float)
-addTrueEval (c,nc) l (p,m,f) ps | l == 12 = if isCheckmate (invertColour c) ps then
-                                               (p,m,checkmate-(fromIntegral l))
+addTrueEval (c,nc) l (p,m,f) ps | l == 50 = if isCheckmate (invertColour c) ps then
+                                               (p,m,futureCheckmate-(fromIntegral l))
                                            else if isCheckmate c ps then
-                                               (p,m,0-checkmate-(fromIntegral l))
+                                               (p,m,0-futureCheckmate-(fromIntegral l))
                                            else (p,m,v+f)
-                                | l == 0 = if f == checkmate then (p,m,f) else addTrueEval (c,(invertColour nc)) (l+1) (p,m,v) (executeMove p m ps)
+                                | l == 0 = if f == checkmate then (p,m,checkmate) else addTrueEval (c,(invertColour nc)) (l+1) (p,m,v) (executeMove p m ps)
                                 | otherwise = if isCheckmate (invertColour c) ps then
-                                                  (p,m,checkmate-(fromIntegral l))
+                                                  (p,m,futureCheckmate-(fromIntegral l))
                                               else if isCheckmate c ps then
-                                                  (p,m,0-checkmate-(fromIntegral l))
+                                                  (p,m,0-futureCheckmate-(fromIntegral l))
                                               else addTrueEval (c,(invertColour nc)) (l+1) (p,m,v+f) (makeSingleBestMove e ps)
                                   where
                                       e = findSingleBestMove nc ps
@@ -50,7 +50,7 @@ findStrongestMoveFromAll xs | not (null xs) = head [ x | x <- xs, all (\y -> (ge
 --takes the top n rated moves from evalList
 takeTopMoves :: Int -> [(Piece,Move,Float)] -> [(Piece,Move,Float)]
 takeTopMoves n [] = []
-takeTopMoves 14 xs = []
+takeTopMoves 19 xs = []
 takeTopMoves n xs = m : takeTopMoves (n+1) (removeMove m xs)
                   where
                       m = findStrongestMoveFromAll xs
@@ -81,3 +81,6 @@ isCheckmate c ps = null (makeEvalList c ps) && isKingInCheck king ps
 
 checkmate :: Float
 checkmate = 10000.0
+
+futureCheckmate :: Float
+futureCheckmate = 250.0
