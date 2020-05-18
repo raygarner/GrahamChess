@@ -6,7 +6,7 @@ import           TypeDefs
 import           Util
 
 totalMaterial :: Colour -> AllPieces -> Float
-totalMaterial c ps = ((sum [pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]))
+totalMaterial c ps = 2 * ((sum [pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]))
 
 -- if a piece is going to be captured then it doesnt really have any material
 pieceMaterial :: Piece -> AllPieces -> Float
@@ -25,13 +25,13 @@ perPieceBonus :: Colour -> AllPieces -> Float
 perPieceBonus c ps = (sum[threatenKingBonus x ps | x <- ps, getPos x /= (-1,-1), getColour x == c])
 
 totalColourBonus :: Colour -> AllPieces -> Float
-totalColourBonus c ps = getPawnPromotion c ps + isOpposingKingInCheck c ps + isKingOnEdges c ps
+totalColourBonus c ps = isKingOnEdges c ps
 
 allPawns :: Colour -> AllPieces -> Float
 allPawns c ps = (sum [passPawnScore x ps | x <- ps, getColour x == c, getPieceType x == Pawn]) - (sum[passPawnScore y ps | y <- ps, getColour y /= c, getPieceType y == Pawn]) * 2.0
 
 totalEndVal :: Colour -> AllPieces -> Float
-totalEndVal a ps =  (totalMaterial a ps) + (totalColourBonus a ps) + (allPawns a ps) + (perPieceBonus a ps)
+totalEndVal a ps =  (totalMaterial a ps) + (totalColourBonus a ps) + (allPawns a ps)
 
 pieceVal :: Piece -> Float
 pieceVal (Pawn,_,_,_)   = 2.5
@@ -55,11 +55,11 @@ isKingOnEdges c ps = isKingSideCol king + isKingSideRow king
                      where king = findKing (invertColour c) ps
 
 isKingSideCol :: Pos -> Float
-isKingSideCol p | getColumn p == 0 || getColumn p == 7 = 2.0
+isKingSideCol p | getColumn p == 0 || getColumn p == 7 = 3.0
                 | otherwise = 0
 
 isKingSideRow :: Pos -> Float
-isKingSideRow p | getRow p == 0 || getRow p == 7 = 2.0
+isKingSideRow p | getRow p == 0 || getRow p == 7 = 3.0
                 | otherwise = 0
 
 pawnsNearEnd :: Colour -> AllPieces -> [Piece]
@@ -68,7 +68,7 @@ pawnsNearEnd Black ps = [x | x <- ps, getColour x == Black, getRow (getPos x) ==
 
 -- bonus points for pawns closer to end
 getPawnPromotion :: Colour -> AllPieces -> Float
-getPawnPromotion c ps = fromIntegral (length (pawnsNearEnd c ps)) * 1.75
+getPawnPromotion c ps = fromIntegral (length (pawnsNearEnd c ps)) * 1.5
 
 passPawnScore :: Piece -> AllPieces -> Float
 passPawnScore a ps | isPassedPawn a ps = 5.0
