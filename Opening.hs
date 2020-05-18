@@ -10,6 +10,7 @@ import           Data.Char
 import           Search
 import           Debug
 import           UI
+import           Data.Time.Clock
 
 main :: IO ()
 main = gameLoop addAllPieces
@@ -39,6 +40,7 @@ gameLoop ps = do printBoard (-1) ps
                              if (not (isEitherCheckmate ps)) then
                                do
                                  putStr "Graham is thinking of a move...\n"
+                                 start <- getCurrentTime
                                  response <- return (findRealBestMove Black ps)
                                  print response
                                  putStr "Graham has made his move...\n"
@@ -46,6 +48,8 @@ gameLoop ps = do printBoard (-1) ps
                                  print move
                                  piece <- return (extractPiece response)
                                  print piece
+                                 end <- getCurrentTime
+                                 putStrLn $ show (end `diffUTCTime` start)
                                  gameLoop (executeMove piece move ps)
                              else
                                do

@@ -414,21 +414,27 @@ willKingBeInCheck p m ps | null k = False
                                                      -- currently i think we should leave it in its most consised and readable form and think about optimisations when we have a compiled executable
                                                      -- definition 1 uses less memory, but it is slower by 0.01s (might add up over lots of calls)
 legalRookMoves :: Piece -> AllPieces -> [Move]
-legalRookMoves p ps = [ (m,n) | m <- [-7..7], n <- [-7..7], targetNotKing p (m,n) ps, isRookValidMove p (m,n) ps, not (willKingBeInCheck p (m,n) ps) ]
+--legalRookMoves p ps = [ (m,n) | m <- [-7..7], n <- [-7..7], targetNotKing p (m,n) ps, isRookValidMove p (m,n) ps, not (willKingBeInCheck p (m,n) ps) ]
+legalRookMoves p ps = [ (m,n) | (m,n) <- y, targetNotKing p (m,n) ps, isRookValidMove p (m,n) ps, not (willKingBeInCheck p (m,n) ps) ]
 --legalRookMoves a b = [ x | x <- y, isRookValidMove a x b ]
---                   where
+                   where
 --                       y = [ (m,n) | m <- [-7..7], n <- [-7..7], isStraightMove (m,n) ]
---                       --z = [ (m,0) | m <- [-7..7] ]
---                       --v = [ (0,n) | n <- [-7..7] ]
---                       --y = z++v
+                       z = [ (m,0) | m <- [-7..7] ]
+                       v = [ (0,n) | n <- [-7..7] ]
+                       y = z++v
 
 
 -- return a list of legal moves for a bishop -- same questions as legalRookMoves
 legalBishopMoves :: Piece -> AllPieces -> [Move]
-legalBishopMoves p ps = [ (m,n) | m <- [-7..7], n <- [-7..7], targetNotKing p (m,n) ps, isBishopValidMove p (m,n) ps, not (willKingBeInCheck p (m,n) ps) ]
+--legalBishopMoves p ps = [ (m,n) | m <- [-7..7], n <- [-7..7], targetNotKing p (m,n) ps, isBishopValidMove p (m,n) ps, not (willKingBeInCheck p (m,n) ps) ]
+legalBishopMoves p ps = [ (m,n) | (m,n) <- o, targetNotKing p (m,n) ps, isBishopValidMove p (m,n) ps, not (willKingBeInCheck p (m,n) ps) ]
 --legalBishopMoves a b = [ x | x <- y , isBishopValidMove a x b ]
---                     where
+                     where
 --                         y = [ (m,n) | m <- [-7..7], n <- [-7..7], isDiagonal (m,n) ]
+                         j = [(m,m) | m <- [-7..7]]
+                         k = [(m,0-m) | m <- [0..7]]
+                         l = [(0-m,m) | m <- [0..7]]
+                         o = j++k++l
 
 -- returns a list of legal moves for a queen
 legalQueenMoves :: Piece -> AllPieces -> [Move]
