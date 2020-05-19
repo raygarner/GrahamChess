@@ -68,7 +68,7 @@ makeSingleBestMove (a,b,_) ps = executeMove a b ps
 -- makes a move and then evaluates the new AllPieces
 evalMove :: Piece -> Move -> AllPieces -> Float
 evalMove a m ps | isCheckmate (invertColour (getColour a)) (executeMove a m ps) = checkmate -- if this is a mating move
-                | otherwise = totalValUnsafe (getColour a) (executeMove a m ps) -- make use unsafe
+                | otherwise = 0 -- totalValUnsafe (getColour a) (executeMove a m ps) -- make use unsafe
 
 isCheckmate :: Colour -> AllPieces -> Bool
 isCheckmate c ps = null (makeEvalList c ps) && isKingInCheck king ps

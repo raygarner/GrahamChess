@@ -54,7 +54,7 @@ blockedPawns c ps = length [x | x <- ps, getPieceType x == Pawn, getColour x == 
 
 
 totalOpeningVal :: Colour -> AllPieces -> Float
-totalOpeningVal a ps = totalMobility a ps + totalMaterial a ps + kingSafety a ps -- + (fromIntegral (blockedPawns a ps - blockedPawns (invertColour a) ps))
+totalOpeningVal a ps = (totalMobility a ps - totalMobility (invertColour a) ps) + totalMaterial a ps + kingSafety a ps -- + (fromIntegral (blockedPawns a ps - blockedPawns (invertColour a) ps))
 
 
 totalOpeningValUnsafe :: Colour -> AllPieces -> Float
