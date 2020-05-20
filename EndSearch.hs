@@ -17,7 +17,7 @@ getScores c ps = [ addTrueEval (c,c) 0 x ps | x <- makeEvalList c ps]
 
 -- updates the evaluation for moves by looking moves into the futur2
 addTrueEval :: (Colour,Colour) -> Int -> (Piece,Move,Float) -> AllPieces -> (Piece,Move,Float)
-addTrueEval (c,nc) l (p,m,f) ps | l == 5 = if isCheckmate (invertColour c) ps then
+addTrueEval (c,nc) l (p,m,f) ps | l == 50 = if isCheckmate (invertColour c) ps then
                                                (p,m,futureCheckmate - (fromIntegral l) + f)
                                            else if isCheckmate c ps then
                                                (p,m,0 - futureCheckmate - (fromIntegral l) - f)

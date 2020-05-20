@@ -1,3 +1,4 @@
-how strong does pushing pawns need to be?
 
-should the king be pushed to the center? or just become more active.
+variable e in addTrueEval, my understanding is that e is just the next best move without looking ahead.
+A good idea could be to change this e to look a few moves in the future maybe 12ish?
+This would mean Graham would think that his opponent is making a better move?
