@@ -11,9 +11,6 @@ import Debug
 -- returns the best move for one side (not sure how this handles checkmate????)
 findRealBestEndMove :: Colour -> AllPieces -> (Piece, Move, Float)
 findRealBestEndMove c ps = findStrongestMoveFromAll [ addTrueEval (c,c) 0 x ps | x <- makeEvalList c ps]
---findRealBestEndMove c ps | c == White = findStrongestWhiteMoveFromAll [ addTrueEval (c,c) 0 x ps | x <- makeEvalList c ps]
---                         | c == Black = findStrongestBlackMoveFromAll [ addTrueEval (c,c) 0 x ps | x <- makeEvalList c ps]
---                         | otherwise = ((King,Black,(0,4),0), (0,0), checkmate)
 
 getScores :: Colour -> AllPieces -> [(Piece,Move,Float)]
 getScores c ps = [ addTrueEval (c,c) 0 x ps | x <- makeEvalList c ps]
@@ -44,22 +41,11 @@ totalValDiff c ps = (totalVal c ps) - (totalVal (invertColour c) ps)
 -- returns the best move which can be made without looking ahead WORKING
 findSingleBestMove :: Colour -> AllPieces -> (Piece, Move, Float)
 findSingleBestMove c ps  = findStrongestMoveFromAll (makeEvalList c ps)
---findSingleBestMove c ps | c == White = findStrongestWhiteMoveFromAll (makeEvalList c ps)
---findSingleBestMove c ps | c == Black = findStrongestBlackMoveFromAll (makeEvalList c ps)
 
 -- returns the stronget move from a list of moves with evaluations
 findStrongestMoveFromAll :: [(Piece,Move,Float)] -> (Piece,Move,Float)
 findStrongestMoveFromAll xs | not (null xs) = head [ x | x <- xs, all (\y -> (getMoveEval y) <= (getMoveEval x)) xs ]
                             | otherwise = ((King, White, (7,4), 0), (0,0), 0-checkmate)
-
--- returns the stronget move from a list of moves with evaluations
-findStrongestWhiteMoveFromAll :: [(Piece,Move,Float)] -> (Piece,Move,Float)
-findStrongestWhiteMoveFromAll xs | not (null xs) = head [ x | x <- xs, all (\y -> (getMoveEval y) <= (getMoveEval x)) xs ]
-                            | otherwise = ((King, White, (7,4), 0), (0,0), 0-checkmate)
-
-findStrongestBlackMoveFromAll :: [(Piece,Move,Float)] -> (Piece,Move,Float)
-findStrongestBlackMoveFromAll xs | not (null xs) = head [ x | x <- xs, all (\y -> (getMoveEval y) >= (getMoveEval x)) xs]
-                                 | otherwise = ((King,Black,(0,4),0), (0,0), checkmate)
 
 -- removes a move from a list
 removeMove :: (Piece,Move,Float) -> [(Piece,Move,Float)] -> [(Piece,Move,Float)]
