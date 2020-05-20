@@ -6,7 +6,8 @@ import           TypeDefs
 import           Util
 
 totalMaterial :: Colour -> AllPieces -> Float
-totalMaterial c ps = 2 * ((sum [pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]))
+totalMaterial c ps = 1.75 * (sum [pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - (sum [ pieceVal y | y <- ps, getPos y /= (-1,-1), getColour y /= c ])
+
 
 -- if a piece is going to be captured then it doesnt really have any material
 pieceMaterial :: Piece -> AllPieces -> Float
@@ -28,7 +29,8 @@ totalColourBonus :: Colour -> AllPieces -> Float
 totalColourBonus c ps = isKingOnEdges c ps
 
 allPawns :: Colour -> AllPieces -> Float
-allPawns c ps = (sum [passPawnScore x ps | x <- ps, getColour x == c, getPieceType x == Pawn]) - (sum[passPawnScore y ps | y <- ps, getColour y /= c, getPieceType y == Pawn]) * 2.0
+--allPawns c ps = (sum [passPawnScore x ps | x <- ps, getColour x == c, getPieceType x == Pawn]) - (sum[passPawnScore y ps | y <- ps, getColour y /= c, getPieceType y == Pawn]) * 2.0
+allPawns c ps = (sum [passPawnScore x ps | x <- ps, getColour x == c, getPieceType x == Pawn]) * 3.5
 
 totalEndVal :: Colour -> AllPieces -> Float
 totalEndVal a ps =  (totalMaterial a ps) + (totalColourBonus a ps) + (allPawns a ps)
@@ -68,10 +70,10 @@ pawnsNearEnd Black ps = [x | x <- ps, getColour x == Black, getRow (getPos x) ==
 
 -- bonus points for pawns closer to end
 getPawnPromotion :: Colour -> AllPieces -> Float
-getPawnPromotion c ps = fromIntegral (length (pawnsNearEnd c ps)) * 1.5
+getPawnPromotion c ps = fromIntegral (length (pawnsNearEnd c ps)) * 2.0
 
 passPawnScore :: Piece -> AllPieces -> Float
-passPawnScore a ps | isPassedPawn a ps = 5.0
+passPawnScore a ps | isPassedPawn a ps = 7.5
                    | otherwise = 0
 
 -- returns whether a position doesnt contain an enemy pawn

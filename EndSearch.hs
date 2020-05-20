@@ -10,23 +10,26 @@ import Debug
 
 -- returns the best move for one side (not sure how this handles checkmate????)
 findRealBestEndMove :: Colour -> AllPieces -> (Piece, Move, Float)
-findRealBestEndMove c ps = findStrongestMoveFromAll [ addTrueEval (c,c) 0 x ps | x <- takeTopMoves 0 (makeEvalList c ps)]
+findRealBestEndMove c ps = findStrongestMoveFromAll [ addTrueEval (c,c) 0 x ps | x <- makeEvalList c ps]
+--findRealBestEndMove c ps | c == White = findStrongestWhiteMoveFromAll [ addTrueEval (c,c) 0 x ps | x <- makeEvalList c ps]
+--                         | c == Black = findStrongestBlackMoveFromAll [ addTrueEval (c,c) 0 x ps | x <- makeEvalList c ps]
+--                         | otherwise = ((King,Black,(0,4),0), (0,0), checkmate)
 
 getScores :: Colour -> AllPieces -> [(Piece,Move,Float)]
 getScores c ps = [ addTrueEval (c,c) 0 x ps | x <- makeEvalList c ps]
 
 -- updates the evaluation for moves by looking moves into the futur2
 addTrueEval :: (Colour,Colour) -> Int -> (Piece,Move,Float) -> AllPieces -> (Piece,Move,Float)
-addTrueEval (c,nc) l (p,m,f) ps | l == 50 = if isCheckmate (invertColour c) ps then
-                                               (p,m,futureCheckmate-(fromIntegral l))
+addTrueEval (c,nc) l (p,m,f) ps | l == 5 = if isCheckmate (invertColour c) ps then
+                                               (p,m,futureCheckmate - (fromIntegral l) + f)
                                            else if isCheckmate c ps then
-                                               (p,m,0-futureCheckmate-(fromIntegral l))
+                                               (p,m,0 - futureCheckmate - (fromIntegral l) - f)
                                            else (p,m,v+f)
                                 | l == 0 = if f == checkmate then (p,m,checkmate) else addTrueEval (c,(invertColour nc)) (l+1) (p,m,v) (executeMove p m ps)
                                 | otherwise = if isCheckmate (invertColour c) ps then
-                                                  (p,m,futureCheckmate-(fromIntegral l))
+                                                  (p,m,futureCheckmate - (fromIntegral l) + f)
                                               else if isCheckmate c ps then
-                                                  (p,m,0-futureCheckmate-(fromIntegral l))
+                                                  (p,m,0 - futureCheckmate - (fromIntegral l) - f)
                                               else addTrueEval (c,(invertColour nc)) (l+1) (p,m,v+f) (makeSingleBestMove e ps)
                                   where
                                       e = findSingleBestMove nc ps
@@ -40,20 +43,23 @@ totalValDiff c ps = (totalVal c ps) - (totalVal (invertColour c) ps)
 
 -- returns the best move which can be made without looking ahead WORKING
 findSingleBestMove :: Colour -> AllPieces -> (Piece, Move, Float)
-findSingleBestMove c ps = findStrongestMoveFromAll (makeEvalList c ps)
+findSingleBestMove c ps  = findStrongestMoveFromAll (makeEvalList c ps)
+--findSingleBestMove c ps | c == White = findStrongestWhiteMoveFromAll (makeEvalList c ps)
+--findSingleBestMove c ps | c == Black = findStrongestBlackMoveFromAll (makeEvalList c ps)
 
 -- returns the stronget move from a list of moves with evaluations
 findStrongestMoveFromAll :: [(Piece,Move,Float)] -> (Piece,Move,Float)
 findStrongestMoveFromAll xs | not (null xs) = head [ x | x <- xs, all (\y -> (getMoveEval y) <= (getMoveEval x)) xs ]
                             | otherwise = ((King, White, (7,4), 0), (0,0), 0-checkmate)
 
---takes the top n rated moves from evalList
-takeTopMoves :: Int -> [(Piece,Move,Float)] -> [(Piece,Move,Float)]
-takeTopMoves n [] = []
-takeTopMoves 19 xs = []
-takeTopMoves n xs = m : takeTopMoves (n+1) (removeMove m xs)
-                  where
-                      m = findStrongestMoveFromAll xs
+-- returns the stronget move from a list of moves with evaluations
+findStrongestWhiteMoveFromAll :: [(Piece,Move,Float)] -> (Piece,Move,Float)
+findStrongestWhiteMoveFromAll xs | not (null xs) = head [ x | x <- xs, all (\y -> (getMoveEval y) <= (getMoveEval x)) xs ]
+                            | otherwise = ((King, White, (7,4), 0), (0,0), 0-checkmate)
+
+findStrongestBlackMoveFromAll :: [(Piece,Move,Float)] -> (Piece,Move,Float)
+findStrongestBlackMoveFromAll xs | not (null xs) = head [ x | x <- xs, all (\y -> (getMoveEval y) >= (getMoveEval x)) xs]
+                                 | otherwise = ((King,Black,(0,4),0), (0,0), checkmate)
 
 -- removes a move from a list
 removeMove :: (Piece,Move,Float) -> [(Piece,Move,Float)] -> [(Piece,Move,Float)]
@@ -83,4 +89,4 @@ checkmate :: Float
 checkmate = 10000.0
 
 futureCheckmate :: Float
-futureCheckmate = 250.0
+futureCheckmate = 75.0
