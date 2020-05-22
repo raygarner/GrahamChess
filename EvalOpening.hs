@@ -193,9 +193,10 @@ pieceVal (King,_,_,_)   = 0.0
 -- if a piece is going to be captured then it doesnt really have any material
 pieceMaterial :: Piece -> AllPieces -> Float
 pieceMaterial a ps   | (length t > length (protectedBy a ps)) = 0
-                     | getLowestVal t < pieceVal a = 0
-                     | otherwise = pieceVal a
+                     | getLowestVal t < v = 0
+                     | otherwise = v
                        where t = threatenedBy a ps
+                             v = pieceVal a
 
 
 -- returns the value of the lowest value piece in a list of pieces

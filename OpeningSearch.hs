@@ -33,8 +33,8 @@ openingMoveWrapper d c ps = findStrongestMoveFromAll (par s4 (par s3 (par s2 (s1
 findRealBestOpeningMove :: Int -> Colour -> AllPieces -> [(Piece, Move, Float)] -> (Piece, Move, Float)
 --findRealBestOpeningMove d c ps = findStrongestMoveFromAll [ addTrueEval (c,c) 0 d x ps | x <- makeEvalList c ps]
 --findRealBestOpeningMove d c ps = findStrongestMoveFromAll (par l (r++l))
-findRealBestOpeningMove d c ps xs | not (null xs) = findStrongestMoveFromAll [addTrueEval (c,c) 0 d x ps | x <- xs]
-                                  | otherwise = findStrongestMoveFromAll [addTrueEval (c,c) 0 d x ps | x <- makeEvalList c ps]
+findRealBestOpeningMove d c ps [] = findStrongestMoveFromAll [addTrueEval (c,c) 0 d x ps | x <- makeEvalList c ps]
+findRealBestOpeningMove d c ps xs = findStrongestMoveFromAll [addTrueEval (c,c) 0 d x ps | x <- xs]
                                  --where
                                   --   a = makeEvalList c ps
                                  --    e = length a
