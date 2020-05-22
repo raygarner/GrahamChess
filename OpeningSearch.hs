@@ -10,9 +10,28 @@ import Debug.Trace
 import Debug
 import Control.Parallel
 
+openingMoveWrapper :: Int -> Colour -> AllPieces -> (Piece, Move, Float)
+openingMoveWrapper d c ps = findStrongestMoveFromAll (par j (k:j:[]))
+                            where
+                                a = makeEvalList c ps
+                                e = length a
+                                l = take ((e `div` 2)+1) a
+                                r = drop (e `div` 2) a
+                                j = findRealBestOpeningMove d c ps l
+                                k = findRealBestOpeningMove d c ps r
+
 -- returns the best move for one side (not sure how this handles checkmate????)
-findRealBestOpeningMove :: Int -> Colour -> AllPieces -> (Piece, Move, Float)
-findRealBestOpeningMove d c ps = findStrongestMoveFromAll [ addTrueEval (c,c) 0 d x ps | x <- makeEvalList c ps]
+findRealBestOpeningMove :: Int -> Colour -> AllPieces -> [(Piece, Move, Float)] -> (Piece, Move, Float)
+--findRealBestOpeningMove d c ps = findStrongestMoveFromAll [ addTrueEval (c,c) 0 d x ps | x <- makeEvalList c ps]
+--findRealBestOpeningMove d c ps = findStrongestMoveFromAll (par l (r++l))
+findRealBestOpeningMove d c ps xs | not (null xs) = findStrongestMoveFromAll [addTrueEval (c,c) 0 d x ps | x <- xs]
+                                  | otherwise = findStrongestMoveFromAll [addTrueEval (c,c) 0 d x ps | x <- makeEvalList c ps]
+                                 --where
+                                  --   a = makeEvalList c ps
+                                 --    e = length a
+                                 --    l = [addTrueEval (c,c) 0 d x ps | x <- take ((e `div` 2)+1) a ]
+                                 --    r = [addTrueEval (c,c) 0 d x ps | x <- drop (e `div` 2) a ]
+
 
 -- updates the evaluation for moves by looking moves into the futur2
 addTrueEval :: (Colour,Colour) -> Int -> Int -> (Piece,Move,Float) -> AllPieces -> (Piece,Move,Float)
@@ -30,7 +49,7 @@ addTrueEval (c,nc) l d (p,m,f) ps | l == d = if isCheckmate (invertColour c) ps 
                                   where
                                       --e = findSingleBestMove nc ps
                                       --e = findRealBestOpeningMove2 (d-l) nc ps
-                                      e = findRealBestOpeningMove (d-l) nc ps
+                                      e = findRealBestOpeningMove (d-l) nc ps []
                                       --v = if nc == c then (totalVal c ps) + materialInDanger (invertColour c) ps else (totalVal c ps) - materialInDanger c ps
                                       --v = if c == nc then totalVal c ps else 0 - totalVal nc ps
                                       v = totalVal c ps
