@@ -1,0 +1,6 @@
+#!/bin/sh
+case $1 in
+    opening)
+        ./Opening +RTS -N -RTS
+        ;;
+esac
