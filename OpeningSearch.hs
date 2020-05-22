@@ -11,14 +11,23 @@ import Debug
 import Control.Parallel
 
 openingMoveWrapper :: Int -> Colour -> AllPieces -> (Piece, Move, Float)
-openingMoveWrapper d c ps = findStrongestMoveFromAll (par j (k:j:[]))
+--openingMoveWrapper d c ps = findStrongestMoveFromAll (par j (k:j:[]))
+openingMoveWrapper d c ps = findStrongestMoveFromAll (par s4 (par s3 (par s2 (s1:s2:s3:s4:[]))))
                             where
                                 a = makeEvalList c ps
                                 e = length a
                                 l = take ((e `div` 2)+1) a
                                 r = drop (e `div` 2) a
-                                j = findRealBestOpeningMove d c ps l
-                                k = findRealBestOpeningMove d c ps r
+                                l1 = take ((e `div` 4)+1) l
+                                l2 = drop (e `div` 4) l
+                                r1 = take ((e `div` 4)+1) r
+                                r2 = drop (e `div` 4) r
+                                --j = findRealBestOpeningMove d c ps l
+                                --k = findRealBestOpeningMove d c ps r
+                                s1 = findRealBestOpeningMove d c ps l1
+                                s2 = findRealBestOpeningMove d c ps l2
+                                s3 = findRealBestOpeningMove d c ps r1
+                                s4 = findRealBestOpeningMove d c ps r2
 
 -- returns the best move for one side (not sure how this handles checkmate????)
 findRealBestOpeningMove :: Int -> Colour -> AllPieces -> [(Piece, Move, Float)] -> (Piece, Move, Float)
