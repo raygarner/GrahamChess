@@ -31,15 +31,9 @@ openingMoveWrapper d c ps = findStrongestMoveFromAll (par s4 (par s3 (par s2 (s1
 
 -- returns the best move for one side (not sure how this handles checkmate????)
 findRealBestOpeningMove :: Int -> Colour -> AllPieces -> [(Piece, Move, Float)] -> (Piece, Move, Float)
---findRealBestOpeningMove d c ps = findStrongestMoveFromAll [ addTrueEval (c,c) 0 d x ps | x <- makeEvalList c ps]
---findRealBestOpeningMove d c ps = findStrongestMoveFromAll (par l (r++l))
 findRealBestOpeningMove d c ps [] = findStrongestMoveFromAll [addTrueEval (c,c) 0 d x ps | x <- makeEvalList c ps]
 findRealBestOpeningMove d c ps xs = findStrongestMoveFromAll [addTrueEval (c,c) 0 d x ps | x <- xs]
-                                 --where
-                                  --   a = makeEvalList c ps
-                                 --    e = length a
-                                 --    l = [addTrueEval (c,c) 0 d x ps | x <- take ((e `div` 2)+1) a ]
-                                 --    r = [addTrueEval (c,c) 0 d x ps | x <- drop (e `div` 2) a ]
+
 
 
 -- updates the evaluation for moves by looking moves into the futur2

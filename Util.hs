@@ -144,6 +144,11 @@ closerToZero a | a < 0 = a + 1
                | a > 0 = a - 1 -- added this line so -1 isnt returned if a is 0 - from ray
                | otherwise = a
 
+furtherFromZero :: Int -> Int
+furtherFromZero a | a < 0 = a - 1
+                  | a > 0 = a + 1
+                  | otherwise = a
+
 -- decrease the value of a move by 1 closer to the original position
 decreaseDiagonalMove :: Move -> Move
 decreaseDiagonalMove (row,col) = (closerToZero row, closerToZero col)
@@ -331,10 +336,9 @@ movePiece p move ps | isValidMove p move ps && not (willKingBeInCheck p move ps)
 
 -- executes a castle move -- WORKING
 executeCastle :: Piece -> Move -> AllPieces -> AllPieces
---executeCastle p (0,2) ps = executeMove p (0,2) (executeMove (head (findPiece (getKingsCastle (getColour p)) ps)) (0,-2) ps)
---executeCastle p (0,-2) ps = executeMove p (0,-2) (executeMove (head (findPiece (getQueensCastle (getColour p)) ps)) (0,3) ps)
 executeCastle p (0,2) ps = updatePosition p (0,2) : removePiece p (executeMove (head (findPiece (getKingsCastle (getColour p)) ps)) (0,-2) ps)
 executeCastle p (0,-2) ps = updatePosition p (0,-2) : removePiece p (executeMove (head (findPiece (getQueensCastle (getColour p)) ps)) (0,3) ps)
+executeCastle _ _ ps = ps
 
 --execute move
 executeMove :: Piece -> Move -> AllPieces -> AllPieces
@@ -382,7 +386,7 @@ getKingsCastle Black = (0,7)
 
 -- returns Queen's side castle for either colour
 getQueensCastle :: Colour -> Pos
-getQueensCastle White = (0,7)
+getQueensCastle White = (7,0)
 getQueensCastle Black = (0,0)
 
 -- returns whether a king and the revelant castle has moved or not. True = kings side castle
@@ -429,28 +433,41 @@ willKingBeInCheck p m ps | null k = False
                                                      -- using :set +s in GHCi, i can see there is a 0.01s difference on my laptop between definitions 1 and 2 for this function (however this isnt evaluating the final compiled version, only the interpreted version)
                                                      -- currently i think we should leave it in its most consised and readable form and think about optimisations when we have a compiled executable
                                                      -- definition 1 uses less memory, but it is slower by 0.01s (might add up over lots of calls)
+--legalRookMoves :: Piece -> AllPieces -> [Move]
+--legalRookMoves p ps = [ (m,n) | (m,n) <- y, targetNotKing p (m,n) ps, isRookValidMove p (m,n) ps, not (willKingBeInCheck p (m,n) ps) ]
+--                   where
+--                       z = [ (m,0) | m <- [-7..7] ]
+--                       v = [ (0,n) | n <- [-7..7] ]
+--                       y = z++v
+
+
 legalRookMoves :: Piece -> AllPieces -> [Move]
---legalRookMoves p ps = [ (m,n) | m <- [-7..7], n <- [-7..7], targetNotKing p (m,n) ps, isRookValidMove p (m,n) ps, not (willKingBeInCheck p (m,n) ps) ]
-legalRookMoves p ps = [ (m,n) | (m,n) <- y, targetNotKing p (m,n) ps, isRookValidMove p (m,n) ps, not (willKingBeInCheck p (m,n) ps) ]
---legalRookMoves a b = [ x | x <- y, isRookValidMove a x b ]
-                   where
---                       y = [ (m,n) | m <- [-7..7], n <- [-7..7], isStraightMove (m,n) ]
-                       z = [ (m,0) | m <- [-7..7] ]
-                       v = [ (0,n) | n <- [-7..7] ]
-                       y = z++v
+legalRookMoves p ps = legalRookMovesLine p ps (0,1) ++ legalRookMovesLine p ps (1,0) ++ legalRookMovesLine p ps (0,-1) ++ legalRookMovesLine p ps (-1,0)
+
+
+
+legalRookMovesLine :: Piece -> AllPieces -> Move -> [Move]
+legalRookMovesLine p ps (m,n) | not (targetNotKing p (m,n) ps && isRookValidMove p (m,n) ps && not (willKingBeInCheck p (m,n) ps)) = []
+                              | otherwise = (m,n) : legalRookMovesLine p ps next
+                              where
+                                  next = if m == 0 then (m, furtherFromZero n) else (furtherFromZero m, n)
 
 
 -- return a list of legal moves for a bishop -- same questions as legalRookMoves
+--legalBishopMoves :: Piece -> AllPieces -> [Move]
+--legalBishopMoves p ps = [ (m,n) | (m,n) <- o, targetNotKing p (m,n) ps, isBishopValidMove p (m,n) ps, not (willKingBeInCheck p (m,n) ps) ]
+--                     where
+--                         j = [(m,m) | m <- [-7..7]]
+--                         k = [(m,0-m) | m <- [0..7]]
+--                         l = [(0-m,m) | m <- [0..7]]
+--                         o = j++k++l
+
 legalBishopMoves :: Piece -> AllPieces -> [Move]
---legalBishopMoves p ps = [ (m,n) | m <- [-7..7], n <- [-7..7], targetNotKing p (m,n) ps, isBishopValidMove p (m,n) ps, not (willKingBeInCheck p (m,n) ps) ]
-legalBishopMoves p ps = [ (m,n) | (m,n) <- o, targetNotKing p (m,n) ps, isBishopValidMove p (m,n) ps, not (willKingBeInCheck p (m,n) ps) ]
---legalBishopMoves a b = [ x | x <- y , isBishopValidMove a x b ]
-                     where
---                         y = [ (m,n) | m <- [-7..7], n <- [-7..7], isDiagonal (m,n) ]
-                         j = [(m,m) | m <- [-7..7]]
-                         k = [(m,0-m) | m <- [0..7]]
-                         l = [(0-m,m) | m <- [0..7]]
-                         o = j++k++l
+legalBishopMoves p ps = legalBishopMovesLine p ps (-1,-1) ++ legalBishopMovesLine p ps (1,1) ++ legalBishopMovesLine p ps (1,-1) ++ legalBishopMovesLine p ps (-1,1)
+
+legalBishopMovesLine :: Piece -> AllPieces -> Move -> [Move]
+legalBishopMovesLine p ps (m, n) | not (isBishopValidMove p (m,n) ps && targetNotKing p (m,n) ps && not (willKingBeInCheck p (m,n) ps)) = []
+                                 | otherwise = (m,n) : legalBishopMovesLine p ps (furtherFromZero m, furtherFromZero n)
 
 -- returns a list of legal moves for a queen
 legalQueenMoves :: Piece -> AllPieces -> [Move]
