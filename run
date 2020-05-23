@@ -3,4 +3,7 @@ case $1 in
     opening)
         ./Opening +RTS -N -RTS
         ;;
+    end)
+        ./Endgame +RTS -N
+        ;;
 esac
