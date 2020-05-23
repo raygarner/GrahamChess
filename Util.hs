@@ -260,8 +260,8 @@ validKingMove p (m,n) ps | abs n == 2 = validCastle p (m,n) ps
                                     where
                                         t = getTarget (getPos p) (m,n)
                                         k = findKing (invertColour (getColour p)) ps
-                                        x = abs (getColumn t) - (getColumn k)
-                                        y = abs (getRow t) - (getRow k)
+                                        x = abs ((getColumn t) - (getColumn k))
+                                        y = abs ((getRow t) - (getRow k))
 
 
 -- returns whether a move is valid

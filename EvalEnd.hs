@@ -6,7 +6,7 @@ import           TypeDefs
 import           Util
 
 totalMaterial :: Colour -> AllPieces -> Float
-totalMaterial c ps = 1.75 * (sum [pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - (sum [ pieceVal y | y <- ps, getPos y /= (-1,-1), getColour y /= c ])
+totalMaterial c ps = 2.5 * (sum [pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - (sum [ pieceVal y | y <- ps, getPos y /= (-1,-1), getColour y /= c ])
 
 
 -- if a piece is going to be captured then it doesnt really have any material
@@ -33,7 +33,7 @@ allPawns :: Colour -> AllPieces -> Float
 allPawns c ps = (sum [passPawnScore x ps | x <- ps, getColour x == c, getPieceType x == Pawn]) * 3.5
 
 totalEndVal :: Colour -> AllPieces -> Float
-totalEndVal a ps =  (totalMaterial a ps) + (totalColourBonus a ps) + (allPawns a ps)
+totalEndVal a ps =  (totalMaterial a ps) + (totalColourBonus a ps) + (allPawns a ps) + (perPieceBonus a ps)
 
 pieceVal :: Piece -> Float
 pieceVal (Pawn,_,_,_)   = 2.5
@@ -49,7 +49,7 @@ isPieceAimedAtEnemyKing p ps = isValidMove p (moveMade (getPos p) k) (p : [])
                                  k = findKing (invertColour (getColour p)) ps
 
 threatenKingBonus :: Piece -> AllPieces -> Float
-threatenKingBonus p ps | isPieceAimedAtEnemyKing p ps = 2.5
+threatenKingBonus p ps | isPieceAimedAtEnemyKing p ps = 1.25
                        | otherwise = 0.0
 
 isKingOnEdges :: Colour -> AllPieces -> Float
@@ -57,11 +57,11 @@ isKingOnEdges c ps = isKingSideCol king + isKingSideRow king
                      where king = findKing (invertColour c) ps
 
 isKingSideCol :: Pos -> Float
-isKingSideCol p | getColumn p == 0 || getColumn p == 7 = 1.5
+isKingSideCol p | getColumn p == 0 || getColumn p == 7 = 0.75
                 | otherwise = 0
 
 isKingSideRow :: Pos -> Float
-isKingSideRow p | getRow p == 0 || getRow p == 7 = 1.5
+isKingSideRow p | getRow p == 0 || getRow p == 7 = 0.75
                 | otherwise = 0
 
 pawnsNearEnd :: Colour -> AllPieces -> [Piece]
