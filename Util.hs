@@ -144,6 +144,11 @@ closerToZero a | a < 0 = a + 1
                | a > 0 = a - 1 -- added this line so -1 isnt returned if a is 0 - from ray
                | otherwise = a
 
+furtherFromZero :: Int -> Int
+furtherFromZero a | a < 0 = a - 1
+                  | a > 0 = a + 1
+                  | otherwise = a
+
 -- decrease the value of a move by 1 closer to the original position
 decreaseDiagonalMove :: Move -> Move
 decreaseDiagonalMove (row,col) = (closerToZero row, closerToZero col)
@@ -441,16 +446,20 @@ legalRookMoves p ps = [ (m,n) | (m,n) <- y, targetNotKing p (m,n) ps, isRookVali
 
 
 -- return a list of legal moves for a bishop -- same questions as legalRookMoves
+--legalBishopMoves :: Piece -> AllPieces -> [Move]
+--legalBishopMoves p ps = [ (m,n) | (m,n) <- o, targetNotKing p (m,n) ps, isBishopValidMove p (m,n) ps, not (willKingBeInCheck p (m,n) ps) ]
+--                     where
+--                         j = [(m,m) | m <- [-7..7]]
+--                         k = [(m,0-m) | m <- [0..7]]
+--                         l = [(0-m,m) | m <- [0..7]]
+--                         o = j++k++l
+
 legalBishopMoves :: Piece -> AllPieces -> [Move]
---legalBishopMoves p ps = [ (m,n) | m <- [-7..7], n <- [-7..7], targetNotKing p (m,n) ps, isBishopValidMove p (m,n) ps, not (willKingBeInCheck p (m,n) ps) ]
-legalBishopMoves p ps = [ (m,n) | (m,n) <- o, targetNotKing p (m,n) ps, isBishopValidMove p (m,n) ps, not (willKingBeInCheck p (m,n) ps) ]
---legalBishopMoves a b = [ x | x <- y , isBishopValidMove a x b ]
-                     where
---                         y = [ (m,n) | m <- [-7..7], n <- [-7..7], isDiagonal (m,n) ]
-                         j = [(m,m) | m <- [-7..7]]
-                         k = [(m,0-m) | m <- [0..7]]
-                         l = [(0-m,m) | m <- [0..7]]
-                         o = j++k++l
+legalBishopMoves p ps = legalBishopMovesLine p ps (-1,-1) ++ legalBishopMovesLine p ps (1,1) ++ legalBishopMovesLine p ps (1,-1) ++ legalBishopMovesLine p ps (-1,1)
+
+legalBishopMovesLine :: Piece -> AllPieces -> Move -> [Move]
+legalBishopMovesLine p ps (m, n) | not (isBishopValidMove p (m,n) ps && targetNotKing p (m,n) ps && not (willKingBeInCheck p (m,n) ps)) = []
+                                 | otherwise = (m,n) : legalBishopMovesLine p ps (furtherFromZero m, furtherFromZero n)
 
 -- returns a list of legal moves for a queen
 legalQueenMoves :: Piece -> AllPieces -> [Move]
