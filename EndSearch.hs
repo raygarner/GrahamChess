@@ -12,12 +12,12 @@ import Debug
 findRealBestEndMove :: Colour -> AllPieces -> (Piece, Move, Float)
 findRealBestEndMove c ps = findStrongestMoveFromAll [ addTrueEval (c,c) 0 x ps | x <- makeEvalList c ps]
 
-getScores :: Colour -> AllPieces -> [(Piece,Move,Float)]
-getScores c ps = [ addTrueEval (c,c) 0 x ps | x <- makeEvalList c ps]
+getScores :: Int -> Colour -> AllPieces -> [(Piece,Move,Float)]
+getScores d c ps = [ addTrueEval (c,c) 0 x ps | x <- makeEvalList c ps]
 
 -- updates the evaluation for moves by looking moves into the futur2
 addTrueEval :: (Colour,Colour) -> Int -> (Piece,Move,Float) -> AllPieces -> (Piece,Move,Float)
-addTrueEval (c,nc) l (p,m,f) ps | l == 50 = if isCheckmate (invertColour c) ps then
+addTrueEval (c,nc) l (p,m,f) ps | l == 25 = if isCheckmate (invertColour c) ps then
                                                (p,m,futureCheckmate - (fromIntegral l) + f)
                                            else if isCheckmate c ps then
                                                (p,m,0 - futureCheckmate - (fromIntegral l) - f)
@@ -29,9 +29,9 @@ addTrueEval (c,nc) l (p,m,f) ps | l == 50 = if isCheckmate (invertColour c) ps t
                                                   (p,m,0 - futureCheckmate - (fromIntegral l) - f)
                                               else addTrueEval (c,(invertColour nc)) (l+1) (p,m,v+f) (makeSingleBestMove e ps)
                                   where
-                                      e = findSingleBestMove nc ps
+                                      e = findRealBestOppEndMove 3 nc ps
                                       --v = if nc == c then (totalVal c ps) + materialInDanger (invertColour c) ps else (totalVal c ps) - materialInDanger c ps
-                                      v = if c == nc then totalVal c ps else 0 - totalVal nc ps
+                                      v = totalVal c ps
                                       --v = totalVal c ps
 
 -- returns the total val difference
@@ -46,6 +46,39 @@ findSingleBestMove c ps  = findStrongestMoveFromAll (makeEvalList c ps)
 findStrongestMoveFromAll :: [(Piece,Move,Float)] -> (Piece,Move,Float)
 findStrongestMoveFromAll xs | not (null xs) = head [ x | x <- xs, all (\y -> (getMoveEval y) <= (getMoveEval x)) xs ]
                             | otherwise = ((King, White, (7,4), 0), (0,0), 0-checkmate)
+
+findRealBestOppEndMove :: Int -> Colour -> AllPieces -> (Piece,Move,Float)
+findRealBestOppEndMove d c ps = findStrongestMoveFromAll [ addTrueOppEval (c,c) 0 d x ps | x <- takeTopMoves 10 (makeEvalList c ps)]
+
+-- updates the evaluation for moves by looking moves into the futur2
+addTrueOppEval :: (Colour,Colour) -> Int -> Int -> (Piece,Move,Float) -> AllPieces -> (Piece,Move,Float)
+addTrueOppEval (c,nc) l d (p,m,f) ps | l == d = if isCheckmate (invertColour c) ps then
+                                               (p,m,checkmate-(fromIntegral l))
+                                           else if isCheckmate c ps then
+                                               (p,m,0-checkmate-(fromIntegral l))
+                                           else (p,m,v)
+                                | l == 0 = if f == checkmate then (p,m,f) else addTrueOppEval (c,(invertColour nc)) (l+1) d (p,m,0) (executeMove p m ps)
+                                | otherwise = if isCheckmate (invertColour c) ps then
+                                                  (p,m,checkmate-(fromIntegral l))
+                                              else if isCheckmate c ps then
+                                                  (p,m,0-checkmate-(fromIntegral l))
+                                              else addTrueOppEval (c,(invertColour nc)) (l+1) d (p,m,0) (makeSingleBestMove e ps)
+                                  where
+                                      --e = findSingleBestMove nc ps
+                                      --e = findRealBestOpeningMove2 (d-l) nc ps
+                                      e = findRealBestOppEndMove (d-l) nc ps
+                                      --v = if nc == c then (totalVal c ps) + materialInDanger (invertColour c) ps else (totalVal c ps) - materialInDanger c ps
+                                      --v = if c == nc then total
+                                      v = totalVal c ps
+
+--takes the top n rated moves from evalList
+takeTopMoves :: Int -> [(Piece,Move,Float)] -> [(Piece,Move,Float)]
+takeTopMoves n [] = []
+takeTopMoves 99 xs = []
+takeTopMoves n xs = m : takeTopMoves (n+1) (removeMove m xs)
+                  where
+                      m = findStrongestMoveFromAll xs
+
 
 -- removes a move from a list
 removeMove :: (Piece,Move,Float) -> [(Piece,Move,Float)] -> [(Piece,Move,Float)]
