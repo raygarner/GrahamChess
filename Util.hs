@@ -117,22 +117,26 @@ isFriendly p z = getColour p == getColour z
 isOnBoard :: Piece -> Move -> Bool
 isOnBoard p move = row >= 0 && row <= 7 && col >= 0 && col <= 7
                 where
-                    row = getRow (getTarget (getPos p) move)
-                    col = getColumn (getTarget (getPos p) move)
+                    t = getTarget (getPos p) move
+                    row = getRow t
+                    col = getColumn t
 
 -- returns whether a square is not occupied by a friendly piece
 -- recursion problem: calls itsself through isKingInCheck
 isValidTarget :: Piece -> Move -> AllPieces -> Bool
-isValidTarget p move ps = ((isEmpty (getTarget (getPos p) move) ps) || (isEnemy p z)) && isOnBoard p move && getPos p /= (-1,-1)-- && getPieceType z /= King
+isValidTarget p move ps = ((isEmpty t ps) || (isEnemy p z)) && isOnBoard p move && pos /= (-1,-1)-- && getPieceType z /= King
                         where
-                          z = head (findPiece (getTarget (getPos p) move) ps)
+                          pos = getPos p
+                          t = getTarget pos move
+                          z = head (findPiece t ps)
 
 
 -- returns whether a square is occupied by an enemy -- WORKING
 isTargetEnemy :: Piece -> Move -> AllPieces -> Bool
-isTargetEnemy p move ps = not (isEmpty (getTarget (getPos p) move) ps) && isEnemy p z -- checks whether square is empty to prevent empty list being passed to head and causing an error - ray
+isTargetEnemy p move ps = not (isEmpty t ps) && isEnemy p z -- checks whether square is empty to prevent empty list being passed to head and causing an error - ray
                         where
-                          z = head(findPiece (getTarget (getPos p) move) ps)
+                          t = getTarget (getPos p) move
+                          z = head(findPiece t ps)
 
 -- get an int closer to 0
 closerToZero :: Int -> Int
@@ -206,12 +210,16 @@ isLShaped (row,col) = (abs row == 2 && abs col == 1) || (abs row == 1 && abs col
 
 -- returns whether a pawn move is valid
 isPawnValidMove :: Piece -> Move -> AllPieces -> Bool
-isPawnValidMove p move ps = isValidTarget p move ps && ( (isEmpty (getTarget (getPos p) move) ps && isBasicPawnMove p move ps && isStraightMovePathEmpty (getPos p) move ps) || (isTargetEnemy p move ps && isPawnCapture p move))
+isPawnValidMove p move ps = isValidTarget p move ps && ( (isEmpty (getTarget pos move) ps && isBasicPawnMove p move ps && isStraightMovePathEmpty pos move ps) || (isTargetEnemy p move ps && isPawnCapture p move))
+                            where
+                                pos = getPos p
 
 -- returns whether a move is a valid en passant move
 isValidEnPassant :: Piece -> Move -> AllPieces -> Bool
-isValidEnPassant a (m,n) ps = isPawnCapture a (m,n) && getRow (getPos a) == r && not (isEmpty (getTarget (getPos a) (0,n)) ps) && p == (Pawn, invertColour (getColour a), (getRow (getPos a), getColumn (getPos a) + n), 2)
+isValidEnPassant a (m,n) ps = isPawnCapture a (m,n) && row == r && not (isEmpty (getTarget pos (0,n)) ps) && p == (Pawn, invertColour (getColour a), (row, getColumn pos + n), 2)
                               where
+                                  pos = getPos a
+                                  row = getRow pos
                                   p = head (findPiece (getTarget (getPos a) (0,n)) ps)
                                   r = if getColour a == White then 3 else 4
 
@@ -250,8 +258,10 @@ validKingMove :: Piece -> Move -> AllPieces -> Bool
 validKingMove p (m,n) ps | abs n == 2 = validCastle p (m,n) ps
                          | otherwise = (abs m <= 1 && abs n <= 1 ) && isValidTarget p (m,n) ps && (x > 1 || y > 1)
                                     where
-                                        x = abs ((getColumn (getTarget (getPos p) (m,n)) - (getColumn (findKing (invertColour (getColour p)) ps))))
-                                        y = abs ((getRow (getTarget (getPos p) (m,n)) - (getRow (findKing (invertColour (getColour p)) ps))))
+                                        t = getTarget (getPos p) (m,n)
+                                        k = findKing (invertColour (getColour p)) ps
+                                        x = abs (getColumn t) - (getColumn k)
+                                        y = abs (getRow t) - (getRow k)
 
 
 -- returns whether a move is valid
@@ -267,8 +277,9 @@ isValidMove (King, col, pos, mc) move ps   = validKingMove (King, col, pos, mc) 
 threatenedBy :: Piece -> AllPieces -> [Piece]
 threatenedBy p ps = [ x | x <- ps, isValidMove x (m - getRow (getPos x), n - getColumn (getPos x)) ps ]
                   where
-                      m = getRow (getPos p)
-                      n = getColumn (getPos p)
+                      pos = getPos p
+                      m = getRow pos
+                      n = getColumn pos
 
 -- changes all pieces to reflect the inverted colour.
 updateAllPieces :: Piece -> AllPieces -> [Piece]
@@ -290,9 +301,10 @@ threatening p ps = getPiecesFromMoves (getPos p) (legalMoves p ps) ps
 -- get a list of pieces from a list of moves and a starting position
 getPiecesFromMoves :: Pos -> [Move] -> AllPieces -> [Piece]
 getPiecesFromMoves pos [] ps = []
-getPiecesFromMoves pos ms ps | not (null y) = head y : getPiecesFromMoves pos (tail ms) ps
-                             | otherwise = getPiecesFromMoves pos (tail ms) ps
+getPiecesFromMoves pos ms ps | not (null y) = head y : g
+                             | otherwise = g
                                where
+                                 g = getPiecesFromMoves pos (tail ms) ps
                                  y = findPiece (getTarget pos (head ms)) ps
 
 -- returns whether the king is in check.
@@ -343,25 +355,25 @@ resetEnemyPawns :: Colour -> AllPieces -> AllPieces
 resetEnemyPawns c ps = [if getPieceType x == Pawn && getColour x /= c then resetMoveCount x else x | x <- ps]
 
 -- writes a move to the pgn file WORKING
-writeMove :: Piece -> Move -> IO ()
-writeMove (piece,colour,(m,n),mc) (rows,cols) = do copyFile "movelist.pgn" "movelistTemp.pgn"
-                                                   appendFile "movelistTemp.pgn" ((show piece) ++ ";" ++ (show colour) ++ ";" ++ (show m) ++ ";" ++ (show n) ++ ";" ++ (show mc) ++ ";" ++ (show rows) ++ ";" ++ (show cols) ++ (show mc) ++ "\n")
-                                                   removeFile "movelist.pgn"
-                                                   renameFile "movelistTemp.pgn" "movelist.pgn"
+--writeMove :: Piece -> Move -> IO ()
+--writeMove (piece,colour,(m,n),mc) (rows,cols) = do copyFile "movelist.pgn" "movelistTemp.pgn"
+ --                                                  appendFile "movelistTemp.pgn" ((show piece) ++ ";" ++ (show colour) ++ ";" ++ (show m) ++ ";" ++ (show n) ++ ";" ++ (show mc) ++ ";" ++ (show rows) ++ ";" ++ (show cols) ++ (show mc) ++ "\n")
+  --                                                 removeFile "movelist.pgn"
+   --                                                renameFile "movelistTemp.pgn" "movelist.pgn"
 
 -- makes a move and writes it to the pgn. returns AllPieces WORKING
-makeProperMove :: Piece -> Move -> AllPieces -> IO AllPieces
-makeProperMove p move ps = do writeMove p move
-                              return (movePiece p move ps)
+--makeProperMove :: Piece -> Move -> AllPieces -> IO AllPieces
+--makeProperMove p move ps = do writeMove p move
+--                              return (movePiece p move ps)
 
 -- returns whether the king has moved before or not
-readMoveList :: IO String
-readMoveList = do x <- readFile "movelist.pgn"
-                  let pureX = read x
-                  return pureX
+--readMoveList :: IO String
+--readMoveList = do x <- readFile "movelist.pgn"
+--                  let pureX = read x
+--                  return pureX
 
-testMoveList :: String -> String
-testMoveList a = a
+--testMoveList :: String -> String
+--testMoveList a = a
 
 -- returns King's side castle for either colour
 getKingsCastle :: Colour -> Pos
@@ -375,8 +387,12 @@ getQueensCastle Black = (0,0)
 
 -- returns whether a king and the revelant castle has moved or not. True = kings side castle
 possibleToCastle :: Colour -> Bool -> AllPieces -> Bool
-possibleToCastle c True ps = not (null (findPiece (getKingsCastle c) ps)) && getMovecount (head (findPiece (findKing c ps) ps)) == 0 && getMovecount (head (findPiece (getKingsCastle c) ps)) == 0
-possibleToCastle c False ps = not (null (findPiece (getQueensCastle c) ps)) && getMovecount (head (findPiece (findKing c ps) ps)) == 0 && getMovecount (head (findPiece (getQueensCastle c) ps)) == 0
+possibleToCastle c True ps = not (null k) && getMovecount (head (findPiece (findKing c ps) ps)) == 0 && getMovecount (head k) == 0
+                             where
+                                k = findPiece (getKingsCastle c) ps
+possibleToCastle c False ps = not (null q) && getMovecount (head (findPiece (findKing c ps) ps)) == 0 && getMovecount (head q) == 0
+                              where
+                                  q = findPiece (getQueensCastle c) ps
 
 
 --returns whether a castle is valid or not TODO: king can still castle through check
