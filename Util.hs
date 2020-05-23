@@ -265,8 +265,8 @@ validKingMove p (m,n) ps | abs n == 2 = validCastle p (m,n) ps
                                     where
                                         t = getTarget (getPos p) (m,n)
                                         k = findKing (invertColour (getColour p)) ps
-                                        x = abs (getColumn t) - (getColumn k)
-                                        y = abs (getRow t) - (getRow k)
+                                        x = abs ((getColumn t) - (getColumn k))
+                                        y = abs ((getRow t) - (getRow k))
 
 
 -- returns whether a move is valid
@@ -336,10 +336,9 @@ movePiece p move ps | isValidMove p move ps && not (willKingBeInCheck p move ps)
 
 -- executes a castle move -- WORKING
 executeCastle :: Piece -> Move -> AllPieces -> AllPieces
---executeCastle p (0,2) ps = executeMove p (0,2) (executeMove (head (findPiece (getKingsCastle (getColour p)) ps)) (0,-2) ps)
---executeCastle p (0,-2) ps = executeMove p (0,-2) (executeMove (head (findPiece (getQueensCastle (getColour p)) ps)) (0,3) ps)
 executeCastle p (0,2) ps = updatePosition p (0,2) : removePiece p (executeMove (head (findPiece (getKingsCastle (getColour p)) ps)) (0,-2) ps)
 executeCastle p (0,-2) ps = updatePosition p (0,-2) : removePiece p (executeMove (head (findPiece (getQueensCastle (getColour p)) ps)) (0,3) ps)
+executeCastle _ _ ps = ps
 
 --execute move
 executeMove :: Piece -> Move -> AllPieces -> AllPieces
@@ -387,7 +386,7 @@ getKingsCastle Black = (0,7)
 
 -- returns Queen's side castle for either colour
 getQueensCastle :: Colour -> Pos
-getQueensCastle White = (0,7)
+getQueensCastle White = (7,0)
 getQueensCastle Black = (0,0)
 
 -- returns whether a king and the revelant castle has moved or not. True = kings side castle
