@@ -21,3 +21,7 @@ type AllPieces = [Piece]
 --type Move = (Piece, Pos, Bool) -- piece, target square, validity
 
 type Move = (Int, Int) -- row difference, column difference
+
+type Node = (AllPieces, AllPieces, Float, Float) --prev board, current board, white eval for the board, black eval for the board
+
+type Tree = [Node]
