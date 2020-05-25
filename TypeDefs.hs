@@ -22,6 +22,6 @@ type AllPieces = [Piece]
 
 type Move = (Int, Int) -- row difference, column difference
 
-type Node = (AllPieces, AllPieces, Float, Float) --prev board, current board, white eval for the board, black eval for the board
+type Node = (AllPieces, AllPieces, Float, Int) --prev board, current board, eval (0-eval for black), depth level
 
 type Tree = [Node]

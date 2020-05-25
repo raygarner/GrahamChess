@@ -62,36 +62,38 @@ addTrueEval (c,nc) l d (p,m,f) ps | l == d = if isCheckmate (invertColour c) ps 
 --findSingleBestMove c ps = findStrongestMoveFromAll (makeEvalList c ps)
 
 
---buildTree :: (Piece, Move, Float) -> Int -> Colour -> AllPieces -> Tree
---buildTree m 0 c ps = []
---buildTree m n c ps = [x | x <- buildLeafs m
+-- pass 1 as first l value and buildBranches 0 <board> as initial tree
+buildTree :: Int -> Colour -> Tree -> Tree
+buildTree 4 c t = addAllBranches c 4 t
+buildTree l c t = buildTree (l+1) (invertColour c) (addAllBranches c l t)
 
-inheritEval :: AllPieces -> Colour -> Tree -> Float
-inheritEval ps c t = head [ getNodeEval c n | n <- t, getPrevBoard n == ps]
+addAllBranches :: Colour -> Int -> Tree -> Tree
+addAllBranches c l t = t++(combineTrees [buildBranches l (getCurrentBoard n) c | n <- t, getDepthLevel n == (l-1)])
 
+--make list of all possible new board with this board as previous board
+buildBranches :: Int -> AllPieces -> Colour -> Tree
+buildBranches l ps c = [ (ps, executeMove x y ps,0,l)| x <- ps, getPos x /= (-1,-1), getColour x == c, y <- legalMoves x ps]
 
-buildBranches :: AllPieces -> Colour -> Tree
-buildBranches ps c = [ (ps, executeMove x y ps,0,0)| x <- ps, getPos x /= (-1,-1), getColour x == c, y <- legalMoves x ps]
+-- takes a list of trees and converts it to one tree with all the nodes
+combineTrees :: [Tree] -> Tree
+combineTrees [] = []
+combineTrees (x:xs) = x ++ combineTrees xs
 
-getNodeEval :: Colour -> Node -> Float
-getNodeEval White (_,_,f,_) = f
-getNodeEval Black (_,_,_,f) = f
+getNodeEval :: Node -> Float
+getNodeEval (_,_,f,_) = f
 
 getPrevBoard :: Node -> AllPieces
 getPrevBoard (ps,_,_,_) = ps
 
+getDepthLevel :: Node -> Int
+getDepthLevel (_,_,_,l) = l
+
+getCurrentBoard :: Node -> AllPieces
+getCurrentBoard (_,ps,_,_) = ps
 
 
--- builds tree from last move in line
---buildLeafs :: Line -> Colour -> AllPieces -> Tree
---buildLeafs m c ps = makeLines (m ++ makeEvalList (invertColour c) (makeSingleBestMove last ps))
---                    where
---                        last = head (drop (length m - 1) m)
 
 
--- takes a list where the head is a move and the tail is all the possible responses and covnerts it to a tree
---makeLines :: [(Piece,Move,Float)] -> Tree
---makeLines xs = [head xs:x:[]| x <- xs, x /= head xs]
 
 -- returns the stronget move from a list of moves with evaluations
 findStrongestMoveFromAll :: [(Piece,Move,Float)] -> (Piece,Move,Float)
