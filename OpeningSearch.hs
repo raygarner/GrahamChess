@@ -22,8 +22,6 @@ openingMoveWrapper d c ps = findStrongestMoveFromAll (par s4 (par s3 (par s2 (s1
                                 l2 = drop (e `div` 4) l
                                 r1 = take ((e `div` 4)+1) r
                                 r2 = drop (e `div` 4) r
-                                --j = findRealBestOpeningMove d c ps l
-                                --k = findRealBestOpeningMove d c ps r
                                 s1 = extractPMF (findRealBestOpeningMoveWrapper d c ps l1 [])
                                 s2 = extractPMF (findRealBestOpeningMoveWrapper d c ps l2 [])
                                 s3 = extractPMF (findRealBestOpeningMoveWrapper d c ps r1 [])
@@ -40,34 +38,31 @@ findRealBestOpeningMoveWrapper d c ps xs ys = findRealBestOpeningMove' d c ps xs
 
 findRealBestOpeningMove' :: Int -> Colour -> AllPieces -> [(Piece, Move, Float)] -> [(Piece,Move,AllPieces, Colour, Int)]-> ((Piece, Move, Float),[(Piece,Move,AllPieces,Colour,Int)])
 findRealBestOpeningMove' d c ps xs ys | length xs == 1 = addTrueEval'' (c, invertColour c) 1 d (h,ys) (makeSingleBestMove h ps)
-                                      -- | otherwise = findStrongestMoveFromAllWithList (te : (findRealBestOpeningMove' d c ps (tail xs) list) : [])
                                       | otherwise = (extractPMF (findStrongestMoveFromAllWithList biglist),extractList (head last))
                                       where
                                           h = head xs
                                           te = addTrueEval'' (c,invertColour c) 1 d (h,ys) (makeSingleBestMove h ps)
-                                          --thePMF = extractPMF te
                                           list = extractList te
                                           biglist = (te : (findRealBestOpeningMove' d c ps (tail xs) list) : [])
                                           last = drop ((length biglist)-1) biglist
-                                          --bigmovebases = combineMoveBases biglist
 
 
 
 
 -- updates the evaluation for moves by looking moves into the futur2
 {-
-addTrueEval' :: (Colour,Colour) -> Int -> Int -> (Piece,Move,Float) -> AllPieces -> (Piece,Move,Float)
-addTrueEval' (c,nc) l d (p,m,f) ps | l == d = if isCheckmate (invertColour c) ps then
-                                               (p,m,checkmate-(fromIntegral l))
-                                           else if isCheckmate c ps then
-                                               (p,m,0-checkmate-(fromIntegral l))
-                                           else (p,m,totalVal c ps)
+--addTrueEval' :: (Colour,Colour) -> Int -> Int -> (Piece,Move,Float) -> AllPieces -> (Piece,Move,Float)
+--addTrueEval' (c,nc) l d (p,m,f) ps | l == d = if isCheckmate (invertColour c) ps then
+--                                               (p,m,checkmate-(fromIntegral l))
+--                                           else if isCheckmate c ps then
+--                                               (p,m,0-checkmate-(fromIntegral l))
+--                                           else (p,m,totalVal c ps)
                                 -- | l == 0 = if f == checkmate then (p,m,f) else addTrueEval (c,(invertColour nc)) (l+1) d (p,m,0) (executeMove p m ps)
-                                | otherwise = if isCheckmate (invertColour c) ps then
-                                                  (p,m,checkmate-(fromIntegral l))
-                                              else if isCheckmate c ps then
-                                                  (p,m,0-checkmate-(fromIntegral l))
-                                              else addTrueEval (c,(invertColour nc)) (l+1) d (p,m,0) (makeSingleBestMove (findRealBestOpeningMove (d-l) nc ps []) ps)
+--                                | otherwise = if isCheckmate (invertColour c) ps then
+--                                                  (p,m,checkmate-(fromIntegral l))
+--                                              else if isCheckmate c ps then
+--                                                  (p,m,0-checkmate-(fromIntegral l))
+--                                              else addTrueEval (c,(invertColour nc)) (l+1) d (p,m,0) (makeSingleBestMove (findRealBestOpeningMove (d-l) nc ps []) ps)
                                               --else (p,m,getMoveEval (findRealBestOpeningMove (d-l) nc ps []))
                                   --where
                                       --e = findSingleBestMove nc ps
@@ -77,48 +72,46 @@ addTrueEval' (c,nc) l d (p,m,f) ps | l == d = if isCheckmate (invertColour c) ps
                                       --v = if c == nc then totalVal c ps else 0 - totalVal nc ps
                                       --v = totalVal c ps
 
--}
+--}
 {-
 -- updates the evaluation for moves by looking moves into the futur2
-addTrueEval :: (Colour,Colour) -> Int -> Int -> (Piece,Move,Float) -> AllPieces -> (Piece,Move,Float)
-addTrueEval (c,nc) l d (p,m,f) ps = do if l==d then
-                                            if isCheckmate (invertColour c) ps then
-                                                (p,m,checkmate-(fromIntegral l))
-                                            else if isCheckmate c ps then
-                                                (p,m,0-checkmate+(fromIntegral l))
-                                            else
-                                                (p,m,totalVal c ps)
-                                        else
-                                            if isCheckmate (invertColour c) ps then
-                                                (p,m,checkmate-(fromIntegral l))
-                                            else if isCheckmate c ps then
-                                                (p,m,0-checkmate+(fromIntegral l))
-                                            else
-                                                addTrueEval (c,(invertColour nc)) (l+1) d (p,m,0) (makeSingleBestMove (findRealBestOpeningMove (d-l) nc ps []) ps)
+--addTrueEval :: (Colour,Colour) -> Int -> Int -> (Piece,Move,Float) -> AllPieces -> (Piece,Move,Float)
+--addTrueEval (c,nc) l d (p,m,f) ps = do if l==d then
+--                                            if isCheckmate (invertColour c) ps then
+--                                                (p,m,checkmate-(fromIntegral l))
+--                                            else if isCheckmate c ps then
+--                                                (p,m,0-checkmate+(fromIntegral l))
+--                                            else
+--                                                (p,m,totalVal c ps)
+--                                        else
+--                                            if isCheckmate (invertColour c) ps then
+--                                                (p,m,checkmate-(fromIntegral l))
+--                                            else if isCheckmate c ps then
+--                                                (p,m,0-checkmate+(fromIntegral l))
+--                                            else
+--                                                addTrueEval (c,(invertColour nc)) (l+1) d (p,m,0) (makeSingleBestMove (findRealBestOpeningMove (d-l) nc ps []) ps)
 
 -}
 -- ((p,m,f),[(Piece,Move,AllPieces, Colour, l)])
 -- updates the evaluation for moves by looking moves into the futur2
 addTrueEval'' :: (Colour,Colour) -> Int -> Int -> ((Piece,Move,Float),[(Piece,Move,AllPieces, Colour, Int)]) -> AllPieces -> ((Piece,Move,Float),[(Piece,Move,AllPieces, Colour, Int)])
-addTrueEval'' (c,nc) l d ((p,m,f),xs) ps = do if l==d then
-                                                  if isCheckmate (invertColour c) ps then
-                                                      ((p,m,checkmate-(fromIntegral l)),xs)
-                                                  else if isCheckmate c ps then
-                                                      ((p,m,0-checkmate+(fromIntegral l)),xs)
-                                                  else
-                                                      ((p,m,totalVal c ps),xs)
-                                              else
-                                                  if isCheckmate (invertColour c) ps then
-                                                      ((p,m,checkmate-(fromIntegral l)),xs)
-                                                  else if isCheckmate c ps then
-                                                      ((p,m,0-checkmate+(fromIntegral l)),xs)
-                                                  else
-                                                      if null move then
-                                                          --addTrueEval'' (c,(invertColour nc)) (l+1) d ((p,m,0),((np,nm,ps,nc,l):xs)++ys) (makeSingleBestMove (np,nm,nf) ps)
-
-                                                          addTrueEval'' (c,(invertColour nc)) (l+1) d ((p,m,0),(np,nm,ps,nc,d-l):ys) (makeSingleBestMove (np,nm,nf) ps)
-                                                      else
-                                                          --trace ("MOVEFOUND*****"++(show (head move))) addTrueEval'' (c,(invertColour nc)) (l+1) d ((p,m,0),xs) (makeSingleBestMove (head move) ps)
+addTrueEval'' (c,nc) l d ((p,m,f),xs) ps = if l==d then
+                                               if isCheckmate (invertColour c) ps then
+                                                  ((p,m,checkmate-(fromIntegral l)),xs)
+                                               else if isCheckmate c ps then
+                                                  ((p,m,0-checkmate+(fromIntegral l)),xs)
+                                               else
+                                                  ((p,m,totalVal c ps),xs)
+                                           else
+                                               if isCheckmate (invertColour c) ps then
+                                                  ((p,m,checkmate-(fromIntegral l)),xs)
+                                               else if isCheckmate c ps then
+                                                  ((p,m,0-checkmate+(fromIntegral l)),xs)
+                                               else
+                                                    if null move then
+                                                        addTrueEval'' (c,(invertColour nc)) (l+1) d ((p,m,0),(np,nm,ps,nc,d-l):ys) (makeSingleBestMove (np,nm,nf) ps)
+                                                         --(p,m,0-getMoveEval (findRealBestOpeningMoveWrapper (d-l) nc ps [] xs))
+                                                    else
                                                           addTrueEval'' (c,(invertColour nc)) (l+1) d ((p,m,0),xs) (makeSingleBestMove (head move) ps)
                                            where
                                                move = getExistingBestMove (d-l) xs ps nc -- existing move
@@ -129,7 +122,6 @@ addTrueEval'' (c,nc) l d ((p,m,f),xs) ps = do if l==d then
 -- search to see if the best move for this case has already been found
 getExistingBestMove :: Int -> [(Piece,Move,AllPieces, Colour, Int)] -> AllPieces -> Colour -> [(Piece,Move,Float)]
 getExistingBestMove d xs ps c = [(p,m,0.0) | (p,m,board,col,l) <- xs, c==col, ps==board, l>=d]
---getExistingBestMove d xs ps c = [(p,m,0.0) | (p,m,board,col,l) <- xs, c=/col, ps==board]
 
 extractPMF :: ((Piece,Move,Float),[(Piece,Move,AllPieces, Colour, Int)]) -> (Piece,Move,Float)
 extractPMF ((p,m,f),_) = (p,m,f)
