@@ -116,19 +116,19 @@ addTrueEval'' (c,nc) l d ((p,m,f),xs) ps = do if l==d then
                                                       if null move then
                                                           --addTrueEval'' (c,(invertColour nc)) (l+1) d ((p,m,0),((np,nm,ps,nc,l):xs)++ys) (makeSingleBestMove (np,nm,nf) ps)
 
-                                                          addTrueEval'' (c,(invertColour nc)) (l+1) d ((p,m,0),(np,nm,ps,nc,l):ys) (makeSingleBestMove (np,nm,nf) ps)
+                                                          addTrueEval'' (c,(invertColour nc)) (l+1) d ((p,m,0),(np,nm,ps,nc,d-l):ys) (makeSingleBestMove (np,nm,nf) ps)
                                                       else
                                                           --trace ("MOVEFOUND*****"++(show (head move))) addTrueEval'' (c,(invertColour nc)) (l+1) d ((p,m,0),xs) (makeSingleBestMove (head move) ps)
                                                           addTrueEval'' (c,(invertColour nc)) (l+1) d ((p,m,0),xs) (makeSingleBestMove (head move) ps)
                                            where
-                                               move = getExistingBestMove l xs ps nc -- existing move
+                                               move = getExistingBestMove (d-l) xs ps nc -- existing move
                                                ((np,nm,nf),ys) = findRealBestOpeningMoveWrapper (d-l) nc ps [] xs-- newmove
 
 
 
 -- search to see if the best move for this case has already been found
 getExistingBestMove :: Int -> [(Piece,Move,AllPieces, Colour, Int)] -> AllPieces -> Colour -> [(Piece,Move,Float)]
-getExistingBestMove d xs ps c = [(p,m,0.0) | (p,m,board,col,l) <- xs, c==col, ps==board, l<=d]
+getExistingBestMove d xs ps c = [(p,m,0.0) | (p,m,board,col,l) <- xs, c==col, ps==board, l>=d]
 --getExistingBestMove d xs ps c = [(p,m,0.0) | (p,m,board,col,l) <- xs, c=/col, ps==board]
 
 extractPMF :: ((Piece,Move,Float),[(Piece,Move,AllPieces, Colour, Int)]) -> (Piece,Move,Float)
