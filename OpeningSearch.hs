@@ -45,8 +45,8 @@ findRealBestOpeningMove' d c ps xs ys | length xs == 1 = addTrueEval'' (c, inver
                                       where
                                           h = head xs
                                           te = addTrueEval'' (c,invertColour c) 1 d (h,ys) (makeSingleBestMove h ps)
-                                          thePMF = extractPMF te
-                                          list = (extractPiece thePMF,extractMove thePMF,ps,c,0):(extractList te)
+                                          --thePMF = extractPMF te
+                                          list = extractList te
                                           biglist = (te : (findRealBestOpeningMove' d c ps (tail xs) list) : [])
                                           last = drop ((length biglist)-1) biglist
                                           --bigmovebases = combineMoveBases biglist
@@ -118,10 +118,11 @@ addTrueEval'' (c,nc) l d ((p,m,f),xs) ps = do if l==d then
 
                                                           addTrueEval'' (c,(invertColour nc)) (l+1) d ((p,m,0),(np,nm,ps,nc,l):ys) (makeSingleBestMove (np,nm,nf) ps)
                                                       else
-                                                          trace "MOVE FOUND*****" addTrueEval'' (c,(invertColour nc)) (l+1) d ((p,m,0),xs) (makeSingleBestMove (head move) ps)
+                                                          --trace ("MOVEFOUND*****"++(show (head move))) addTrueEval'' (c,(invertColour nc)) (l+1) d ((p,m,0),xs) (makeSingleBestMove (head move) ps)
+                                                          addTrueEval'' (c,(invertColour nc)) (l+1) d ((p,m,0),xs) (makeSingleBestMove (head move) ps)
                                            where
                                                move = getExistingBestMove l xs ps nc -- existing move
-                                               ((np,nm,nf),ys) = findRealBestOpeningMoveWrapper (d-l) nc ps [] xs-- newmove -- have this return list too???
+                                               ((np,nm,nf),ys) = findRealBestOpeningMoveWrapper (d-l) nc ps [] xs-- newmove
 
 
 
