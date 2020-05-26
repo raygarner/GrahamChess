@@ -471,6 +471,7 @@ legalBishopMovesLine :: Piece -> AllPieces -> Move -> [Move]
 legalBishopMovesLine p ps (m, n) | not (isBishopValidMove p (m,n) ps && targetNotKing p (m,n) ps && not (willKingBeInCheck p (m,n) ps)) = []
                                  | otherwise = (m,n) : legalBishopMovesLine p ps (furtherFromZero m, furtherFromZero n)
 
+
 -- returns a list of legal moves for a queen
 legalQueenMoves :: Piece -> AllPieces -> [Move]
 legalQueenMoves p ps = (legalBishopMoves p ps) ++ (legalRookMoves p ps)
@@ -482,6 +483,9 @@ legalPawnMoves p ps = [ (m,n) | m <- [-2..2], n <- [-1..1], targetNotKing p (m,n
 -- returns a list of legal moves for a king
 legalKingMoves :: Piece -> AllPieces -> [Move]
 legalKingMoves p ps = [(m,n) | m <- [-1..1], n <- [-2..2], targetNotKing p (m,n) ps, validKingMove p (m,n) ps, not (willKingBeInCheck p (m,n) ps)]
+
+allLegalMoves :: Colour -> AllPieces -> [Move]
+allLegalMoves c ps = [ m | p <- ps, m <- legalMoves p ps]
 
 -- returns a list of legal moves for a piece
 legalMoves :: Piece -> AllPieces -> [Move]
