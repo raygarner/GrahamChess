@@ -280,11 +280,13 @@ isValidMove (King, col, pos, mc) move ps   = validKingMove (King, col, pos, mc) 
 
 -- returns a list of the pieces which can capture piece p
 threatenedBy :: Piece -> AllPieces -> [Piece]
-threatenedBy p ps = [ x | x <- ps, isValidMove x (m - getRow (getPos x), n - getColumn (getPos x)) ps ]
+threatenedBy p ps = [ x | x <- ps, isValidMove x (m - getRow (getPos x), n - getColumn (getPos x)) ps, getColour x /= getColour p]
                   where
                       pos = getPos p
                       m = getRow pos
                       n = getColumn pos
+
+
 
 -- changes all pieces to reflect the inverted colour.
 updateAllPieces :: Piece -> AllPieces -> [Piece]
