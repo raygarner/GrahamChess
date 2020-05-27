@@ -36,7 +36,7 @@ totalEndVal :: Colour -> AllPieces -> Float
 totalEndVal a ps =  (totalMaterial a ps) + (totalColourBonus a ps) + (allPawns a ps) + (perPieceBonus a ps)
 
 pieceVal :: Piece -> Float
-pieceVal (Pawn,_,_,_)   = 2.5
+pieceVal (Pawn,_,_,_)   = 4.0
 pieceVal (Knight,_,_,_) = 3.0
 pieceVal (Bishop,_,_,_) = 3.5
 pieceVal (Rook,_,_,_)   = 5.0
@@ -78,7 +78,8 @@ getPawnPromotion :: Colour -> AllPieces -> Float
 getPawnPromotion c ps = fromIntegral (length (pawnsNearEnd c ps)) * 2.0
 
 passPawnScore :: Piece -> AllPieces -> Float
-passPawnScore a ps | isPassedPawn a ps = 7.5
+passPawnScore a ps | isPassedPawn a ps && pathClearAhead a ps = 1.0
+                   | isPassedPawn a ps = 0.5
                    | otherwise = 0
 
 -- returns whether a position doesnt contain an enemy pawn
@@ -93,12 +94,18 @@ pawnClearAhead c (m,n) ps = all (==True) [ isNotEnemyPawn c (m+d, n+x) ps | x <-
 
 -- returns whether a pawn is a passed pawn
 isPassedPawn :: Piece -> AllPieces -> Bool
-isPassedPawn a ps = all (==True) [(pawnClearAhead (getColour a) (y,n) ps) && (squareNotThreatened (getColour a) (x,n) ps) | y <- [m,m+d..e], x <- [m,m+d..e]]
+isPassedPawn a ps = all (==True) [pawnClearAhead (getColour a) (y,n) ps| y <- [m,m+d..e]]
                     where
                         (m,n) = getPos a
                         d = if getColour a == White then -1 else 1
                         e = if getColour a == White then 1 else 6
-                        s = m+d
+
+pathClearAhead :: Piece -> AllPieces -> Bool
+pathClearAhead a ps = all (==True) [squareNotThreatened (getColour a) (y,n) ps | y <- [m,m+d..e]]
+                    where
+                      (m,n) = getPos a
+                      d = if getColour a == White then -1 else 1
+                      e = if getColour a == White then 1 else 6
 
 isOpposingKingInCheck :: Colour -> AllPieces -> Float
 isOpposingKingInCheck c ps | isKingInCheck king ps = 3.0
