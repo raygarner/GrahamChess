@@ -37,14 +37,16 @@ findRealBestOpeningMoveWrapper d c ps [] ys = findRealBestOpeningMove' d c ps (m
 findRealBestOpeningMoveWrapper d c ps xs ys = findRealBestOpeningMove' d c ps xs ys
 
 findRealBestOpeningMove' :: Int -> Colour -> AllPieces -> [(Piece, Move, Float)] -> [(Piece,Move,AllPieces, Colour, Int)]-> ((Piece, Move, Float),[(Piece,Move,AllPieces,Colour,Int)])
+findRealBestOpeningMove' d c ps [] ys = (((King, c, (7,4),0),(0,0),0.0),[]) --this shouldnt be necessery but for some reason it is?
 findRealBestOpeningMove' d c ps xs ys | length xs == 1 = addTrueEval'' (c, invertColour c) 1 d (h,ys) (makeSingleBestMove h ps)
-                                      | otherwise = (extractPMF (findStrongestMoveFromAllWithList biglist),extractList (head last))
+                                      | otherwise = (extractPMF (findStrongestMoveFromAllWithList biglist), last)
                                       where
                                           h = head xs
                                           te = addTrueEval'' (c,invertColour c) 1 d (h,ys) (makeSingleBestMove h ps)
                                           list = extractList te
                                           biglist = (te : (findRealBestOpeningMove' d c ps (tail xs) list) : [])
-                                          last = drop ((length biglist)-1) biglist
+                                          finalsingleton = drop ((length biglist)-1) biglist
+                                          last = if null finalsingleton then [] else extractList (head finalsingleton)
 
 
 
@@ -110,8 +112,7 @@ addTrueEval'' (c,nc) l d ((p,m,f),xs) ps = if l==d then
                                                else
                                                     if null move then
                                                         addTrueEval'' (c,(invertColour nc)) (l+1) d ((p,m,0),(np,nm,ps,nc,d-l):ys) (makeSingleBestMove (np,nm,nf) ps)
-                                                         --(p,m,0-getMoveEval (findRealBestOpeningMoveWrapper (d-l) nc ps [] xs))
-                                                    else
+                                                    else -- if there is an existing best move already of equal or greater accuracy that would otherwise be achieved with a search
                                                           addTrueEval'' (c,(invertColour nc)) (l+1) d ((p,m,0),xs) (makeSingleBestMove (head move) ps)
                                            where
                                                move = getExistingBestMove (d-l) xs ps nc -- existing move
@@ -149,77 +150,77 @@ newsearchtestfunc = findBestFirstBoard White $! (propagateEval 3 White $! (addLe
 findBestFirstBoard :: Colour -> Tree -> AllPieces
 findBestFirstBoard c t | not (null xs) = trace (show zs) getCurrentBoard (head xs)
                        | otherwise = []
-                         where
-                             zs = [n | n <- t, getDepthLevel n == 0]
-                             xs = if c==White then [n | n <- t, all (\y -> (getNodeEval y) <= (getNodeEval n)) zs] else [n | n <- t, all (\y -> (getNodeEval y) >= (getNodeEval n)) zs]
+--                         where
+--                             zs = [n | n <- t, getDepthLevel n == 0]
+--                             xs = if c==White then [n | n <- t, all (\y -> (getNodeEval y) <= (getNodeEval n)) zs] else [n | n <- t, all (\y -> (getNodeEval y) >= (getNodeEval n)) zs]
 
 
 
 -- add values to every node in a tree which already has eval for the leafs
-propagateEval :: Int -> Colour -> Tree -> Tree
-propagateEval 0 c t = trace "PROPAGATEEVAL*****" inheritVals 0 c t
-propagateEval l c t = trace ("PROPAGATEEVAL****"++(show l)) propagateEval (l-1) (invertColour c) (inheritVals l c t)
+--propagateEval :: Int -> Colour -> Tree -> Tree
+--propagateEval 0 c t = trace "PROPAGATEEVAL*****" inheritVals 0 c t
+--propagateEval l c t = trace ("PROPAGATEEVAL****"++(show l)) propagateEval (l-1) (invertColour c) (inheritVals l c t)
 
 -- inherit the values for one level
-inheritVals :: Int -> Colour -> Tree -> Tree
-inheritVals d c t = trace "INHERIT VALS******"[(prev,ps,if l==d then trace "getting eval for this level" bestEval (prev,ps,e,l) c t else trace "not getting eval for this level yet" e,l) | (prev,ps,e,l) <- t]
+--inheritVals :: Int -> Colour -> Tree -> Tree
+--inheritVals d c t = trace "INHERIT VALS******"[(prev,ps,if l==d then trace "getting eval for this level" bestEval (prev,ps,e,l) c t else trace "not getting eval for this level yet" e,l) | (prev,ps,e,l) <- t]
 
 -- find the value of the best move which can be made from a node
-bestEval :: Node -> Colour -> Tree -> Float
-bestEval node c t | not (null xs) = trace "BESTEVAL******getting best eval" getNodeEval (head xs)
-                  | otherwise = trace "BESTEVAL******just returning 0" 0.0
-                        where
-                            zs = [n | n <- t, getDepthLevel n == ((getDepthLevel node)+1), getPrevBoard n == (getCurrentBoard node)]
-                            xs = if c==White then [n | n <- zs, all (\y -> (getNodeEval y) <= (getNodeEval n)) zs ] else [n | n <- zs, all (\y -> (getNodeEval y) >= (getNodeEval n)) zs ]
+--bestEval :: Node -> Colour -> Tree -> Float
+--bestEval node c t | not (null xs) = trace "BESTEVAL******getting best eval" getNodeEval (head xs)
+--                  | otherwise = trace "BESTEVAL******just returning 0" 0.0
+--                        where
+--                            zs = [n | n <- t, getDepthLevel n == ((getDepthLevel node)+1), getPrevBoard n == (getCurrentBoard node)]
+--                            xs = if c==White then [n | n <- zs, all (\y -> (getNodeEval y) <= (getNodeEval n)) zs ] else [n | n <- zs, all (\y -> (getNodeEval y) >= (getNodeEval n)) zs ]
 
 -- search for a board
-searchForEval :: Int -> Tree -> AllPieces -> Float
-searchForEval l t ps | not (null zs) = getNodeEval (head zs)
-                     | otherwise = 0.0
-                     where
-                         zs = [n | n <- t, getDepthLevel n == l, getCurrentBoard n == ps, getNodeEval n /= 0.0]
+--searchForEval :: Int -> Tree -> AllPieces -> Float
+--searchForEval l t ps | not (null zs) = getNodeEval (head zs)
+--                     | otherwise = 0.0
+--                     where
+--                         zs = [n | n <- t, getDepthLevel n == l, getCurrentBoard n == ps, getNodeEval n /= 0.0]
 
 -- add final eval to tree
-addLeafEval :: Colour -> Tree -> Tree
-addLeafEval c t = trace "ADDLEAFEVAL***"[(prev,ps,if l==4 then (if searchForEval l t ps /= 0.0 then searchForEval l t ps else z (totalVal c ps)) else e, l)| (prev,ps,e,l) <- t]
-                  where
+--addLeafEval :: Colour -> Tree -> Tree
+--addLeafEval c t = trace "ADDLEAFEVAL***"[(prev,ps,if l==4 then (if searchForEval l t ps /= 0.0 then searchForEval l t ps else z (totalVal c ps)) else e, l)| (prev,ps,e,l) <- t]
+--                  where
                       --z = if c == Black then (\y -> 0 - y) else (\y -> y)
                       --searcher = (\y -> searchForEval l t y)
-                      xs = [n | n <- t, getDepthLevel n == 4]
-                      z = (\y -> if c==White then y else 0-y)
+--                      xs = [n | n <- t, getDepthLevel n == 4]
+--                      z = (\y -> if c==White then y else 0-y)
 
 -- pass 1 as first l value and buildBranches 0 <board> as initial tree
-buildTree :: Int -> Colour -> Tree -> Tree
-buildTree 4 c t = trace "BUILDTREE****" addAllBranches c 4 t
-buildTree l c t = trace "BUILDTREE****" buildTree (l+1) (invertColour c) (addAllBranches c l t)
+--buildTree :: Int -> Colour -> Tree -> Tree
+--buildTree 4 c t = trace "BUILDTREE****" addAllBranches c 4 t
+--buildTree l c t = trace "BUILDTREE****" buildTree (l+1) (invertColour c) (addAllBranches c l t)
 
-addAllBranches :: Colour -> Int -> Tree -> Tree
-addAllBranches c l t = trace "ADDALLBRANCHES*****" t++(combineTrees [buildBranches l (getCurrentBoard n) c | n <- t, getDepthLevel n == (l-1)])
+--addAllBranches :: Colour -> Int -> Tree -> Tree
+--addAllBranches c l t = trace "ADDALLBRANCHES*****" t++(combineTrees [buildBranches l (getCurrentBoard n) c | n <- t, getDepthLevel n == (l-1)])
 
 --make list of all possible new board with this board as previous board
-buildBranches :: Int -> AllPieces -> Colour -> Tree
-buildBranches l ps c = trace "BUILDBRANCHES******" [ (ps, executeMove x y ps,0,l)| x <- ps, getPos x /= (-1,-1), getColour x == c, y <- legalMoves x ps]
+--buildBranches :: Int -> AllPieces -> Colour -> Tree
+--buildBranches l ps c = trace "BUILDBRANCHES******" [ (ps, executeMove x y ps,0,l)| x <- ps, getPos x /= (-1,-1), getColour x == c, y <- legalMoves x ps]
 
 -- takes a list of trees and converts it to one tree with all the nodes
-combineTrees :: [Tree] -> Tree
-combineTrees [] = []
-combineTrees (x:xs) = x ++ combineTrees xs
+--combineTrees :: [Tree] -> Tree
+--combineTrees [] = []
+--combineTrees (x:xs) = x ++ combineTrees xs
 
-getNodeEval :: Node -> Float
-getNodeEval (_,_,f,_) = f
+--getNodeEval :: Node -> Float
+--getNodeEval (_,_,f,_) = f
 
-getPrevBoard :: Node -> AllPieces
-getPrevBoard (ps,_,_,_) = ps
+--getPrevBoard :: Node -> AllPieces
+--getPrevBoard (ps,_,_,_) = ps
 
-getDepthLevel :: Node -> Int
-getDepthLevel (_,_,_,l) = l
+--getDepthLevel :: Node -> Int
+--getDepthLevel (_,_,_,l) = l
 
-getCurrentBoard :: Node -> AllPieces
-getCurrentBoard (_,ps,_,_) = ps
+--getCurrentBoard :: Node -> AllPieces
+--getCurrentBoard (_,ps,_,_) = ps
 
-depth :: Int
-depth = 4
--}
+--depth :: Int
+--depth = 4
+---}
 
 
 -- returns the stronget move from a list of moves with evaluations
