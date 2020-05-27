@@ -30,7 +30,7 @@ totalColourBonus c ps = isKingOnEdges c ps
 
 allPawns :: Colour -> AllPieces -> Float
 --allPawns c ps = (sum [passPawnScore x ps | x <- ps, getColour x == c, getPieceType x == Pawn]) - (sum[passPawnScore y ps | y <- ps, getColour y /= c, getPieceType y == Pawn]) * 2.0
-allPawns c ps = (sum [passPawnScore x ps | x <- ps, getColour x == c, getPieceType x == Pawn]) * 3.5
+allPawns c ps = (sum [passPawnScore x ps | x <- ps, getColour x == c, getPieceType x == Pawn])
 
 totalEndVal :: Colour -> AllPieces -> Float
 totalEndVal a ps =  (totalMaterial a ps) + (totalColourBonus a ps) + (allPawns a ps) + (perPieceBonus a ps)
@@ -49,7 +49,7 @@ isPieceAimedAtEnemyKing p ps = isValidMove p (moveMade (getPos p) k) (p : [])
                                  k = findKing (invertColour (getColour p)) ps
 
 threatenKingBonus :: Piece -> AllPieces -> Float
-threatenKingBonus p ps | isPieceAimedAtEnemyKing p ps = 1.25
+threatenKingBonus p ps | isPieceAimedAtEnemyKing p ps = 0.75
                        | otherwise = 0.0
 
 isKingOnEdges :: Colour -> AllPieces -> Float
@@ -57,13 +57,18 @@ isKingOnEdges c ps = isKingSideCol king + isKingSideRow king
                      where king = findKing (invertColour c) ps
 
 isKingSideCol :: Pos -> Float
-isKingSideCol p | getColumn p == 0 || getColumn p == 7 = 0.75
+isKingSideCol p | getColumn p == 0 || getColumn p == 7 = 0.9
                 | otherwise = 0
 
 isKingSideRow :: Pos -> Float
-isKingSideRow p | getRow p == 0 || getRow p == 7 = 0.75
+isKingSideRow p | getRow p == 0 || getRow p == 7 = 0.9
                 | otherwise = 0
 
+squareNotThreatened :: Colour -> Pos -> AllPieces -> Bool
+squareNotThreatened c (m,n) ps | isEmpty (m,n) ps = null (threatenedBy newPiece (newPiece : ps))
+                               | otherwise = True
+                               where
+                                 newPiece = (Pawn,c,(m,n),0)
 pawnsNearEnd :: Colour -> AllPieces -> [Piece]
 pawnsNearEnd White ps = [x | x <- ps, getColour x == White, getRow (getPos x) == 1, getPieceType x == Pawn]
 pawnsNearEnd Black ps = [x | x <- ps, getColour x == Black, getRow (getPos x) == 6, getPieceType x == Pawn]
@@ -88,11 +93,12 @@ pawnClearAhead c (m,n) ps = all (==True) [ isNotEnemyPawn c (m+d, n+x) ps | x <-
 
 -- returns whether a pawn is a passed pawn
 isPassedPawn :: Piece -> AllPieces -> Bool
-isPassedPawn a ps = all (==True) [pawnClearAhead (getColour a) (y,n) ps | y <- [m,m+d..e]]
+isPassedPawn a ps = all (==True) [(pawnClearAhead (getColour a) (y,n) ps) && (squareNotThreatened (getColour a) (x,n) ps) | y <- [m,m+d..e], x <- [m,m+d..e]]
                     where
                         (m,n) = getPos a
                         d = if getColour a == White then -1 else 1
                         e = if getColour a == White then 1 else 6
+                        s = m+d
 
 isOpposingKingInCheck :: Colour -> AllPieces -> Float
 isOpposingKingInCheck c ps | isKingInCheck king ps = 3.0
