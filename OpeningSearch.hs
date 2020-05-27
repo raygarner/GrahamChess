@@ -124,6 +124,9 @@ addTrueEval'' (c,nc) l d ((p,m,f),xs) ps = if l==d then
 getExistingBestMove :: Int -> [(Piece,Move,AllPieces, Colour, Int)] -> AllPieces -> Colour -> [(Piece,Move,Float)]
 getExistingBestMove d xs ps c = [(p,m,0.0) | (p,m,board,col,l) <- xs, c==col, ps==board, l>=d]
 
+getExistingEval :: Colour -> AllPieces -> [(AllPieces, Float)] -> Float
+getExistingEval c ps xs = 0.0
+
 extractPMF :: ((Piece,Move,Float),[(Piece,Move,AllPieces, Colour, Int)]) -> (Piece,Move,Float)
 extractPMF ((p,m,f),_) = (p,m,f)
 
