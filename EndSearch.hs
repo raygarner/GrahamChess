@@ -9,18 +9,19 @@ import Debug.Trace
 import Debug
 import Control.Parallel
 import Data.List
+import System.Random
 
 
 
 endSearchWrapper :: Colour -> AllPieces -> (Piece,Move,Float)
-endSearchWrapper c ps = findStrongestMoveFromAll (par s2 (s1:s2:[]))
+endSearchWrapper c ps = findStrongestMoveFromAll (par s2 (s2:s1:[]
                             where
                                 a = makeEvalList c ps
                                 e = length a
-                                l = take ((e `div` 2)+1) a
-                                r = drop (e `div` 2) a
-                                s1 = findBestMove c ps r
-                                s2 = findBestMove c ps l
+                                l = take ((div e 2) + 1) a
+                                r = drop (div e 2) a
+                                s1 = findBestMove c ps l
+                                s2 = findBestMove c ps r
 
 
 
@@ -40,7 +41,7 @@ addTrueEval (c,nc) l d (p,m,f) ps | l == d = if isCheckmate (invertColour c) ps 
                                                (p,m,checkmate-(fromIntegral l))
                                            else if isCheckmate c ps then
                                                (p,m,0-checkmate-(fromIntegral l))
-                                           else  (p,m,v)
+                                           else (p,m,v)
                                 | l == 0 = if f == checkmate then (p,m,f) else addTrueEval (c,(invertColour nc)) (l+1) d (p,m,0) (executeMove p m ps)
                                 | otherwise = if isCheckmate (invertColour c) ps then
                                                   (p,m,checkmate-(fromIntegral l))
@@ -81,11 +82,10 @@ getBadMoves pieces = takeBottomMoves pieces
 -- takes the bottom n rated moves from a evalist
 takeBottomMoves :: [(Piece,Move,Float)] -> [(Piece,Move,Float)]
 takeBottomMoves xs | null xs = []
-                   | otherwise = take n (reverse m)
+                   | otherwise = take n m
                    where
-                     m = movesWithLowerScore (medianValue xs) xs
-                     n = div (length m) 4
-
+                      m = movesWithLowerScore (medianValue xs) xs
+                      n = div (length m) 2 + 1
 
 -- returns the weakest move from a list of moves with evaluation
 findWorstMoveFromAll :: [(Piece,Move,Float)] -> (Piece,Move,Float)

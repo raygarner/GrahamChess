@@ -6,7 +6,7 @@ import           TypeDefs
 import           Util
 
 totalMaterial :: Colour -> AllPieces -> Float
-totalMaterial c ps = 2.5 * ((sum [pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - (sum [ pieceVal y | y <- ps, getPos y /= (-1,-1), getColour y /= c ]))
+totalMaterial c ps = 4.5 * ((sum [pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - (sum [ pieceVal y | y <- ps, getPos y /= (-1,-1), getColour y /= c ]))
 
 
 -- if a piece is going to be captured then it doesnt really have any material
@@ -26,7 +26,7 @@ perPieceBonus :: Colour -> AllPieces -> Float
 perPieceBonus c ps = (sum[threatenKingBonus x ps | x <- ps, getPos x /= (-1,-1), getColour x == c])
 
 totalColourBonus :: Colour -> AllPieces -> Float
-totalColourBonus c ps = isKingOnEdges c ps
+totalColourBonus c ps = isKingOnEdges c ps + getPawnPromotion c ps
 
 allPawns :: Colour -> AllPieces -> Float
 --allPawns c ps = (sum [passPawnScore x ps | x <- ps, getColour x == c, getPieceType x == Pawn]) - (sum[passPawnScore y ps | y <- ps, getColour y /= c, getPieceType y == Pawn]) * 2.0
@@ -36,7 +36,7 @@ totalEndVal :: Colour -> AllPieces -> Float
 totalEndVal a ps =  (totalMaterial a ps) + (totalColourBonus a ps) + (allPawns a ps) + (perPieceBonus a ps)
 
 pieceVal :: Piece -> Float
-pieceVal (Pawn,_,_,_)   = 4.0
+pieceVal (Pawn,_,_,_)   = 2.5
 pieceVal (Knight,_,_,_) = 3.0
 pieceVal (Bishop,_,_,_) = 3.5
 pieceVal (Rook,_,_,_)   = 5.0
@@ -49,7 +49,7 @@ isPieceAimedAtEnemyKing p ps = isValidMove p (moveMade (getPos p) k) (p : [])
                                  k = findKing (invertColour (getColour p)) ps
 
 threatenKingBonus :: Piece -> AllPieces -> Float
-threatenKingBonus p ps | isPieceAimedAtEnemyKing p ps = 0.75
+threatenKingBonus p ps | isPieceAimedAtEnemyKing p ps = 1.0
                        | otherwise = 0.0
 
 isKingOnEdges :: Colour -> AllPieces -> Float
@@ -75,11 +75,11 @@ pawnsNearEnd Black ps = [x | x <- ps, getColour x == Black, getRow (getPos x) ==
 
 -- bonus points for pawns closer to end
 getPawnPromotion :: Colour -> AllPieces -> Float
-getPawnPromotion c ps = fromIntegral (length (pawnsNearEnd c ps)) * 2.0
+getPawnPromotion c ps = fromIntegral (length (pawnsNearEnd c ps))
 
 passPawnScore :: Piece -> AllPieces -> Float
-passPawnScore a ps | isPassedPawn a ps && pathClearAhead a ps = 1.0
-                   | isPassedPawn a ps = 0.5
+passPawnScore a ps | isPassedPawn a ps && pathClearAhead a ps = 3.5
+                   | isPassedPawn a ps = 1.5
                    | otherwise = 0
 
 -- returns whether a position doesnt contain an enemy pawn
@@ -88,7 +88,7 @@ isNotEnemyPawn c p ps = isEmpty p ps || (getPieceType (head (findPiece p ps))) /
 
 -- returns whether the 3 squares in front of one are not enemy pawns
 pawnClearAhead :: Colour -> Pos -> AllPieces -> Bool
-pawnClearAhead c (m,n) ps = all (==True) [ isNotEnemyPawn c (m+d, n+x) ps | x <- [-1..1] ]
+pawnClearAhead c (m,n) ps = all (==True) [ isNotEnemyPawn c (m+d, n+x) ps | x <- [-1..1]]
                             where
                                 d = if c == White then -1 else 1
 
