@@ -104,6 +104,7 @@ addTrueEval'' (c,nc) l d ((p,m,f),xs) ps = if l==d then
                                                   ((p,m,0-checkmate+(fromIntegral l)),xs)
                                                else
                                                   ((p,m,totalVal c ps),xs)
+
                                            else
                                                if isCheckmate (invertColour c) ps then
                                                   ((p,m,checkmate-(fromIntegral l)),xs)
@@ -113,19 +114,36 @@ addTrueEval'' (c,nc) l d ((p,m,f),xs) ps = if l==d then
                                                     if null move then
                                                         addTrueEval'' (c,(invertColour nc)) (l+1) d ((p,m,0),(np,nm,ps,nc,d-l):ys) (makeSingleBestMove (np,nm,nf) ps)
                                                     else -- if there is an existing best move already of equal or greater accuracy that would otherwise be achieved with a search
-                                                          addTrueEval'' (c,(invertColour nc)) (l+1) d ((p,m,0),xs) (makeSingleBestMove (head move) ps)
+                                                        addTrueEval'' (c,(invertColour nc)) (l+1) d ((p,m,0),xs) (makeSingleBestMove (head move) ps)
                                            where
                                                move = getExistingBestMove (d-l) xs ps nc -- existing move
+                                               neweval = totalVal c ps
                                                ((np,nm,nf),ys) = findRealBestOpeningMoveWrapper (d-l) nc ps [] xs-- newmove
 
 
 
 -- search to see if the best move for this case has already been found
-getExistingBestMove :: Int -> [(Piece,Move,AllPieces, Colour, Int)] -> AllPieces -> Colour -> [(Piece,Move,Float)]
-getExistingBestMove d xs ps c = [(p,m,0.0) | (p,m,board,col,l) <- xs, c==col, ps==board, l>=d]
+--getExistingBestMove :: Int -> [(Piece,Move,AllPieces, Colour, Int,Float)] -> AllPieces -> Colour -> [(Piece,Move,Float)]
+--getExistingBestMove d xs ps c = [(p,m,0.0) | (p,m,board,col,l,f) <- xs,  ps==board, c==col, l>=d ,m /=(0,0)]
 
-getExistingEval :: Colour -> AllPieces -> [(AllPieces, Float)] -> Float
-getExistingEval c ps xs = 0.0
+
+getExistingBestMove :: Int -> [(Piece,Move,AllPieces, Colour, Int)] -> AllPieces -> Colour -> [(Piece,Move,Float)]
+getExistingBestMove d [] ps c = []
+getExistingBestMove d ((p,m,board,col,l):xs) ps c = if ps==board && c==col && l>=d then
+                                                          [(p,m,0.0)]
+                                                      else
+                                                          getExistingBestMove d xs ps c
+
+--getExistingEval :: AllPieces -> Colour -> [(Piece,Move,AllPieces,Colour,Int,Float)] -> [Float]
+--getExistingEval ps c xs = [f | (p,m,board,col,l,f) <- xs, ps==board, c==col]
+
+--getExistingEval :: AllPieces -> Colour -> [(Piece,Move,AllPieces,Colour,Int,Float)] -> [Float]
+--getExistingEval ps c [] = []
+--getExistingEval ps c ((p,m,board,col,d,f):xs) = if col==c && board==ps then
+--                                                    [f]
+--                                                else
+--                                                    getExistingEval ps c xs
+
 
 extractPMF :: ((Piece,Move,Float),[(Piece,Move,AllPieces, Colour, Int)]) -> (Piece,Move,Float)
 extractPMF ((p,m,f),_) = (p,m,f)
@@ -150,9 +168,9 @@ newsearchtestfunc :: AllPieces
 newsearchtestfunc = findBestFirstBoard White $! (propagateEval 3 White $! (addLeafEval Black $! (buildTree 1 Black $! (buildBranches 0 addAllPieces White))))
 
 
-findBestFirstBoard :: Colour -> Tree -> AllPieces
-findBestFirstBoard c t | not (null xs) = trace (show zs) getCurrentBoard (head xs)
-                       | otherwise = []
+--findBestFirstBoard :: Colour -> Tree -> AllPieces
+--findBestFirstBoard c t | not (null xs) = trace (show zs) getCurrentBoard (head xs)
+--                       | otherwise = []
 --                         where
 --                             zs = [n | n <- t, getDepthLevel n == 0]
 --                             xs = if c==White then [n | n <- t, all (\y -> (getNodeEval y) <= (getNodeEval n)) zs] else [n | n <- t, all (\y -> (getNodeEval y) >= (getNodeEval n)) zs]
@@ -235,16 +253,16 @@ findStrongestMoveFromAllWithList :: [((Piece,Move,Float),[(Piece,Move,AllPieces,
 findStrongestMoveFromAllWithList xs | not (null xs) = head [ x | x <- xs, all (\y -> (getMoveEval (extractPMF y)) <= (getMoveEval (extractPMF x))) xs ]
                                     | otherwise = (((King, White, (7,4), 0), (0,0), 0-checkmate),[])
 
-combineMoveBases :: [((Piece,Move,Float),[(Piece,Move,AllPieces,Colour,Int)])] -> [(Piece,Move,AllPieces,Colour,Int)]
-combineMoveBases [] = []
-combineMoveBases (x:xs) = removeDuplicates (extractList x ++ combineMoveBases xs)
+--combineMoveBases :: [((Piece,Move,Float),[(Piece,Move,AllPieces,Colour,Int,Float)])] -> [(Piece,Move,AllPieces,Colour,Int,Float)]
+--combineMoveBases [] = []
+--combineMoveBases (x:xs) = removeDuplicates (extractList x ++ combineMoveBases xs)
 
-removeDuplicates :: Eq a => [a] -> [a]
-removeDuplicates = rdHelper []
-    where rdHelper seen [] = seen
-          rdHelper seen (x:xs)
-              | x `elem` seen = rdHelper seen xs
-              | otherwise = rdHelper (seen ++ [x]) xs
+--removeDuplicates :: Eq a => [a] -> [a]
+--removeDuplicates = rdHelper []
+--    where rdHelper seen [] = seen
+--          rdHelper seen (x:xs)
+--              | x `elem` seen = rdHelper seen xs
+--              | otherwise = rdHelper (seen ++ [x]) xs
 
 --takes the top n rated moves from evalList
 --takeTopMoves :: Int -> [(Piece,Move,Float)] -> [(Piece,Move,Float)]
