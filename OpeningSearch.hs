@@ -96,6 +96,7 @@ findRealBestOpeningMove' d c ps xs ys | length xs == 1 = addTrueEval'' (c, inver
 -}
 -- ((p,m,f),[(Piece,Move,AllPieces, Colour, l)])
 -- updates the evaluation for moves by looking moves into the futur2
+-- due to the way material evaluation works depth must be an even number
 addTrueEval'' :: (Colour,Colour) -> Int -> Int -> ((Piece,Move,Float),[(Piece,Move,AllPieces, Colour, Int)]) -> AllPieces -> ((Piece,Move,Float),[(Piece,Move,AllPieces, Colour, Int)])
 addTrueEval'' (c,nc) l d ((p,m,f),xs) ps = if l==d then
                                                if isCheckmate (invertColour c) ps then
@@ -122,11 +123,19 @@ addTrueEval'' (c,nc) l d ((p,m,f),xs) ps = if l==d then
 
 
 
+-- returns whether a move means the piece is threatening to capture afterwards
 isThreat :: Piece -> Move -> AllPieces -> Bool
-isThreat p m ps = False
+isThreat p m ps = if (length (trulyThreatening p ps) < length (trulyThreatening newp newb)) then True else False
+                  where
+                      newb = executeMove p m ps
+                      newp = head (findPiece (getTarget (getPos p) m) newb)
 
+-- returns whether a move is a capture
 isCapture :: Piece -> Move -> AllPieces -> Bool
-isCapture p m ps = False
+isCapture p m ps = if (totalMaterial enemyCol ps) > (totalMaterial enemyCol newb) then True else False
+                   where
+                       enemyCol = invertColour (getColour p)
+                       newb = executeMove p m ps
 
 isCheck :: Piece -> Move -> AllPieces -> Bool
 isCheck p m ps = False
@@ -135,8 +144,8 @@ isPin :: Piece -> Move -> AllPieces -> Bool
 isPin p m ps = False
 
 -- returns all pieces which a piece is threatening which it would make sense to take
---trulyThreatening :: Piece -> AllPieces -> [Piece]
---trulyThreatening p ps = [x | x <- threatening p ps, pieceVal p < pieceVal x ||
+trulyThreatening :: Piece -> AllPieces -> [Piece]
+trulyThreatening p ps = [x | x <- threatening p ps, pieceMaterial x ps == 0]
 
 
 

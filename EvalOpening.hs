@@ -193,7 +193,7 @@ pieceVal (King,_,_,_)   = 0.0
 -- if a piece is going to be captured then it doesnt really have any material
 pieceMaterial :: Piece -> AllPieces -> Float
 pieceMaterial a ps   | (length t > length pr) && not (compareBackupVals t pr) = 0
-                     | pieceVal (head t) < v = 0
+                     | getLowestVal t < v = 0
                      | otherwise = v
                        where t = sortPieces (threatenedBy a ps)
                              v = pieceVal a
