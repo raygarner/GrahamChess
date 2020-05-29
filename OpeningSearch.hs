@@ -122,6 +122,18 @@ addTrueEval'' (c,nc) l d ((p,m,f),xs) ps = if l==d then
 
 
 
+isThreat :: Piece -> Move -> AllPieces -> Bool
+isThreat p m ps = False
+
+isCapture :: Piece -> Move -> AllPieces -> Bool
+isCapture p m ps = False
+
+isCheck :: Piece -> Move -> AllPieces -> Bool
+isCheck p m ps = False
+
+isPin :: Piece -> Move -> AllPieces -> Bool
+isPin p m ps = False
+
 -- search to see if the best move for this case has already been found
 --getExistingBestMove :: Int -> [(Piece,Move,AllPieces, Colour, Int,Float)] -> AllPieces -> Colour -> [(Piece,Move,Float)]
 --getExistingBestMove d xs ps c = [(p,m,0.0) | (p,m,board,col,l,f) <- xs,  ps==board, c==col, l>=d ,m /=(0,0)]
