@@ -192,12 +192,28 @@ pieceVal (King,_,_,_)   = 0.0
 
 -- if a piece is going to be captured then it doesnt really have any material
 pieceMaterial :: Piece -> AllPieces -> Float
-pieceMaterial a ps   | (length t > length (protectedBy a ps)) = 0
-                     | getLowestVal t < v = 0
+pieceMaterial a ps   | (length t > length pr) && not (compareBackupVals t pr) = 0
+                     | pieceVal (head t) < v = 0
                      | otherwise = v
-                       where t = threatenedBy a ps
+                       where t = sortPieces (threatenedBy a ps)
                              v = pieceVal a
+                             pr= sortPieces (protectedBy a ps)
 
+-- returns true if protection is sufficient (xs is threats and ys is protection)
+compareBackupVals :: [Piece] -> [Piece] -> Bool
+compareBackupVals [] [] = True
+compareBackupVals xs [] = False
+compareBackupVals [] ys = True
+compareBackupVals (x:xs) (y:ys) = if (pieceVal y > pieceVal x) && (length (x:xs) > length (y:ys)) then False else compareBackupVals xs ys
+
+
+-- sort a list of pieces by value from lowest to highest
+sortPieces :: [Piece] -> [Piece]
+sortPieces []     = []
+sortPieces (p:xs) = (sortPieces lesser) ++ [p] ++ (sortPieces greater)
+    where
+        lesser  = filter (\y -> pieceVal y < pieceVal p) xs--filter (< p) xs
+        greater = filter (\y -> pieceVal y >= pieceVal p) xs--filter (>= p) xs
 
 -- returns the value of the lowest value piece in a list of pieces
 getLowestVal :: [Piece] -> Float

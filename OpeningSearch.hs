@@ -134,6 +134,12 @@ isCheck p m ps = False
 isPin :: Piece -> Move -> AllPieces -> Bool
 isPin p m ps = False
 
+-- returns all pieces which a piece is threatening which it would make sense to take
+--trulyThreatening :: Piece -> AllPieces -> [Piece]
+--trulyThreatening p ps = [x | x <- threatening p ps, pieceVal p < pieceVal x ||
+
+
+
 -- search to see if the best move for this case has already been found
 --getExistingBestMove :: Int -> [(Piece,Move,AllPieces, Colour, Int,Float)] -> AllPieces -> Colour -> [(Piece,Move,Float)]
 --getExistingBestMove d xs ps c = [(p,m,0.0) | (p,m,board,col,l,f) <- xs,  ps==board, c==col, l>=d ,m /=(0,0)]
