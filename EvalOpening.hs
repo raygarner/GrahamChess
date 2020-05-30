@@ -28,6 +28,9 @@ pieceMobMult (Bishop,_,_,_) = 1.0
 totalMaterial :: Colour -> AllPieces -> Float
 totalMaterial c ps = 10 * ((sum [pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - ( sum [ pieceVal y | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
 
+--totalMaterial :: Colour -> AllPieces -> Float
+--totalMaterial c ps = 1.5 * sum [pieceVal (y,White,(0,0),0) * (countPieceType c y ps - countPieceType (invertColour c) y ps) | y <- pieceTypes]
+
 --totalMaterialUnsafe :: Colour -> AllPieces -> Float
 --totalMaterialUnsafe c ps = 10 * ((sum [pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - ( sum [ pieceMaterial y ps | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
 
@@ -37,11 +40,11 @@ totalMaterial c ps = 10 * ((sum [pieceMaterial x ps | x <- ps, getPos x /= (-1,-
 --materialInDanger c ps = 10 * sum [ pieceVal x | x <- ps, (length (threatenedBy x ps) > length (protectedBy x ps)) || getLowestVal (threatenedBy x ps) < pieceVal x, getColour x == c ]
 
 
---countPieceType :: Colour -> PieceType -> AllPieces -> Float
---countPieceType c t ps = fromIntegral (length [ x | x <- ps, getColour x == c, getPieceType x == t, getPos x /= (-1,-1) ])
+countPieceType :: Colour -> PieceType -> AllPieces -> Float
+countPieceType c t ps = fromIntegral (length [ x | x <- ps, getColour x == c, getPieceType x == t, getPos x /= (-1,-1) ])
 
---pieceTypes :: [PieceType]
---pieceTypes = [Pawn, Knight, Bishop, Rook, Queen, King]
+pieceTypes :: [PieceType]
+pieceTypes = [Pawn, Knight, Bishop, Rook, Queen, King]
 
 totalMobility :: Colour -> AllPieces -> Float
 totalMobility c ps = 1 * ( sum [ evalPiece x ps | x <- ps, getColour x == c, getPos x /= (-1,-1) ]) -- - ( sum [ evalPiece y ps | y <- ps, getColour y /= c, getPos y /= (-1,-1) ])

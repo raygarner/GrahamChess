@@ -38,12 +38,14 @@ findRealBestOpeningMoveWrapper d c ps xs ys = findRealBestOpeningMove' d c ps xs
 
 findRealBestOpeningMove' :: Int -> Colour -> AllPieces -> [(Piece, Move, Float)] -> [(Piece,Move,AllPieces, Colour, Int)]-> ((Piece, Move, Float),[(Piece,Move,AllPieces,Colour,Int)])
 findRealBestOpeningMove' d c ps [] ys = (((King, c, (7,4),0),(0,0),0.0),[]) --this shouldnt be necessery but for some reason it is?
-findRealBestOpeningMove' d c ps xs ys | length xs == 1 = if explore then addTrueEval'' (c, invertColour c) 1 d (h,ys) mademove else didntexplore
+--findRealBestOpeningMove' d c ps xs ys | length xs == 1 = if explore then addTrueEval'' (c, invertColour c) 1 d (h,ys) mademove else didntexplore
+findRealBestOpeningMove' d c ps xs ys | length xs == 1 = addTrueEval'' (c, invertColour c) 1 d (h,ys) mademove
                                       | otherwise = (extractPMF (findStrongestMoveFromAllWithList biglist), last)
                                       where
                                           h = head xs
                                           mademove = makeSingleBestMove h ps
-                                          te = if explore then addTrueEval'' (c,invertColour c) 1 d (h,ys) mademove else didntexplore
+                                          --te = if explore then addTrueEval'' (c,invertColour c) 1 d (h,ys) mademove else didntexplore
+                                          te = addTrueEval'' (c,invertColour c) 1 d (h,ys) mademove
                                           list = extractList te
                                           biglist = (te : (findRealBestOpeningMove' d c ps (tail xs) list) : [])
                                           finalsingleton = drop ((length biglist)-1) biglist
@@ -101,7 +103,7 @@ findRealBestOpeningMove' d c ps xs ys | length xs == 1 = if explore then addTrue
 -- updates the evaluation for moves by looking moves into the futur2
 -- due to the way material evaluation works depth must be an even number
 addTrueEval'' :: (Colour,Colour) -> Int -> Int -> ((Piece,Move,Float),[(Piece,Move,AllPieces, Colour, Int)]) -> AllPieces -> ((Piece,Move,Float),[(Piece,Move,AllPieces, Colour, Int)])
-addTrueEval'' (c,nc) l d ((p,m,f),xs) ps = if l==d then
+addTrueEval'' (c,nc) l d ((p,m,f),xs) ps = if l>=d then
                                                if isCheckmate (invertColour c) ps then
                                                   ((p,m,checkmate-(fromIntegral l)),xs)
                                                else if isCheckmate c ps then
@@ -116,13 +118,13 @@ addTrueEval'' (c,nc) l d ((p,m,f),xs) ps = if l==d then
                                                   ((p,m,0-checkmate+(fromIntegral l)),xs)
                                                else
                                                     if null move then
-                                                        addTrueEval'' (c,(invertColour nc)) (l+1) d ((p,m,0),(np,nm,ps,nc,d-l):ys) (makeSingleBestMove (np,nm,nf) ps)
+                                                        addTrueEval'' (c,(invertColour nc)) (l+1) d ((p,m,0),(np,nm,ps,nc,d-(l*2)):ys) (makeSingleBestMove (np,nm,nf) ps)
                                                     else -- if there is an existing best move already of equal or greater accuracy that would otherwise be achieved with a search
                                                         addTrueEval'' (c,(invertColour nc)) (l+1) d ((p,m,0),xs) (makeSingleBestMove (head move) ps)
                                            where
-                                               move = getExistingBestMove (d-l) xs ps nc -- existing move
+                                               move = getExistingBestMove (d-(l*2)) xs ps nc -- existing move
                                                neweval = totalVal c ps
-                                               ((np,nm,nf),ys) = findRealBestOpeningMoveWrapper (d-l) nc ps [] xs-- newmove
+                                               ((np,nm,nf),ys) = findRealBestOpeningMoveWrapper (d-(l*2)) nc ps [] xs-- newmove
 
 
 shouldExploreMove :: Piece -> Move -> AllPieces -> Bool
@@ -130,8 +132,8 @@ shouldExploreMove p m ps = isThreat p m ps || isCapture p m ps
 
 -- returns whether a move means the piece is threatening to capture afterwards
 isThreat :: Piece -> Move -> AllPieces -> Bool
---isThreat p m ps = if (length (trulyThreatening p ps) < length (trulyThreatening newp newb)) then True else False
-isThreat p m ps = if totalMaterial c ps > totalMaterial c newb then True else False
+isThreat p m ps = if (length (trulyThreatening p ps) < length (trulyThreatening newp newb)) then True else False
+--isThreat p m ps = if totalMaterial c ps > totalMaterial c newb then True else False
                   where
                       newb = executeMove p m ps
                       newp = head (findPiece (getTarget (getPos p) m) newb)
