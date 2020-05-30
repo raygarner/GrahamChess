@@ -12,7 +12,7 @@ import Control.Parallel
 
 openingMoveWrapper :: Int -> Colour -> AllPieces -> (Piece, Move, Float)
 --openingMoveWrapper d c ps = findStrongestMoveFromAll (par j (k:j:[]))
-openingMoveWrapper d c ps = findStrongestMoveFromAll (par s4 (par s3 (par s2 (s1:s2:s3:s4:[]))))
+openingMoveWrapper d c ps = findStrongestMoveFromAll c (par s4 (par s3 (par s2 (s1:s2:s3:s4:[]))))
                             where
                                 a = makeEvalList c ps
                                 e = length a
@@ -40,7 +40,7 @@ findRealBestOpeningMove' :: Int -> Colour -> AllPieces -> [(Piece, Move, Float)]
 findRealBestOpeningMove' d c ps [] ys = (((King, c, (7,4),0),(0,0),0.0),[]) --this shouldnt be necessery but for some reason it is?
 --findRealBestOpeningMove' d c ps xs ys | length xs == 1 = if explore then addTrueEval'' (c, invertColour c) 1 d (h,ys) mademove else didntexplore
 findRealBestOpeningMove' d c ps xs ys | length xs == 1 = addTrueEval'' (c, invertColour c) 1 d (h,ys) mademove
-                                      | otherwise = (extractPMF (findStrongestMoveFromAllWithList biglist), last)
+                                      | otherwise = (extractPMF (findStrongestMoveFromAllWithList c biglist), last)
                                       where
                                           h = head xs
                                           mademove = makeSingleBestMove h ps
@@ -109,7 +109,7 @@ addTrueEval'' (c,nc) l d ((p,m,f),xs) ps = if l>=d then
                                                else if isCheckmate c ps then
                                                   ((p,m,0-checkmate+(fromIntegral l)),xs)
                                                else
-                                                  ((p,m,totalVal c ps),xs)
+                                                  ((p,m,v),xs)
 
                                            else
                                                if isCheckmate (invertColour c) ps then
@@ -125,7 +125,7 @@ addTrueEval'' (c,nc) l d ((p,m,f),xs) ps = if l>=d then
                                                move = getExistingBestMove (d-l) xs ps nc -- existing move
                                                neweval = totalVal c ps
                                                ((np,nm,nf),ys) = findRealBestOpeningMoveWrapper (d-l) nc ps [] xs-- newmove
-
+                                               v = if c==White then totalVal c ps else 0 - totalVal c ps
 
 shouldExploreMove :: Piece -> Move -> AllPieces -> Bool
 shouldExploreMove p m ps = isThreat p m ps || isCapture p m ps
@@ -285,13 +285,20 @@ extractList (_,xs) = xs
 
 
 -- returns the stronget move from a list of moves with evaluations
-findStrongestMoveFromAll :: [(Piece,Move,Float)] -> (Piece,Move,Float)
-findStrongestMoveFromAll xs | not (null xs) = head [ x | x <- xs, all (\y -> (getMoveEval y) <= (getMoveEval x)) xs ]
-                            | otherwise = ((King, White, (7,4), 0), (0,0), 0-checkmate)
+findStrongestMoveFromAll :: Colour -> [(Piece,Move,Float)] -> (Piece,Move,Float)
+findStrongestMoveFromAll c xs | not (null xs) = head list
+                              | otherwise = ((King, White, (7,4), 0), (0,0), 0-checkmate)
+                                where
+                                    list = if c==White then [ x | x <- xs, all (\y -> (getMoveEval y) <= (getMoveEval x)) xs ] else [ x | x <- xs, all (\y -> (getMoveEval y) >= (getMoveEval x)) xs ]
 
-findStrongestMoveFromAllWithList :: [((Piece,Move,Float),[(Piece,Move,AllPieces,Colour,Int)])] -> ((Piece,Move,Float),[(Piece,Move,AllPieces,Colour,Int)])
-findStrongestMoveFromAllWithList xs | not (null xs) = head [ x | x <- xs, all (\y -> (getMoveEval (extractPMF y)) <= (getMoveEval (extractPMF x))) xs ]
-                                    | otherwise = (((King, White, (7,4), 0), (0,0), 0-checkmate),[])
+
+
+findStrongestMoveFromAllWithList :: Colour -> [((Piece,Move,Float),[(Piece,Move,AllPieces,Colour,Int)])] -> ((Piece,Move,Float),[(Piece,Move,AllPieces,Colour,Int)])
+findStrongestMoveFromAllWithList c xs | not (null xs) = head list
+                                      | otherwise = (((King, White, (7,4), 0), (0,0), 0-checkmate),[])
+                                        where
+                                            list = if c==White then [ x | x <- xs, all (\y -> (getMoveEval (extractPMF y)) <= (getMoveEval (extractPMF x))) xs ] else [ x | x <- xs, all (\y -> (getMoveEval (extractPMF y)) >= (getMoveEval (extractPMF x))) xs ]
+
 
 --combineMoveBases :: [((Piece,Move,Float),[(Piece,Move,AllPieces,Colour,Int,Float)])] -> [(Piece,Move,AllPieces,Colour,Int,Float)]
 --combineMoveBases [] = []
