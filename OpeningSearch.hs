@@ -38,15 +38,18 @@ findRealBestOpeningMoveWrapper d c ps xs ys = findRealBestOpeningMove' d c ps xs
 
 findRealBestOpeningMove' :: Int -> Colour -> AllPieces -> [(Piece, Move, Float)] -> [(Piece,Move,AllPieces, Colour, Int)]-> ((Piece, Move, Float),[(Piece,Move,AllPieces,Colour,Int)])
 findRealBestOpeningMove' d c ps [] ys = (((King, c, (7,4),0),(0,0),0.0),[]) --this shouldnt be necessery but for some reason it is?
-findRealBestOpeningMove' d c ps xs ys | length xs == 1 = addTrueEval'' (c, invertColour c) 1 d (h,ys) (makeSingleBestMove h ps)
+findRealBestOpeningMove' d c ps xs ys | length xs == 1 = if explore then addTrueEval'' (c, invertColour c) 1 d (h,ys) mademove else didntexplore
                                       | otherwise = (extractPMF (findStrongestMoveFromAllWithList biglist), last)
                                       where
                                           h = head xs
-                                          te = addTrueEval'' (c,invertColour c) 1 d (h,ys) (makeSingleBestMove h ps)
+                                          mademove = makeSingleBestMove h ps
+                                          te = if explore then addTrueEval'' (c,invertColour c) 1 d (h,ys) mademove else didntexplore
                                           list = extractList te
                                           biglist = (te : (findRealBestOpeningMove' d c ps (tail xs) list) : [])
                                           finalsingleton = drop ((length biglist)-1) biglist
                                           last = if null finalsingleton then [] else extractList (head finalsingleton)
+                                          explore = shouldExploreMove (extractPiece h) (extractMove h) ps
+                                          didntexplore = ((extractPiece h, extractMove h, totalVal c mademove),ys)
 
 
 
@@ -122,6 +125,8 @@ addTrueEval'' (c,nc) l d ((p,m,f),xs) ps = if l==d then
                                                ((np,nm,nf),ys) = findRealBestOpeningMoveWrapper (d-l) nc ps [] xs-- newmove
 
 
+shouldExploreMove :: Piece -> Move -> AllPieces -> Bool
+shouldExploreMove p m ps = isThreat p m ps || isCapture p m ps
 
 -- returns whether a move means the piece is threatening to capture afterwards
 isThreat :: Piece -> Move -> AllPieces -> Bool
@@ -132,16 +137,20 @@ isThreat p m ps = if (length (trulyThreatening p ps) < length (trulyThreatening 
 
 -- returns whether a move is a capture
 isCapture :: Piece -> Move -> AllPieces -> Bool
-isCapture p m ps = if (totalMaterial enemyCol ps) > (totalMaterial enemyCol newb) then True else False
+--isCapture p m ps = if (totalMaterial enemyCol ps) > (totalMaterial enemyCol newb) then True else False
+isCapture p m ps = if not (isEmpty t ps) then True else False
                    where
-                       enemyCol = invertColour (getColour p)
-                       newb = executeMove p m ps
+                       --enemyCol = invertColour (getColour p)
+                       --newb = executeMove p m ps
+                       pos = getPos p
+                       t = getTarget pos m
 
+-- returns whether a move puts the enemy king in check
 isCheck :: Piece -> Move -> AllPieces -> Bool
 isCheck p m ps = False
 
-isPin :: Piece -> Move -> AllPieces -> Bool
-isPin p m ps = False
+--isPin :: Piece -> Move -> AllPieces -> Bool
+--isPin p m ps = False
 
 -- returns all pieces which a piece is threatening which it would make sense to take
 trulyThreatening :: Piece -> AllPieces -> [Piece]

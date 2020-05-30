@@ -15,9 +15,9 @@ evalPiece a ps = fromIntegral (length (legalMoves a ps)) * pieceMobMult a
 
 pieceMobMult :: Piece -> Float
 pieceMobMult (Pawn,_,_,_) = 1.5
-pieceMobMult (Knight,_,_,_) = 1.1
+pieceMobMult (Knight,_,_,_) = 1.3
 pieceMobMult (Queen,_,_,_) = 0.0
-pieceMobMult (Rook,_,_,_) = 1.0
+pieceMobMult (Rook,_,_,_) = 0.5
 pieceMobMult (King,_,_,_) = 0.0
 pieceMobMult (Bishop,_,_,_) = 1.0
 
@@ -198,6 +198,11 @@ pieceMaterial a ps   | (length t > length pr) && not (compareBackupVals t pr) = 
                        where t = sortPieces (threatenedBy a ps)
                              v = pieceVal a
                              pr= sortPieces (protectedBy a ps)
+
+--trulyThreatenedBy
+
+
+--trulyProtectedBy
 
 -- returns true if protection is sufficient (xs is threats and ys is protection)
 compareBackupVals :: [Piece] -> [Piece] -> Bool
