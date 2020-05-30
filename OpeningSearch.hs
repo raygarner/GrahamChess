@@ -118,13 +118,13 @@ addTrueEval'' (c,nc) l d ((p,m,f),xs) ps = if l>=d then
                                                   ((p,m,0-checkmate+(fromIntegral l)),xs)
                                                else
                                                     if null move then
-                                                        addTrueEval'' (c,(invertColour nc)) (l+1) d ((p,m,0),(np,nm,ps,nc,d-(l*2)):ys) (makeSingleBestMove (np,nm,nf) ps)
+                                                        addTrueEval'' (c,(invertColour nc)) (l+1) d ((p,m,0),(np,nm,ps,nc,d-l):ys) (makeSingleBestMove (np,nm,nf) ps)
                                                     else -- if there is an existing best move already of equal or greater accuracy that would otherwise be achieved with a search
                                                         addTrueEval'' (c,(invertColour nc)) (l+1) d ((p,m,0),xs) (makeSingleBestMove (head move) ps)
                                            where
-                                               move = getExistingBestMove (d-(l*2)) xs ps nc -- existing move
+                                               move = getExistingBestMove (d-l) xs ps nc -- existing move
                                                neweval = totalVal c ps
-                                               ((np,nm,nf),ys) = findRealBestOpeningMoveWrapper (d-(l*2)) nc ps [] xs-- newmove
+                                               ((np,nm,nf),ys) = findRealBestOpeningMoveWrapper (d-l) nc ps [] xs-- newmove
 
 
 shouldExploreMove :: Piece -> Move -> AllPieces -> Bool
