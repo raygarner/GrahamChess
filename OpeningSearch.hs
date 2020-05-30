@@ -50,8 +50,8 @@ findRealBestOpeningMove' d c ps xs ys | length xs == 1 = addTrueEval'' (c, inver
                                           biglist = (te : (findRealBestOpeningMove' d c ps (tail xs) list) : [])
                                           finalsingleton = drop ((length biglist)-1) biglist
                                           last = if null finalsingleton then [] else extractList (head finalsingleton)
-                                          explore = shouldExploreMove (extractPiece h) (extractMove h) ps
-                                          didntexplore = ((extractPiece h, extractMove h, totalVal c mademove),ys)
+                                          --explore = shouldExploreMove (extractPiece h) (extractMove h) ps
+                                          --didntexplore = ((extractPiece h, extractMove h, totalVal c mademove),ys)
 
 
 

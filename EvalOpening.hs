@@ -29,7 +29,7 @@ totalMaterial :: Colour -> AllPieces -> Float
 totalMaterial c ps = 10 * ((sum [pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - ( sum [ pieceVal y | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
 
 --totalMaterial :: Colour -> AllPieces -> Float
---totalMaterial c ps = 1.5 * sum [pieceVal (y,White,(0,0),0) * (countPieceType c y ps - countPieceType (invertColour c) y ps) | y <- pieceTypes]
+--totalMaterial c ps = 5 * sum [pieceVal (y,White,(0,0),0) * (countPieceType c y ps - countPieceType (invertColour c) y ps) | y <- pieceTypes]
 
 --totalMaterialUnsafe :: Colour -> AllPieces -> Float
 --totalMaterialUnsafe c ps = 10 * ((sum [pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - ( sum [ pieceMaterial y ps | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
@@ -195,7 +195,8 @@ pieceVal (King,_,_,_)   = 0.0
 
 -- if a piece is going to be captured then it doesnt really have any material
 pieceMaterial :: Piece -> AllPieces -> Float
-pieceMaterial a ps   | (length t2 > length pr) && not (compareBackupVals t2 pr) = 0
+--pieceMaterial a ps   | (length t2 > length pr) && not (compareBackupVals t2 pr) = 0
+pieceMaterial a ps   | not (compareBackupVals t2 pr) = 0
                      | getLowestVal t < v = 0
                      | otherwise = v
                        where t = threatenedBy a ps
