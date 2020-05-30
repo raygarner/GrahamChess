@@ -14,8 +14,8 @@ evalPiece (King,_,_,_) ps = 0.0
 evalPiece a ps = fromIntegral (length (legalMoves a ps)) * pieceMobMult a
 
 pieceMobMult :: Piece -> Float
-pieceMobMult (Pawn,_,_,_) = 1.5
-pieceMobMult (Knight,_,_,_) = 1.3
+pieceMobMult (Pawn,_,_,_) = 0.0
+pieceMobMult (Knight,_,_,_) = 1.0
 pieceMobMult (Queen,_,_,_) = 0.0
 pieceMobMult (Rook,_,_,_) = 0.5
 pieceMobMult (King,_,_,_) = 0.0
@@ -192,17 +192,33 @@ pieceVal (King,_,_,_)   = 0.0
 
 -- if a piece is going to be captured then it doesnt really have any material
 pieceMaterial :: Piece -> AllPieces -> Float
-pieceMaterial a ps   | (length t > length pr) && not (compareBackupVals t pr) = 0
+pieceMaterial a ps   | (length t2 > length pr) && not (compareBackupVals t2 pr) = 0
                      | getLowestVal t < v = 0
                      | otherwise = v
-                       where t = sortPieces (threatenedBy a ps)
+                       where t = threatenedBy a ps
+                             t2 = trulyThreatenedBy 4 a ps
                              v = pieceVal a
-                             pr= sortPieces (protectedBy a ps)
+                             pr= trulyProtectedBy 4 a ps
+
 
 --trulyThreatenedBy
+trulyThreatenedBy :: Int -> Piece -> AllPieces -> [Piece]
+trulyThreatenedBy 0 p ps = []
+trulyThreatenedBy i p ps = if null xs then [] else xs ++ trulyThreatenedBy (i-1) p newps
+                         where
+                             xs = sortPieces (threatenedBy p ps)
+                             newps = [n | n <- ps, all (/=n) xs]
 
 
 --trulyProtectedBy
+trulyProtectedBy :: Int -> Piece -> AllPieces -> [Piece]
+trulyProtectedBy i (p,c,pos,mc) ps = trulyThreatenedBy i newp (newp:removePiece (p,c,pos,mc) ps)
+                                     where
+                                         newp = (p,invertColour c, pos,mc)
+
+--mergePieceList :: [[Piece]] -> [Piece]
+--mergePieceList [] = []
+--mergePieceList (x:xs) = x ++ mergePieceList xs
 
 -- returns true if protection is sufficient (xs is threats and ys is protection)
 compareBackupVals :: [Piece] -> [Piece] -> Bool

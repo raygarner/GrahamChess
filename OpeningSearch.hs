@@ -130,10 +130,12 @@ shouldExploreMove p m ps = isThreat p m ps || isCapture p m ps
 
 -- returns whether a move means the piece is threatening to capture afterwards
 isThreat :: Piece -> Move -> AllPieces -> Bool
-isThreat p m ps = if (length (trulyThreatening p ps) < length (trulyThreatening newp newb)) then True else False
+--isThreat p m ps = if (length (trulyThreatening p ps) < length (trulyThreatening newp newb)) then True else False
+isThreat p m ps = if totalMaterial c ps > totalMaterial c newb then True else False
                   where
                       newb = executeMove p m ps
                       newp = head (findPiece (getTarget (getPos p) m) newb)
+                      c = invertColour (getColour p)
 
 -- returns whether a move is a capture
 isCapture :: Piece -> Move -> AllPieces -> Bool
@@ -200,8 +202,8 @@ extractList (_,xs) = xs
 -----
 
 {-
-newsearchtestfunc :: AllPieces
-newsearchtestfunc = findBestFirstBoard White $! (propagateEval 3 White $! (addLeafEval Black $! (buildTree 1 Black $! (buildBranches 0 addAllPieces White))))
+--newsearchtestfunc :: AllPieces
+--newsearchtestfunc = findBestFirstBoard White $! (propagateEval 3 White $! (addLeafEval Black $! (buildTree 1 Black $! (buildBranches 0 addAllPieces White))))
 
 
 --findBestFirstBoard :: Colour -> Tree -> AllPieces
