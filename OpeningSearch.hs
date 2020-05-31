@@ -39,13 +39,21 @@ openingMoveWrapper d c ps = findStrongestMoveFromAll c (par s4 (par s3 (par s2 (
 --findRealBestOpeningMove d c ps xs = findStrongestMoveFromAll [addTrueEval (c,invertColour c) 1 d x (makeSingleBestMove x ps) | x <- xs]
 
 -- FINDMOSTEPICMOVE
+--findMostEpicMove :: Int -> Colour -> AllPieces -> [(Piece,Move,Float)] -> (Piece,Move,Float)
+--findMostEpicMove 0 c ps xs = findStrongestMoveFromAll c [(p,m,totalOpeningVal (executeMove p m ps)) | (p,m,f) <- moves]
+--                             where
+--                                 moves = if null xs then makeEvalList c ps else xs
+--findMostEpicMove d c ps xs = findStrongestMoveFromAll c [(p,m, getMoveEval (findMostEpicMove (d-1) (invertColour c) (makeSingleBestMove (p,m,f) ps) [])) | (p,m,f) <- moves]
+--                             where
+--                                 moves = if null xs then makeEvalList c ps else xs
+
 findMostEpicMove :: Int -> Colour -> AllPieces -> [(Piece,Move,Float)] -> (Piece,Move,Float)
-findMostEpicMove 0 c ps xs = findStrongestMoveFromAll c [(p,m,totalOpeningVal (executeMove p m ps)) | (p,m,f) <- moves]
-                             where
-                                 moves = if null xs then makeEvalList c ps else xs
+--findMostEpicMove 0 c ps xs = findStrongestMoveFromAll c [(p,m,totalOpeningVal (executeMove p m ps)) | (p,m,f) <- makeEvalList c ps]
+findMostEpicMove 0 c ps xs = ((King,White,(0,0),0),(0,0),totalOpeningVal ps)
 findMostEpicMove d c ps xs = findStrongestMoveFromAll c [(p,m, getMoveEval (findMostEpicMove (d-1) (invertColour c) (makeSingleBestMove (p,m,f) ps) [])) | (p,m,f) <- moves]
                              where
                                  moves = if null xs then makeEvalList c ps else xs
+
 
 
 --findRealBestOpeningMoveWrapper :: Int -> Colour -> AllPieces -> [(Piece,Move,Float)] -> [(Piece,Move,AllPieces, Colour, Int,Float)] -> ((Piece, Move, Float),[(Piece,Move,AllPieces,Colour,Int,Float)])
