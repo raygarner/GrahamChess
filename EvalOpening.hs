@@ -29,7 +29,7 @@ pieceMobMult (Bishop,_,_,_) = 1.0
 --totalMaterial c ps = 10 * ((sum [pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - ( sum [ pieceVal y | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
 
 totalMaterial :: AllPieces -> Float
-totalMaterial ps = 10 * sum [pieceVal (y,White,(0,0),0) * (countPieceType White y ps - countPieceType Black y ps) | y <- pieceTypes]
+totalMaterial ps = 50 * sum [pieceVal (y,White,(0,0),0) * (countPieceType White y ps - countPieceType Black y ps) | y <- pieceTypes]
 
 --totalMaterialUnsafe :: Colour -> AllPieces -> Float
 --totalMaterialUnsafe c ps = 10 * ((sum [pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - ( sum [ pieceMaterial y ps | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
