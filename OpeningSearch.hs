@@ -22,35 +22,51 @@ openingMoveWrapper d c ps = findStrongestMoveFromAll c (par s4 (par s3 (par s2 (
                                 l2 = drop (e `div` 4) l
                                 r1 = take ((e `div` 4)+1) r
                                 r2 = drop (e `div` 4) r
-                                s1 = extractPMF (findRealBestOpeningMoveWrapper d c ps l1 [])
-                                s2 = extractPMF (findRealBestOpeningMoveWrapper d c ps l2 [])
-                                s3 = extractPMF (findRealBestOpeningMoveWrapper d c ps r1 [])
-                                s4 = extractPMF (findRealBestOpeningMoveWrapper d c ps r2 [])
+                                --s1 = extractPMF (findRealBestOpeningMoveWrapper d c ps l1 [])
+                                --s2 = extractPMF (findRealBestOpeningMoveWrapper d c ps l2 [])
+                                --s3 = extractPMF (findRealBestOpeningMoveWrapper d c ps r1 [])
+                                --s4 = extractPMF (findRealBestOpeningMoveWrapper d c ps r2 [])
+                                s1 = findMostEpicMove d c ps l1
+                                s2 = findMostEpicMove d c ps l2
+                                s3 = findMostEpicMove d c ps r1
+                                s4 = findMostEpicMove d c ps r2
+
+
 
 -- returns the best move for one side (not sure how this handles checkmate????)
 --findRealBestOpeningMove :: Int -> Colour -> AllPieces -> [(Piece, Move, Float)] -> (Piece, Move, Float)
 --findRealBestOpeningMove d c ps [] = findStrongestMoveFromAll [addTrueEval (c,invertColour c) 1 d x (makeSingleBestMove x ps) | x <- makeEvalList c ps]
 --findRealBestOpeningMove d c ps xs = findStrongestMoveFromAll [addTrueEval (c,invertColour c) 1 d x (makeSingleBestMove x ps) | x <- xs]
 
-findRealBestOpeningMoveWrapper :: Int -> Colour -> AllPieces -> [(Piece,Move,Float)] -> [(Piece,Move,AllPieces, Colour, Int)] -> ((Piece, Move, Float),[(Piece,Move,AllPieces,Colour,Int)])
-findRealBestOpeningMoveWrapper d c ps [] ys = findRealBestOpeningMove' d c ps (makeEvalList c ps) ys
-findRealBestOpeningMoveWrapper d c ps xs ys = findRealBestOpeningMove' d c ps xs ys
+-- FINDMOSTEPICMOVE
+findMostEpicMove :: Int -> Colour -> AllPieces -> [(Piece,Move,Float)] -> (Piece,Move,Float)
+findMostEpicMove 0 c ps xs = findStrongestMoveFromAll c [(p,m,totalOpeningVal (executeMove p m ps)) | (p,m,f) <- moves]
+                             where
+                                 moves = if null xs then makeEvalList c ps else xs
+findMostEpicMove d c ps xs = findStrongestMoveFromAll c [(p,m, getMoveEval (findMostEpicMove (d-1) (invertColour c) (makeSingleBestMove (p,m,f) ps) [])) | (p,m,f) <- moves]
+                             where
+                                 moves = if null xs then makeEvalList c ps else xs
 
-findRealBestOpeningMove' :: Int -> Colour -> AllPieces -> [(Piece, Move, Float)] -> [(Piece,Move,AllPieces, Colour, Int)]-> ((Piece, Move, Float),[(Piece,Move,AllPieces,Colour,Int)])
-findRealBestOpeningMove' d c ps [] ys = (((King, c, (7,4),0),(0,0),0.0),[]) --this shouldnt be necessery but for some reason it is?
+
+--findRealBestOpeningMoveWrapper :: Int -> Colour -> AllPieces -> [(Piece,Move,Float)] -> [(Piece,Move,AllPieces, Colour, Int,Float)] -> ((Piece, Move, Float),[(Piece,Move,AllPieces,Colour,Int,Float)])
+--findRealBestOpeningMoveWrapper d c ps [] ys = findRealBestOpeningMove' d c ps (makeEvalList c ps) ys
+--findRealBestOpeningMoveWrapper d c ps xs ys = findRealBestOpeningMove' d c ps xs ys
+
+--findRealBestOpeningMove' :: Int -> Colour -> AllPieces -> [(Piece, Move, Float)] -> [(Piece,Move,AllPieces, Colour, Int,Float)]-> ((Piece, Move, Float),[(Piece,Move,AllPieces,Colour,Int,Float)])
+--findRealBestOpeningMove' d c ps [] ys = (((King, c, (7,4),0),(0,0),0.0),[]) --this shouldnt be necessery but for some reason it is?
 --findRealBestOpeningMove' d c ps xs ys | length xs == 1 = if explore then addTrueEval'' (c, invertColour c) 1 d (h,ys) mademove else didntexplore
-findRealBestOpeningMove' d c ps xs ys | length xs == 1 = addTrueEval'' (c, invertColour c) 1 d (h,ys) mademove
-                                      | otherwise = (extractPMF (findStrongestMoveFromAllWithList c biglist), last)
-                                      where
-                                          h = head xs
-                                          mademove = makeSingleBestMove h ps
-                                          --te = if explore then addTrueEval'' (c,invertColour c) 1 d (h,ys) mademove else didntexplore
-                                          te = addTrueEval'' (c,invertColour c) 1 d (h,ys) mademove
-                                          list = extractList te
-                                          biglist = (te : (findRealBestOpeningMove' d c ps (tail xs) list) : [])
-                                          finalsingleton = drop ((length biglist)-1) biglist
-                                          last = if null finalsingleton then [] else extractList (head finalsingleton)
-                                          --explore = shouldExploreMove (extractPiece h) (extractMove h) ps
+--findRealBestOpeningMove' d c ps xs ys | length xs == 1 = addTrueEval'' (c, invertColour c) 1 d (h,ys) mademove
+--                                      | otherwise = (extractPMF (findStrongestMoveFromAllWithList c biglist), last)
+--                                      where
+--                                          h = head xs
+--                                          mademove = makeSingleBestMove h ps
+--                                          --te = if explore then addTrueEval'' (c,invertColour c) 1 d (h,ys) mademove else didntexplore
+--                                          te = addTrueEval'' (c,invertColour c) 1 d (h,ys) mademove
+--                                          list = extractList te
+--                                          biglist = (te : (findRealBestOpeningMove' d c ps (tail xs) list) : [])
+--                                          finalsingleton = drop ((length biglist)-1) biglist
+--                                          last = if null finalsingleton then [] else extractList (head finalsingleton)
+--                                          --explore = shouldExploreMove (extractPiece h) (extractMove h) ps
                                           --didntexplore = ((extractPiece h, extractMove h, totalVal c mademove),ys)
 
 
@@ -102,63 +118,63 @@ findRealBestOpeningMove' d c ps xs ys | length xs == 1 = addTrueEval'' (c, inver
 -- ((p,m,f),[(Piece,Move,AllPieces, Colour, l)])
 -- updates the evaluation for moves by looking moves into the futur2
 -- due to the way material evaluation works depth must be an even number
-addTrueEval'' :: (Colour,Colour) -> Int -> Int -> ((Piece,Move,Float),[(Piece,Move,AllPieces, Colour, Int)]) -> AllPieces -> ((Piece,Move,Float),[(Piece,Move,AllPieces, Colour, Int)])
-addTrueEval'' (c,nc) l d ((p,m,f),xs) ps = if l>=d then
-                                               if isCheckmate (invertColour c) ps then
-                                                  ((p,m,checkmate-(fromIntegral l)),xs)
-                                               else if isCheckmate c ps then
-                                                  ((p,m,0-checkmate+(fromIntegral l)),xs)
-                                               else
-                                                  ((p,m,v),xs)
+--addTrueEval'' :: (Colour,Colour) -> Int -> Int -> ((Piece,Move,Float),[(Piece,Move,AllPieces, Colour, Int,Float)]) -> AllPieces -> ((Piece,Move,Float),[(Piece,Move,AllPieces, Colour, Int,Float)])
+--addTrueEval'' (c,nc) l d ((p,m,f),xs) ps = if l>=d then
+--                                               if isCheckmate (invertColour c) ps then
+--                                                  ((p,m,checkmate-(fromIntegral l)),xs)
+--                                               else if isCheckmate c ps then
+--                                                  ((p,m,0-checkmate+(fromIntegral l)),xs)
+--                                               else
+--                                                  ((p,m,v),xs)
+--
+--                                           else
+--                                               if isCheckmate (invertColour c) ps then
+--                                                  ((p,m,checkmate-(fromIntegral l)),xs)
+--                                               else if isCheckmate c ps then
+--                                                  ((p,m,0-checkmate+(fromIntegral l)),xs)
+--                                              else
+--                                                    if null move then
+--                                                        addTrueEval'' (c,(invertColour nc)) (l+1) d ((p,m,0),(np,nm,ps,nc,d-l,0.0):ys) (makeSingleBestMove (np,nm,nf) ps)
+--                                                    else -- if there is an existing best move already of equal or greater accuracy that would otherwise be achieved with a search
+--                                                       addTrueEval'' (c,(invertColour nc)) (l+1) d ((p,m,0),xs) (makeSingleBestMove (head move) ps)
+--                                           where
+--                                               move = getExistingBestMove (d-l) xs ps nc -- existing move
+--                                               neweval = totalVal c ps
+--                                               ((np,nm,nf),ys) = findRealBestOpeningMoveWrapper (d-l) nc ps [] xs-- newmove
+--                                               v = if c==White then totalVal c ps else 0 - totalVal c ps
 
-                                           else
-                                               if isCheckmate (invertColour c) ps then
-                                                  ((p,m,checkmate-(fromIntegral l)),xs)
-                                               else if isCheckmate c ps then
-                                                  ((p,m,0-checkmate+(fromIntegral l)),xs)
-                                               else
-                                                    if null move then
-                                                        addTrueEval'' (c,(invertColour nc)) (l+1) d ((p,m,0),(np,nm,ps,nc,d-l):ys) (makeSingleBestMove (np,nm,nf) ps)
-                                                    else -- if there is an existing best move already of equal or greater accuracy that would otherwise be achieved with a search
-                                                        addTrueEval'' (c,(invertColour nc)) (l+1) d ((p,m,0),xs) (makeSingleBestMove (head move) ps)
-                                           where
-                                               move = getExistingBestMove (d-l) xs ps nc -- existing move
-                                               neweval = totalVal c ps
-                                               ((np,nm,nf),ys) = findRealBestOpeningMoveWrapper (d-l) nc ps [] xs-- newmove
-                                               v = if c==White then totalVal c ps else 0 - totalVal c ps
-
-shouldExploreMove :: Piece -> Move -> AllPieces -> Bool
-shouldExploreMove p m ps = isThreat p m ps || isCapture p m ps
+--shouldExploreMove :: Piece -> Move -> AllPieces -> Bool
+--shouldExploreMove p m ps = isThreat p m ps || isCapture p m ps
 
 -- returns whether a move means the piece is threatening to capture afterwards
-isThreat :: Piece -> Move -> AllPieces -> Bool
-isThreat p m ps = if (length (trulyThreatening p ps) < length (trulyThreatening newp newb)) then True else False
+--isThreat :: Piece -> Move -> AllPieces -> Bool
+--isThreat p m ps = if (length (trulyThreatening p ps) < length (trulyThreatening newp newb)) then True else False
 --isThreat p m ps = if totalMaterial c ps > totalMaterial c newb then True else False
-                  where
-                      newb = executeMove p m ps
-                      newp = head (findPiece (getTarget (getPos p) m) newb)
-                      c = invertColour (getColour p)
+--                  where
+--                      newb = executeMove p m ps
+--                      newp = head (findPiece (getTarget (getPos p) m) newb)
+--                      c = invertColour (getColour p)
 
 -- returns whether a move is a capture
-isCapture :: Piece -> Move -> AllPieces -> Bool
+--isCapture :: Piece -> Move -> AllPieces -> Bool
 --isCapture p m ps = if (totalMaterial enemyCol ps) > (totalMaterial enemyCol newb) then True else False
-isCapture p m ps = if not (isEmpty t ps) then True else False
-                   where
+--isCapture p m ps = if not (isEmpty t ps) then True else False
+--                   where
                        --enemyCol = invertColour (getColour p)
                        --newb = executeMove p m ps
-                       pos = getPos p
-                       t = getTarget pos m
+--                       pos = getPos p
+--                       t = getTarget pos m
 
 -- returns whether a move puts the enemy king in check
-isCheck :: Piece -> Move -> AllPieces -> Bool
-isCheck p m ps = False
+--isCheck :: Piece -> Move -> AllPieces -> Bool
+--isCheck p m ps = False
 
 --isPin :: Piece -> Move -> AllPieces -> Bool
 --isPin p m ps = False
 
 -- returns all pieces which a piece is threatening which it would make sense to take
-trulyThreatening :: Piece -> AllPieces -> [Piece]
-trulyThreatening p ps = [x | x <- threatening p ps, pieceMaterial x ps == 0]
+--trulyThreatening :: Piece -> AllPieces -> [Piece]
+--trulyThreatening p ps = [x | x <- threatening p ps, pieceMaterial x ps == 0]
 
 
 
@@ -167,12 +183,12 @@ trulyThreatening p ps = [x | x <- threatening p ps, pieceMaterial x ps == 0]
 --getExistingBestMove d xs ps c = [(p,m,0.0) | (p,m,board,col,l,f) <- xs,  ps==board, c==col, l>=d ,m /=(0,0)]
 
 
-getExistingBestMove :: Int -> [(Piece,Move,AllPieces, Colour, Int)] -> AllPieces -> Colour -> [(Piece,Move,Float)]
-getExistingBestMove d [] ps c = []
-getExistingBestMove d ((p,m,board,col,l):xs) ps c = if ps==board && c==col && l>=d then
-                                                          [(p,m,0.0)]
-                                                      else
-                                                          getExistingBestMove d xs ps c
+--getExistingBestMove :: Int -> [(Piece,Move,AllPieces, Colour, Int,Float)] -> AllPieces -> Colour -> [(Piece,Move,Float)]
+--getExistingBestMove d [] ps c = []
+--getExistingBestMove d ((p,m,board,col,l,f):xs) ps c = if ps==board && c==col && l>=d then
+--                                                          [(p,m,0.0)]
+--                                                      else
+--                                                          getExistingBestMove d xs ps c
 
 --getExistingEval :: AllPieces -> Colour -> [(Piece,Move,AllPieces,Colour,Int,Float)] -> [Float]
 --getExistingEval ps c xs = [f | (p,m,board,col,l,f) <- xs, ps==board, c==col]
@@ -185,11 +201,11 @@ getExistingBestMove d ((p,m,board,col,l):xs) ps c = if ps==board && c==col && l>
 --                                                    getExistingEval ps c xs
 
 
-extractPMF :: ((Piece,Move,Float),[(Piece,Move,AllPieces, Colour, Int)]) -> (Piece,Move,Float)
-extractPMF ((p,m,f),_) = (p,m,f)
+--extractPMF :: ((Piece,Move,Float),[(Piece,Move,AllPieces, Colour, Int,Float)]) -> (Piece,Move,Float)
+--extractPMF ((p,m,f),_) = (p,m,f)
 
-extractList :: ((Piece,Move,Float),[(Piece,Move,AllPieces, Colour, Int)]) -> [(Piece,Move,AllPieces,Colour,Int)]
-extractList (_,xs) = xs
+--extractList :: ((Piece,Move,Float),[(Piece,Move,AllPieces, Colour, Int,Float)]) -> [(Piece,Move,AllPieces,Colour,Int,Float)]
+--extractList (_,xs) = xs
 
 -- returns the best move which can be made without looking ahead WORKING
 --findSingleBestMove :: Colour -> AllPieces -> (Piece, Move, Float)
@@ -293,11 +309,11 @@ findStrongestMoveFromAll c xs | not (null xs) = head list
 
 
 
-findStrongestMoveFromAllWithList :: Colour -> [((Piece,Move,Float),[(Piece,Move,AllPieces,Colour,Int)])] -> ((Piece,Move,Float),[(Piece,Move,AllPieces,Colour,Int)])
-findStrongestMoveFromAllWithList c xs | not (null xs) = head list
-                                      | otherwise = (((King, White, (7,4), 0), (0,0), 0-checkmate),[])
-                                        where
-                                            list = if c==White then [ x | x <- xs, all (\y -> (getMoveEval (extractPMF y)) <= (getMoveEval (extractPMF x))) xs ] else [ x | x <- xs, all (\y -> (getMoveEval (extractPMF y)) >= (getMoveEval (extractPMF x))) xs ]
+--findStrongestMoveFromAllWithList :: Colour -> [((Piece,Move,Float),[(Piece,Move,AllPieces,Colour,Int,Float)])] -> ((Piece,Move,Float),[(Piece,Move,AllPieces,Colour,Int,Float)])
+--findStrongestMoveFromAllWithList c xs | not (null xs) = head list
+--                                      | otherwise = (((King, White, (7,4), 0), (0,0), 0-checkmate),[])
+--                                        where
+--                                            list = if c==White then [ x | x <- xs, all (\y -> (getMoveEval (extractPMF y)) <= (getMoveEval (extractPMF x))) xs ] else [ x | x <- xs, all (\y -> (getMoveEval (extractPMF y)) >= (getMoveEval (extractPMF x))) xs ]
 
 
 --combineMoveBases :: [((Piece,Move,Float),[(Piece,Move,AllPieces,Colour,Int,Float)])] -> [(Piece,Move,AllPieces,Colour,Int,Float)]
@@ -334,9 +350,9 @@ makeSingleBestMove :: (Piece, Move, Float) -> AllPieces -> AllPieces
 makeSingleBestMove (a,b,_) ps = executeMove a b ps
 
 -- makes a move and then evaluates the new AllPieces
-evalMove :: Piece -> Move -> AllPieces -> Float
-evalMove a m ps | isCheckmate (invertColour (getColour a)) (executeMove a m ps) = checkmate -- if this is a mating move
-                | otherwise = 0 --totalVal (getColour a) (executeMove a m ps)
+--evalMove :: Piece -> Move -> AllPieces -> Float
+--evalMove a m ps | isCheckmate (invertColour (getColour a)) (executeMove a m ps) = checkmate -- if this is a mating move
+--                | otherwise = 0 --totalVal (getColour a) (executeMove a m ps)
 
 isCheckmate :: Colour -> AllPieces -> Bool
 isCheckmate c ps = null (allLegalMoves c ps) && isKingInCheck king ps

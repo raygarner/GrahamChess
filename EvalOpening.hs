@@ -25,11 +25,11 @@ pieceMobMult (Bishop,_,_,_) = 1.0
 --evalPieceBonus :: Piece -> AllPieces -> Float
 --evalPieceBonus a ps = (threatenKing a ps) + (threatenEvaluation a ps) + (evaluationCentralSquares a ps)
 
-totalMaterial :: Colour -> AllPieces -> Float
-totalMaterial c ps = 10 * ((sum [pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - ( sum [ pieceVal y | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
-
 --totalMaterial :: Colour -> AllPieces -> Float
---totalMaterial c ps = 5 * sum [pieceVal (y,White,(0,0),0) * (countPieceType c y ps - countPieceType (invertColour c) y ps) | y <- pieceTypes]
+--totalMaterial c ps = 10 * ((sum [pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - ( sum [ pieceVal y | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
+
+totalMaterial :: AllPieces -> Float
+totalMaterial ps = 10 * sum [pieceVal (y,White,(0,0),0) * (countPieceType White y ps - countPieceType Black y ps) | y <- pieceTypes]
 
 --totalMaterialUnsafe :: Colour -> AllPieces -> Float
 --totalMaterialUnsafe c ps = 10 * ((sum [pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - ( sum [ pieceMaterial y ps | y <- ps, getPos y /= (-1,-1), getColour y /= c ]) )
@@ -61,8 +61,11 @@ totalMobility c ps = 1 * ( sum [ evalPiece x ps | x <- ps, getColour x == c, get
 --blockedPawns c ps = length [x | x <- ps, getPieceType x == Pawn, getColour x == c, null (legalMoves x ps)] * (-5)
 
 
-totalOpeningVal :: Colour -> AllPieces -> Float
-totalOpeningVal a ps = (totalMobility a ps - totalMobility (invertColour a) ps) + totalMaterial a ps + kingSafety a ps -- + (fromIntegral (blockedPawns a ps - blockedPawns (invertColour a) ps))
+--totalOpeningVal :: Colour -> AllPieces -> Float
+--totalOpeningVal a ps = (totalMobility a ps - totalMobility (invertColour a) ps) + totalMaterial a ps + kingSafety a ps -- + (fromIntegral (blockedPawns a ps - blockedPawns (invertColour a) ps))
+
+totalOpeningVal :: AllPieces -> Float
+totalOpeningVal ps = (totalMobility White ps - totalMobility Black ps) + totalMaterial ps + (kingSafety White ps - kingSafety Black ps)-- + (fromIntegral (blockedPawns a ps - blockedPawns (invertColour a) ps))
 
 
 --totalOpeningValUnsafe :: Colour -> AllPieces -> Float
