@@ -11,6 +11,7 @@ import           Control.Parallel
 evalPiece :: Piece -> AllPieces -> Float
 evalPiece (Queen,_,_,_) ps = 0.0
 evalPiece (King,_,_,_) ps = 0.0
+evalPiece (Pawn,_,_,_) ps = 0.0
 evalPiece a ps = fromIntegral (length (legalMoves a ps)) * pieceMobMult a
 
 pieceMobMult :: Piece -> Float
@@ -47,7 +48,11 @@ pieceTypes :: [PieceType]
 pieceTypes = [Pawn, Knight, Bishop, Rook, Queen, King]
 
 totalMobility :: Colour -> AllPieces -> Float
-totalMobility c ps = 1 * ( sum [ evalPiece x ps | x <- ps, getColour x == c, getPos x /= (-1,-1) ]) -- - ( sum [ evalPiece y ps | y <- ps, getColour y /= c, getPos y /= (-1,-1) ])
+totalMobility c ps = if moves==0 then mate else moves
+                     where
+                         moves = sum [ evalPiece x ps | x <- ps, getColour x == c, getPos x /= (-1,-1) ]
+                         mate = -1000000
+
 
 
 
