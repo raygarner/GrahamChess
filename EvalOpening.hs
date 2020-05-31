@@ -78,11 +78,11 @@ totalOpeningVal ps = (totalMobility White ps - totalMobility Black ps) + totalMa
 
 
 castleMotive :: Colour -> AllPieces -> Float
-castleMotive c ps | any (==getColumn (findKing c ps)) [3..5] = (-5)
+castleMotive c ps | any (==getColumn (findKing c ps)) [3..5] = (-40)
                   | otherwise = 0
 
 staticKingMotive :: Colour -> AllPieces -> Float
-staticKingMotive c ps | getRow (findKing c ps) /= r = (-5.0)
+staticKingMotive c ps | getRow (findKing c ps) /= r = (-40.0)
                       | otherwise = 0
                         where r = if c == White then 7 else 0
 
