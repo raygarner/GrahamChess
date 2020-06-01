@@ -6,7 +6,7 @@ import           TypeDefs
 import           Util
 
 totalMaterial :: Colour -> AllPieces -> Float
-totalMaterial c ps = 4.5 * ((sum [pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - (sum [ pieceVal y | y <- ps, getPos y /= (-1,-1), getColour y /= c ]))
+totalMaterial c ps = 3.5 * ((sum [pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - (sum [ pieceVal y | y <- ps, getPos y /= (-1,-1), getColour y /= c ]))
 
 
 -- if a piece is going to be captured then it doesnt really have any material
@@ -36,7 +36,7 @@ totalEndVal :: Colour -> AllPieces -> Float
 totalEndVal a ps =  (totalMaterial a ps) + (totalColourBonus a ps) + (allPawns a ps) + (perPieceBonus a ps)
 
 pieceVal :: Piece -> Float
-pieceVal (Pawn,_,_,_)   = 2.5
+pieceVal (Pawn,_,_,_)   = 2.75
 pieceVal (Knight,_,_,_) = 3.0
 pieceVal (Bishop,_,_,_) = 3.5
 pieceVal (Rook,_,_,_)   = 5.0
@@ -49,7 +49,7 @@ isPieceAimedAtEnemyKing p ps = isValidMove p (moveMade (getPos p) k) (p : [])
                                  k = findKing (invertColour (getColour p)) ps
 
 threatenKingBonus :: Piece -> AllPieces -> Float
-threatenKingBonus p ps | isPieceAimedAtEnemyKing p ps = 1.0
+threatenKingBonus p ps | isPieceAimedAtEnemyKing p ps = 0.05
                        | otherwise = 0.0
 
 isKingOnEdges :: Colour -> AllPieces -> Float
@@ -70,16 +70,17 @@ squareNotThreatened c (m,n) ps | isEmpty (m,n) ps = null (threatenedBy newPiece 
                                where
                                  newPiece = (Pawn,c,(m,n),0)
 pawnsNearEnd :: Colour -> AllPieces -> [Piece]
-pawnsNearEnd White ps = [x | x <- ps, getColour x == White, getRow (getPos x) == 1, getPieceType x == Pawn]
-pawnsNearEnd Black ps = [x | x <- ps, getColour x == Black, getRow (getPos x) == 6, getPieceType x == Pawn]
+pawnsNearEnd White ps = [x | x <- ps, getColour x == White, (getRow (getPos x) == 1 || getRow (getPos x) == 2), getPieceType x == Pawn]
+pawnsNearEnd Black ps = [x | x <- ps, getColour x == Black, (getRow (getPos x) == 6 || getRow (getPos x) == 5), getPieceType x == Pawn]
+
 
 -- bonus points for pawns closer to end
 getPawnPromotion :: Colour -> AllPieces -> Float
-getPawnPromotion c ps = fromIntegral (length (pawnsNearEnd c ps))
+getPawnPromotion c ps = fromIntegral (div (length (pawnsNearEnd c ps)) 2)
 
 passPawnScore :: Piece -> AllPieces -> Float
-passPawnScore a ps | isPassedPawn a ps && pathClearAhead a ps = 3.5
-                   | isPassedPawn a ps = 1.5
+passPawnScore a ps | isPassedPawn a ps && pathClearAhead a ps = 3.0
+                   | isPassedPawn a ps = 2.5
                    | otherwise = 0
 
 -- returns whether a position doesnt contain an enemy pawn

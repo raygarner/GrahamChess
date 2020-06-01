@@ -14,7 +14,7 @@ import System.Random
 
 
 endSearchWrapper :: Colour -> AllPieces -> (Piece,Move,Float)
-endSearchWrapper c ps = findStrongestMoveFromAll (par s2 (s2:s1:[]
+endSearchWrapper c ps = findStrongestMoveFromAll (par s2 (s2:s1:[]))
                             where
                                 a = makeEvalList c ps
                                 e = length a
@@ -30,23 +30,27 @@ findBestMove c ps xs = findStrongestMoveFromAll (getGoodMoveScores c (getFavouri
 
 
 getBadMoveScores :: Colour -> [(Piece,Move,Float)] -> AllPieces -> [(Piece,Move,Float)]
-getBadMoveScores c xs ps = [addTrueEval (c,c) 0 6 x ps | x <- xs]
+getBadMoveScores c xs ps = [addTrueEval (c,c) 0 4 x ps | x <- xs]
 
 getGoodMoveScores :: Colour -> [(Piece,Move,Float)] -> AllPieces -> [(Piece,Move,Float)]
-getGoodMoveScores c xs ps = [addTrueEval (c,c) 0 4 x ps | x <- xs]
+getGoodMoveScores c xs ps = [addTrueEval (c,c) 0 2 x ps | x <- xs]
 
 -- updates the evaluation for moves by looking moves into the futur2
-addTrueEval :: (Colour,Colour) -> Int -> Int -> (Piece,Move,Float) -> AllPieces -> (Piece,Move,Float)
+addTrueEval :: (Colour,Colour) -> Int -> Int -> (Piece,Move,Float) -> AllPieces -> (Piece,Move,Float,AllPieces)
 addTrueEval (c,nc) l d (p,m,f) ps | l == d = if isCheckmate (invertColour c) ps then
-                                               (p,m,checkmate-(fromIntegral l))
+                                               (p,m,checkmate-(fromIntegral l),ps)
                                            else if isCheckmate c ps then
-                                               (p,m,0-checkmate-(fromIntegral l))
-                                           else (p,m,v)
+                                               (p,m,0-checkmate-(fromIntegral l),ps)
+                                           else
+                                             --if l == 4 then
+                                               --trace (show (l) ++ ":" ++ show (ps)) (p,m,v)
+                                             --else
+                                               (p,m,v,ps)
                                 | l == 0 = if f == checkmate then (p,m,f) else addTrueEval (c,(invertColour nc)) (l+1) d (p,m,0) (executeMove p m ps)
                                 | otherwise = if isCheckmate (invertColour c) ps then
-                                                  (p,m,checkmate-(fromIntegral l))
+                                                  (p,m,checkmate-(fromIntegral l),ps)
                                               else if isCheckmate c ps then
-                                                  (p,m,0-checkmate-(fromIntegral l))
+                                                  (p,m,0-checkmate-(fromIntegral l),ps)
                                               else
                                                 addTrueEval (c,(invertColour nc)) (l+1) d (p,m,0) (makeSingleBestMove e ps)
                                   where
