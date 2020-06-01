@@ -68,7 +68,7 @@ updateAB (a,b) c f = if c==White then
 -- returns the stronget move from a list of moves with evaluations
 findStrongestMoveFromAll :: Colour -> [(Piece,Move,Float)] -> (Piece,Move,Float)
 findStrongestMoveFromAll c xs | not (null xs) = head list
-                              | otherwise = ((King, White, (7,4), 0), (0,0), 0-checkmate c)
+                              | otherwise = ((King, White, (7,4), 0), (0,0), checkmate c)
                                 where
                                     list = if c==White then [ x | x <- xs, all (\y -> (getMoveEval y) <= (getMoveEval x)) xs ] else [ x | x <- xs, all (\y -> (getMoveEval y) >= (getMoveEval x)) xs ]
 
