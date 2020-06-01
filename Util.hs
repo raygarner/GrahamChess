@@ -409,7 +409,7 @@ validCastle _ _ _ = False
 
 -- make sure that the king can't castle through check or while in check (true == kingside)
 clearCastlePath :: Piece -> AllPieces -> Bool -> Bool
-clearCastlePath p ps s = null [(m,n) | n <- ys, not (null (threatenedBy (Pawn, getColour p, (m,n),0) ((Pawn,getColour p, (m,n), 0):ps))) ] && not (isKingInCheck p ps)-- dummy piece to keep threatenedBy happy
+clearCastlePath p ps s = null [(m,n) | n <- ys, not (null (threatenedBy (Knight, getColour p, (m,n),0) ((Knight,getColour p, (m,n), 0):ps))) ] && not (isKingInCheck p ps)-- dummy piece to keep threatenedBy happy
                            where
                                m = if getColour p == White then 7 else 0
                                ys = if s then [5,6] else [2,3]
