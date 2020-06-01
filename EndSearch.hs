@@ -13,59 +13,58 @@ import System.Random
 
 
 
-endSearchWrapper :: Colour -> AllPieces -> (Piece,Move,Float)
-endSearchWrapper c ps = findStrongestMoveFromAll (par s2 (s2:s1:[]))
-                            where
-                                a = makeEvalList c ps
-                                e = length a
-                                l = take ((div e 2) + 1) a
-                                r = drop (div e 2) a
-                                s1 = findBestMove c ps l
-                                s2 = findBestMove c ps r
-
-
-
-findBestMove :: Colour -> AllPieces -> [(Piece,Move,Float)] -> (Piece,Move,Float)
-findBestMove c ps xs = findStrongestMoveFromAll (getGoodMoveScores c (getFavouriteMoves xs) ps ++ getBadMoveScores c (getBadMoves xs) ps)
-
-
-getBadMoveScores :: Colour -> [(Piece,Move,Float)] -> AllPieces -> [(Piece,Move,Float)]
-getBadMoveScores c xs ps = [addTrueEval (c,c) 0 4 x ps | x <- xs]
-
-getGoodMoveScores :: Colour -> [(Piece,Move,Float)] -> AllPieces -> [(Piece,Move,Float)]
-getGoodMoveScores c xs ps = [addTrueEval (c,c) 0 2 x ps | x <- xs]
-
--- updates the evaluation for moves by looking moves into the futur2
-addTrueEval :: (Colour,Colour) -> Int -> Int -> (Piece,Move,Float) -> AllPieces -> (Piece,Move,Float)
-addTrueEval (c,nc) l d (p,m,f) ps | l == d = if isCheckmate (invertColour c) ps then
-                                               (p,m,checkmate-(fromIntegral l))
-                                           else if isCheckmate c ps then
-                                               (p,m,0-checkmate-(fromIntegral l))
-                                           else
-                                             --if l == 4 then
-                                               --trace (show (l) ++ ":" ++ show (ps)) (p,m,v)
-                                             --else
-                                               (p,m,v)
-                                | l == 0 = if f == checkmate then (p,m,f) else addTrueEval (c,(invertColour nc)) (l+1) d (p,m,0) (executeMove p m ps)
-                                | otherwise = if isCheckmate (invertColour c) ps then
-                                                  (p,m,checkmate-(fromIntegral l))
-                                              else if isCheckmate c ps then
-                                                  (p,m,0-checkmate-(fromIntegral l))
-                                              else
-                                                addTrueEval (c,(invertColour nc)) (l+1) d (p,m,0) (makeSingleBestMove e ps)
-                                  where
-                                      e = findBestDeepMove (d-l) nc ps
-                                      v = totalVal c ps
-
-
-findBestDeepMove :: Int -> Colour -> AllPieces -> (Piece,Move,Float)
-findBestDeepMove d c ps = findStrongestMoveFromAll [addTrueEval (c,c) 0 d x ps | x <- getFavouriteMoves (makeEvalList c ps)]
+-- endSearchWrapper :: Colour -> AllPieces -> (Piece,Move,Float)
+-- endSearchWrapper c ps = findStrongestMoveFromAll (par s2 (s2:s1:[]))
+--                             where
+--                                 a = makeEvalList c ps
+--                                 e = length a
+--                                 l = take ((div e 2) + 1) a
+--                                 r = drop (div e 2) a
+--                                 s1 = findBestMove c ps l
+--                                 s2 = findBestMove c ps r
+--
+--
+--
+-- findBestMove :: Colour -> AllPieces -> [(Piece,Move,Float)] -> (Piece,Move,Float)
+-- findBestMove c ps xs = findStrongestMoveFromAll (getGoodMoveScores c (getFavouriteMoves xs) ps ++ getBadMoveScores c (getBadMoves xs) ps)
+--
+--
+-- getBadMoveScores :: Colour -> [(Piece,Move,Float)] -> AllPieces -> [(Piece,Move,Float)]
+-- getBadMoveScores c xs ps = [addTrueEval (c,c) 0 4 x ps | x <- xs]
+--
+-- getGoodMoveScores :: Colour -> [(Piece,Move,Float)] -> AllPieces -> [(Piece,Move,Float)]
+-- getGoodMoveScores c xs ps = [addTrueEval (c,c) 0 2 x ps | x <- xs]
+--
+-- -- updates the evaluation for moves by looking moves into the futur2
+-- addTrueEval :: (Colour,Colour) -> Int -> Int -> (Piece,Move,Float) -> AllPieces -> (Piece,Move,Float)
+-- addTrueEval (c,nc) l d (p,m,f) ps | l == d = if isCheckmate (invertColour c) ps then
+--                                                (p,m,checkmate-(fromIntegral l))
+--                                            else if isCheckmate c ps then
+--                                                (p,m,0-checkmate-(fromIntegral l))
+--                                            else
+--                                              --if l == 4 then
+--                                                --trace (show (l) ++ ":" ++ show (ps)) (p,m,v)
+--                                              --else
+--                                                (p,m,v)
+--                                 | l == 0 = if f == checkmate then (p,m,f) else addTrueEval (c,(invertColour nc)) (l+1) d (p,m,0) (executeMove p m ps)
+--                                 | otherwise = if isCheckmate (invertColour c) ps then
+--                                                   (p,m,checkmate-(fromIntegral l))
+--                                               else if isCheckmate c ps then
+--                                                   (p,m,0-checkmate-(fromIntegral l))
+--                                               else
+--                                                 addTrueEval (c,(invertColour nc)) (l+1) d (p,m,0) (makeSingleBestMove e ps)
+--                                   where
+--                                       e = findBestDeepMove (d-l) nc ps
+--                                       v = totalVal c ps
+--
+--
+-- findBestDeepMove :: Int -> Colour -> AllPieces -> (Piece,Move,Float)
+-- findBestDeepMove d c ps = findStrongestMoveFromAll [addTrueEval (c,c) 0 d x ps | x <- getFavouriteMoves (makeEvalList c ps)]
 
 -- minimax :: [(Piece,Move,Float)] -> AllPieces -> Int -> (Float,Float) -> Colour -> (Piece,Move,Float)
 -- minimax xs ps 0 (a,b) c = ((King,White,(0,0),0),(0,1),totalEndVal ps)
 -- minimax xs ps d (a,b) c = findStrongestMoveFromAll ()
---                           where
---                             if null xs then ys == make
+
 
 
 movesWithSameScoreOrHigher :: Float -> [(Piece,Move,Float)] -> [(Piece,Move,Float)]
