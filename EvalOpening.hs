@@ -12,18 +12,20 @@ evalPiece :: Piece -> AllPieces -> Float
 evalPiece (Queen,_,_,_) ps = 0.0
 evalPiece (King,_,_,_) ps = 0.0
 evalPiece (Pawn,_,_,_) ps = 0.0
-evalPiece a ps = fromIntegral (length (legalMoves a ps)) * pieceMobMult a
+evalPiece (Rook,_,_,_) ps = 0.0
+evalPiece a ps = fromIntegral (length (legalMoves a ps)) -- * pieceMobMult a
 
 pieceMobMult :: Piece -> Float
-pieceMobMult (Pawn,_,_,_) = 0.0
+pieceMobMult (Pawn,_,_,_) = 0
 pieceMobMult (Knight,_,_,_) = 1.0
-pieceMobMult (Queen,_,_,_) = 0.0
-pieceMobMult (Rook,_,_,_) = 0.5
-pieceMobMult (King,_,_,_) = 0.0
+pieceMobMult (Queen,_,_,_) = 0
+pieceMobMult (Rook,_,_,_) = 0
+pieceMobMult (King,_,_,_) = 0
 pieceMobMult (Bishop,_,_,_) = 1.0
 
-totalMaterial :: AllPieces -> Float
-totalMaterial ps = 100 * sum [pieceVal (y,White,(0,0),0) * (countPieceType White y ps - countPieceType Black y ps) | y <- pieceTypes]
+totalMaterial :: Colour -> AllPieces -> Float
+--totalMaterial ps = 5 * sum [pieceVal (y,White,(0,0),0) * (countPieceType White y ps - countPieceType Black y ps) | y <- pieceTypes]
+totalMaterial c ps = 10 * sum [pieceVal (y,White,(0,0),0) * countPieceType c y ps  | y <- pieceTypes]
 
 countPieceType :: Colour -> PieceType -> AllPieces -> Float
 countPieceType c t ps = fromIntegral (length [ x | x <- ps, getColour x == c, getPieceType x == t, getPos x /= (-1,-1) ])
@@ -32,21 +34,27 @@ pieceTypes :: [PieceType]
 pieceTypes = [Pawn, Knight, Bishop, Rook, Queen, King]
 
 totalMobility :: Colour -> AllPieces -> Float
-totalMobility c ps = if moves==0 then mate else moves
-                     where
-                         moves = sum [ evalPiece x ps | x <- ps, getColour x == c, getPos x /= (-1,-1) ]
-                         mate = -1000000
+--totalMobility c ps = if moves==0 then mate else moves
+totalMobility c ps = sum [ evalPiece x ps | x <- ps, getColour x == c, getPos x /= (-1,-1) ]
+                     --where
+                      --   moves = sum [ evalPiece x ps | x <- ps, getColour x == c, getPos x /= (-1,-1) ]
+                       --  mate = -1000000
 
 totalOpeningVal :: AllPieces -> Float
-totalOpeningVal ps = (totalMobility White ps - totalMobility Black ps) + totalMaterial ps + (kingSafety White ps - kingSafety Black ps)
+--totalOpeningVal ps = (totalMobility White ps - totalMobility Black ps) + totalMaterial ps + (kingSafety White ps - kingSafety Black ps)
+--totalOpeningVal ps = (movePieceBonus White ps - movePieceBonus Black ps) + totalMaterial ps + (kingSafety White ps - kingSafety Black ps)
+totalOpeningVal ps = totalOpeningValColour White ps - totalOpeningValColour Black ps
+
+totalOpeningValColour :: Colour -> AllPieces -> Float
+totalOpeningValColour c ps = movePieceBonus c ps + totalMobility c ps + totalMaterial c ps + kingSafety c ps
 
 
 castleMotive :: Colour -> AllPieces -> Float
-castleMotive c ps | any (==getColumn (findKing c ps)) [3..5] = (-40)
+castleMotive c ps | any (==getColumn (findKing c ps)) [3..5] = (-5)
                   | otherwise = 0
 
 staticKingMotive :: Colour -> AllPieces -> Float
-staticKingMotive c ps | getRow (findKing c ps) /= r = (-40)
+staticKingMotive c ps | getRow (findKing c ps) /= r = (-5)
                       | otherwise = 0
                         where r = if c == White then 7 else 0
 
@@ -111,3 +119,9 @@ getLowestVal ps | null a = 10.0 -- return a value greater than any piece
                 | otherwise = head a
                   where
                       a = [pieceVal x | x <- ps, all (\y -> (pieceVal y) >= pieceVal x) ps ]
+
+
+
+-- add bonus for moving multiple pieces.
+movePieceBonus :: Colour -> AllPieces -> Float
+movePieceBonus c ps = fromIntegral (length [x | x <- ps, getPos x /= (-1,-1), getColour x == c, getMovecount x == 0, getPieceType x == Knight || getPieceType x == Bishop]) * (-10)
