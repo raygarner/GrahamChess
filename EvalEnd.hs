@@ -5,9 +5,17 @@ import           Init
 import           TypeDefs
 import           Util
 
-totalMaterial :: Colour -> AllPieces -> Float
-totalMaterial c ps = 3.5 * ((sum [pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - (sum [ pieceVal y | y <- ps, getPos y /= (-1,-1), getColour y /= c ]))
+-- totalMaterial :: Colour -> AllPieces -> Float
+-- totalMaterial c ps = 3.5 * ((sum [pieceMaterial x ps | x <- ps, getPos x /= (-1,-1), getColour x == c ]) - (sum [ pieceVal y | y <- ps, getPos y /= (-1,-1), getColour y /= c ]))
 
+totalMaterial :: AllPieces -> Float
+totalMaterial ps = 50 * sum [pieceVal (y,White,(0,0),0) * (countPieceType White y ps - countPieceType Black y ps) | y <- pieceTypes]
+
+countPieceType :: Colour -> PieceType -> AllPieces -> Float
+countPieceType c t ps = fromIntegral (length [ x | x <- ps, getColour x == c, getPieceType x == t, getPos x /= (-1,-1) ])
+
+pieceTypes :: [PieceType]
+pieceTypes = [Pawn, Knight, Bishop, Rook, Queen, King]
 
 -- if a piece is going to be captured then it doesnt really have any material
 pieceMaterial :: Piece -> AllPieces -> Float
@@ -32,8 +40,8 @@ allPawns :: Colour -> AllPieces -> Float
 --allPawns c ps = (sum [passPawnScore x ps | x <- ps, getColour x == c, getPieceType x == Pawn]) - (sum[passPawnScore y ps | y <- ps, getColour y /= c, getPieceType y == Pawn]) * 2.0
 allPawns c ps = (sum [passPawnScore x ps | x <- ps, getColour x == c, getPieceType x == Pawn])
 
-totalEndVal :: Colour -> AllPieces -> Float
-totalEndVal a ps =  (totalMaterial a ps) + (totalColourBonus a ps) + (allPawns a ps) + (perPieceBonus a ps)
+totalEndVal :: AllPieces -> Float
+totalEndVal ps =  totalMaterial ps + (totalColourBonus White ps - totalColourBonus Black ps) + (allPawns White ps - allPawns Black ps)
 
 pieceVal :: Piece -> Float
 pieceVal (Pawn,_,_,_)   = 2.75
@@ -64,11 +72,12 @@ isKingSideRow :: Pos -> Float
 isKingSideRow p | getRow p == 0 || getRow p == 7 = 0.9
                 | otherwise = 0
 
-squareNotThreatened :: Colour -> Pos -> AllPieces -> Bool
-squareNotThreatened c (m,n) ps | isEmpty (m,n) ps = null (threatenedBy newPiece (newPiece : ps))
-                               | otherwise = True
-                               where
-                                 newPiece = (Pawn,c,(m,n),0)
+-- squareNotThreatened :: Colour -> Pos -> AllPieces -> Bool
+-- squareNotThreatened c (m,n) ps | isEmpty (m,n) ps = null (threatenedBy newPiece (newPiece : ps))
+--                                | otherwise = True
+--                                where
+--                                  newPiece = (Pawn,c,(m,n),0)
+
 pawnsNearEnd :: Colour -> AllPieces -> [Piece]
 pawnsNearEnd White ps = [x | x <- ps, getColour x == White, (getRow (getPos x) == 1 || getRow (getPos x) == 2), getPieceType x == Pawn]
 pawnsNearEnd Black ps = [x | x <- ps, getColour x == Black, (getRow (getPos x) == 6 || getRow (getPos x) == 5), getPieceType x == Pawn]
@@ -79,8 +88,7 @@ getPawnPromotion :: Colour -> AllPieces -> Float
 getPawnPromotion c ps = fromIntegral (div (length (pawnsNearEnd c ps)) 2)
 
 passPawnScore :: Piece -> AllPieces -> Float
-passPawnScore a ps | isPassedPawn a ps && pathClearAhead a ps = 3.0
-                   | isPassedPawn a ps = 2.5
+passPawnScore a ps | isPassedPawn a ps = 2.5
                    | otherwise = 0
 
 -- returns whether a position doesnt contain an enemy pawn
@@ -101,12 +109,12 @@ isPassedPawn a ps = all (==True) [pawnClearAhead (getColour a) (y,n) ps| y <- [m
                         d = if getColour a == White then -1 else 1
                         e = if getColour a == White then 1 else 6
 
-pathClearAhead :: Piece -> AllPieces -> Bool
-pathClearAhead a ps = all (==True) [squareNotThreatened (getColour a) (y,n) ps | y <- [m,m+d..e]]
-                    where
-                      (m,n) = getPos a
-                      d = if getColour a == White then -1 else 1
-                      e = if getColour a == White then 1 else 6
+-- pathClearAhead :: Piece -> AllPieces -> Bool
+-- pathClearAhead a ps = all (==True) [squareNotThreatened (getColour a) (y,n) ps | y <- [m,m+d..e]]
+--                     where
+--                       (m,n) = getPos a
+--                       d = if getColour a == White then -1 else 1
+--                       e = if getColour a == White then 1 else 6
 
 isOpposingKingInCheck :: Colour -> AllPieces -> Float
 isOpposingKingInCheck c ps | isKingInCheck king ps = 3.0
