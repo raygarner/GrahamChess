@@ -12,14 +12,14 @@ evalPiece :: Piece -> AllPieces -> Float
 evalPiece (Queen,_,_,_) ps = 0.0
 evalPiece (King,_,_,_) ps = 0.0
 evalPiece (Pawn,_,_,_) ps = 0.0
-evalPiece (Rook,_,_,_) ps = 0.0
+--evalPiece (Rook,_,_,_) ps = 0.0
 evalPiece a ps = fromIntegral (length (legalMoves a ps)) -- * pieceMobMult a
 
 pieceMobMult :: Piece -> Float
 pieceMobMult (Pawn,_,_,_) = 0
 pieceMobMult (Knight,_,_,_) = 1.0
 pieceMobMult (Queen,_,_,_) = 0
-pieceMobMult (Rook,_,_,_) = 0
+pieceMobMult (Rook,_,_,_) = 0.25
 pieceMobMult (King,_,_,_) = 0
 pieceMobMult (Bishop,_,_,_) = 1.0
 
@@ -46,15 +46,18 @@ totalOpeningVal :: AllPieces -> Float
 totalOpeningVal ps = totalOpeningValColour White ps - totalOpeningValColour Black ps
 
 totalOpeningValColour :: Colour -> AllPieces -> Float
-totalOpeningValColour c ps = movePieceBonus c ps + totalMobility c ps + totalMaterial c ps + kingSafety c ps
+--totalOpeningValColour c ps = movePieceBonus c ps + totalMobility c ps + totalMaterial c ps + kingSafety c ps
+totalOpeningValColour c ps = totalMobility c ps + totalMaterial c ps + kingSafety c ps
 
+--queenSafety :: Colour -> AllPieces -> Float
+--queenSafety c =
 
 castleMotive :: Colour -> AllPieces -> Float
-castleMotive c ps | any (==getColumn (findKing c ps)) [3..5] = (-5)
+castleMotive c ps | any (==getColumn (findKing c ps)) [3..5] = (-3)
                   | otherwise = 0
 
 staticKingMotive :: Colour -> AllPieces -> Float
-staticKingMotive c ps | getRow (findKing c ps) /= r = (-5)
+staticKingMotive c ps | getRow (findKing c ps) /= r = (-3)
                       | otherwise = 0
                         where r = if c == White then 7 else 0
 

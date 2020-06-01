@@ -9,7 +9,7 @@ import Debug.Trace
 import Debug
 import Control.Parallel
 import Data.List
-import System.Random
+--import System.Random
 
 
 endSearchWrapper :: Int -> Colour -> AllPieces -> (Piece, Move, Float)
