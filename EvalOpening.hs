@@ -25,7 +25,7 @@ pieceMobMult (Bishop,_,_,_) = 1.0
 
 totalMaterial :: Colour -> AllPieces -> Float
 --totalMaterial ps = 5 * sum [pieceVal (y,White,(0,0),0) * (countPieceType White y ps - countPieceType Black y ps) | y <- pieceTypes]
-totalMaterial c ps = 10 * sum [pieceVal (y,White,(0,0),0) * countPieceType c y ps  | y <- pieceTypes]
+totalMaterial c ps = 20 * sum [pieceVal (y,White,(0,0),0) * countPieceType c y ps  | y <- pieceTypes]
 
 countPieceType :: Colour -> PieceType -> AllPieces -> Float
 countPieceType c t ps = fromIntegral (length [ x | x <- ps, getColour x == c, getPieceType x == t, getPos x /= (-1,-1) ])
