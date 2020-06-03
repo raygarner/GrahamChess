@@ -485,7 +485,7 @@ legalKingMoves :: Piece -> AllPieces -> [Move]
 legalKingMoves p ps = [(m,n) | m <- [-1..1], n <- [-2..2], targetNotKing p (m,n) ps, validKingMove p (m,n) ps, not (willKingBeInCheck p (m,n) ps)]
 
 allLegalMoves :: Colour -> AllPieces -> [Move]
-allLegalMoves c ps = [ m | p <- ps, m <- legalMoves p ps]
+allLegalMoves c ps = [ m | p <- ps, m <- legalMoves p ps, getColour p == c]
 
 -- returns a list of legal moves for a piece
 legalMoves :: Piece -> AllPieces -> [Move]

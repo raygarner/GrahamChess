@@ -37,12 +37,12 @@ allPawns :: Colour -> AllPieces -> Float
 allPawns c ps = (sum [passPawnScore x ps | x <- ps, getColour x == c, getPieceType x == Pawn])
 
 checkMateScore :: AllPieces -> Float
-checkMateScore ps | isCheckmate White ps = 1000000
-                  | isCheckmate Black ps = -1000000
+checkMateScore ps | isCheckmate White ps = -10000
+                  | isCheckmate Black ps = 10000
                   | otherwise = 0
 
 totalEndVal :: AllPieces -> Float
-totalEndVal ps =  totalMaterial ps + (totalColourBonus White ps - totalColourBonus Black ps) + (allPawns White ps - allPawns Black ps) + checkMateScore ps
+totalEndVal ps =  totalMaterial ps + (totalColourBonus White ps - totalColourBonus Black ps) + (allPawns White ps - allPawns Black ps)
 
 pieceVal :: Piece -> Float
 pieceVal (Pawn,_,_,_)   = 2.75
