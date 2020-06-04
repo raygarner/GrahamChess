@@ -14,13 +14,13 @@ evalPiece (Pawn,_,_,_) ps = 0.0
 evalPiece a ps = fromIntegral (length (legalMoves a ps)) * pieceMobMult a
 
 pieceMobMult :: Piece -> Float
-pieceMobMult (Knight,_,_,_) = 2
+pieceMobMult (Knight,_,_,_) = 1
 pieceMobMult (Queen,_,_,_) = 0.0
 pieceMobMult (Rook,_,_,_) = 0.25
 pieceMobMult (Bishop,_,_,_) = 1.0
 
 totalMaterial :: Colour -> AllPieces -> Float
-totalMaterial c ps = 75 * sum [pieceVal (y,White,(0,0),0) * countPieceType c y ps  | y <- pieceTypes]
+totalMaterial c ps = 100 * sum [pieceVal (y,White,(0,0),0) * countPieceType c y ps  | y <- pieceTypes]
 
 countPieceType :: Colour -> PieceType -> AllPieces -> Float
 countPieceType c t ps = fromIntegral (length [ x | x <- ps, getColour x == c, getPieceType x == t, getPos x /= (-1,-1) ])
@@ -29,13 +29,20 @@ pieceTypes :: [PieceType]
 pieceTypes = [Pawn, Knight, Bishop, Rook, Queen, King]
 
 totalMobility :: Colour -> AllPieces -> Float
-totalMobility c ps = sum [ evalPiece x ps | x <- ps, getColour x == c, getPos x /= (-1,-1) ]
+totalMobility c ps = 0.01 * sum [ evalPiece x ps | x <- ps, getColour x == c, getPos x /= (-1,-1) ]
 
 totalOpeningVal :: AllPieces -> Float
 totalOpeningVal ps = totalOpeningValColour White ps - totalOpeningValColour Black ps
 
 totalOpeningValColour :: Colour -> AllPieces -> Float
-totalOpeningValColour c ps = totalMobility c ps + totalMaterial c ps + kingSafety c ps + queenSafety c ps + blockedPawns c ps + centralPawns c ps
+--totalOpeningValColour c ps = totalMobility c ps + totalMaterial c ps + kingSafety c ps + queenSafety c ps + blockedPawns c ps + centralPawns c ps
+--totalOpeningValColour c ps = totalMobility c ps + movePieceBonus c ps + totalMaterial c ps + kingSafety c ps + queenSafety c ps + blockedPawns c ps + centralPawns c ps
+--totalOpeningValColour c ps = totalMobility c ps + totalMaterial c ps + kingSafety c ps + queenSafety c ps + blockedPawns c ps
+--totalOpeningValColour c ps = totalMobility c ps + totalMaterial c ps
+--totalOpeningValColour c ps = movePieceBonus c ps + centralPawns c ps + totalMaterial c ps + kingSafety c ps + queenSafety c ps + blockedPawns c ps
+--totalOpeningValColour c ps = movePieceBonus c ps + centralPawns c ps + totalMaterial c ps + kingSafety c ps + queenSafety c ps + blockedPawns c ps
+--totalOpeningValColour c ps = totalMaterial c ps + movePieceBonus c ps
+totalOpeningValColour c ps = totalMaterial c ps + totalMobility c ps + blockedPawns c ps + kingSafety c ps + queenSafety c ps
 
 centralPawns :: Colour -> AllPieces -> Float
 centralPawns c ps = 40.0 * (fromIntegral (length [x | x <- ps, getColour x == c, getPieceType x == Pawn, any (==getPos x) squares]))
@@ -54,16 +61,16 @@ queenSafety c ps | q == (-1,-1) = 0.0
 
 movedLessThan :: Colour -> Piece -> AllPieces -> Float
 movedLessThan c p ps | mc == 0 = 0.0
-                     | otherwise = if null [x | x <- ps, getColour x == c, getMovecount x == 0, (getPieceType x == Knight || getPieceType x == Bishop)] then 0.0 else (-20)
+                     | otherwise = if null [x | x <- ps, getColour x == c, getMovecount x == 0, (getPieceType x == Knight || getPieceType x == Bishop)] then 0.0 else (-40)
                        where
                            mc = getMovecount p
 
 castleMotive :: Colour -> AllPieces -> Float
-castleMotive c ps | any (==getColumn (findKing c ps)) [3..5] = (-40)
+castleMotive c ps | any (==getColumn (findKing c ps)) [3..5] = (-20)
                   | otherwise = 0
 
 staticKingMotive :: Colour -> AllPieces -> Float
-staticKingMotive c ps | getRow (findKing c ps) /= r = (-60)
+staticKingMotive c ps | getRow (findKing c ps) /= r = (-20)
                       | otherwise = 0
                         where r = if c == White then 7 else 0
 
@@ -133,4 +140,4 @@ getLowestVal ps | null a = 10.0 -- return a value greater than any piece
 
 -- add bonus for moving multiple pieces.
 movePieceBonus :: Colour -> AllPieces -> Float
-movePieceBonus c ps = fromIntegral (length [x | x <- ps, getPos x /= (-1,-1), getColour x == c, getMovecount x == 0, getPieceType x == Knight || getPieceType x == Bishop]) * (-10)
+movePieceBonus c ps = fromIntegral (length [x | x <- ps, getPos x /= (-1,-1), getColour x == c, getMovecount x == 0, getPieceType x == Knight || getPieceType x == Bishop]) * (-20)
