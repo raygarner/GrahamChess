@@ -36,7 +36,8 @@ openingMoveWrapper d c ps = findStrongestMoveFromAll c (par s4 (par s3 (par s2 (
 
 findMostEpicMove :: (Float,Float) -> Int -> Colour -> AllPieces -> [(Piece,Move,Float)] -> (Piece,Move,Float)
 findMostEpicMove (a,b) 0 c ps xs = ((King,White,(0,0),0),(0,0),totalOpeningVal ps)
-findMostEpicMove (a,b) d c ps xs | isCheckmate c ps = if c == Black then ((King,White,(0,0),0),(0,0), (checkmate c) + (fromIntegral d)) else ((King,White,(0,0),0),(0,0), (checkmate c) - fromIntegral (d))
+findMostEpicMove (a,b) d c ps xs | isCheckmate White ps = ((King,White,(0,0),0),(0,0), (checkmate White))
+                                 | isCheckmate Black ps = ((King,White,(0,0),0), (0,0), (checkmate Black))
                                  | otherwise = findStrongestMoveFromAll c (addEvals (a,b) d c ps moves)
                                              where
                                                moves = if null xs then makeEvalList c ps else xs
@@ -78,7 +79,7 @@ updateAB (a,b) c f = if c==White then
 -- returns the stronget move from a list of moves with evaluations
 findStrongestMoveFromAll :: Colour -> [(Piece,Move,Float)] -> (Piece,Move,Float)
 findStrongestMoveFromAll c xs | not (null xs) = head list
-                              | otherwise = ((King, White, (7,4), 0), (0,0), checkmate c)
+                              | otherwise = ((King, White, (7,4), 0), (0,0), 0) -- if stalemate
                                 where
                                     list = if c==White then [ x | x <- xs, all (\y -> (getMoveEval y) <= (getMoveEval x)) xs ] else [ x | x <- xs, all (\y -> (getMoveEval y) >= (getMoveEval x)) xs ]
 

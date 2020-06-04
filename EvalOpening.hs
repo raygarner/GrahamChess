@@ -14,13 +14,13 @@ evalPiece (Pawn,_,_,_) ps = 0.0
 evalPiece a ps = fromIntegral (length (legalMoves a ps)) * pieceMobMult a
 
 pieceMobMult :: Piece -> Float
-pieceMobMult (Knight,_,_,_) = 1.0
-pieceMobMult (Queen,_,_,_) = 0.25
-pieceMobMult (Rook,_,_,_) = 0.5
+pieceMobMult (Knight,_,_,_) = 2
+pieceMobMult (Queen,_,_,_) = 0.0
+pieceMobMult (Rook,_,_,_) = 0.25
 pieceMobMult (Bishop,_,_,_) = 1.0
 
 totalMaterial :: Colour -> AllPieces -> Float
-totalMaterial c ps = 50 * sum [pieceVal (y,White,(0,0),0) * countPieceType c y ps  | y <- pieceTypes]
+totalMaterial c ps = 75 * sum [pieceVal (y,White,(0,0),0) * countPieceType c y ps  | y <- pieceTypes]
 
 countPieceType :: Colour -> PieceType -> AllPieces -> Float
 countPieceType c t ps = fromIntegral (length [ x | x <- ps, getColour x == c, getPieceType x == t, getPos x /= (-1,-1) ])
@@ -54,7 +54,7 @@ queenSafety c ps | q == (-1,-1) = 0.0
 
 movedLessThan :: Colour -> Piece -> AllPieces -> Float
 movedLessThan c p ps | mc == 0 = 0.0
-                     | otherwise = fromIntegral (length [x | x <- ps, getColour x == c, getMovecount x == 0, (getPieceType x == Knight || getPieceType x == Bishop)]) * (-10)
+                     | otherwise = if null [x | x <- ps, getColour x == c, getMovecount x == 0, (getPieceType x == Knight || getPieceType x == Bishop)] then 0.0 else (-20)
                        where
                            mc = getMovecount p
 
@@ -63,7 +63,7 @@ castleMotive c ps | any (==getColumn (findKing c ps)) [3..5] = (-40)
                   | otherwise = 0
 
 staticKingMotive :: Colour -> AllPieces -> Float
-staticKingMotive c ps | getRow (findKing c ps) /= r = (-40)
+staticKingMotive c ps | getRow (findKing c ps) /= r = (-60)
                       | otherwise = 0
                         where r = if c == White then 7 else 0
 
