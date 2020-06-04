@@ -27,11 +27,21 @@ openingMoveWrapper d c ps = findStrongestMoveFromAll c (par s4 (par s3 (par s2 (
                                 s4 = findMostEpicMove (-2000000,2000000) d c ps r2
 
 
+--findMostEpicMove :: (Float,Float) -> Int -> Colour -> AllPieces -> [(Piece,Move,Float)] -> (Piece,Move,Float)
+--findMostEpicMove (a,b) 0 c ps xs = ((King,White,(0,0),0),(0,0),totalOpeningVal ps)
+--findMostEpicMove (a,b) d c ps xs = findStrongestMoveFromAll c (addEvals (a,b) d c ps moves)
+--                             where
+--                                 moves = if null xs then makeEvalList c ps else xs
+
+
 findMostEpicMove :: (Float,Float) -> Int -> Colour -> AllPieces -> [(Piece,Move,Float)] -> (Piece,Move,Float)
 findMostEpicMove (a,b) 0 c ps xs = ((King,White,(0,0),0),(0,0),totalOpeningVal ps)
-findMostEpicMove (a,b) d c ps xs = findStrongestMoveFromAll c (addEvals (a,b) d c ps moves)
-                             where
-                                 moves = if null xs then makeEvalList c ps else xs
+findMostEpicMove (a,b) d c ps xs | isCheckmate c ps = if c == Black then ((King,White,(0,0),0),(0,0), (checkmate c) + (fromIntegral d)) else ((King,White,(0,0),0),(0,0), (checkmate c) - fromIntegral (d))
+                                 | otherwise = findStrongestMoveFromAll c (addEvals (a,b) d c ps moves)
+                                             where
+                                               moves = if null xs then makeEvalList c ps else xs
+
+
 
 addEvals :: (Float,Float) -> Int -> Colour -> AllPieces -> [(Piece,Move,Float)] -> [(Piece,Move,Float)]
 addEvals (a,b) d c ps [] = []

@@ -9,23 +9,18 @@ import           Control.Parallel
 -- some crude evaluations
 
 evalPiece :: Piece -> AllPieces -> Float
-evalPiece (Queen,_,_,_) ps = 0.0
 evalPiece (King,_,_,_) ps = 0.0
 evalPiece (Pawn,_,_,_) ps = 0.0
---evalPiece (Rook,_,_,_) ps = 0.0
-evalPiece a ps = fromIntegral (length (legalMoves a ps)) -- * pieceMobMult a
+evalPiece a ps = fromIntegral (length (legalMoves a ps)) * pieceMobMult a
 
 pieceMobMult :: Piece -> Float
-pieceMobMult (Pawn,_,_,_) = 0
 pieceMobMult (Knight,_,_,_) = 1.0
-pieceMobMult (Queen,_,_,_) = 0
-pieceMobMult (Rook,_,_,_) = 0.25
-pieceMobMult (King,_,_,_) = 0
+pieceMobMult (Queen,_,_,_) = 0.25
+pieceMobMult (Rook,_,_,_) = 0.5
 pieceMobMult (Bishop,_,_,_) = 1.0
 
 totalMaterial :: Colour -> AllPieces -> Float
---totalMaterial ps = 5 * sum [pieceVal (y,White,(0,0),0) * (countPieceType White y ps - countPieceType Black y ps) | y <- pieceTypes]
-totalMaterial c ps = 20 * sum [pieceVal (y,White,(0,0),0) * countPieceType c y ps  | y <- pieceTypes]
+totalMaterial c ps = 50 * sum [pieceVal (y,White,(0,0),0) * countPieceType c y ps  | y <- pieceTypes]
 
 countPieceType :: Colour -> PieceType -> AllPieces -> Float
 countPieceType c t ps = fromIntegral (length [ x | x <- ps, getColour x == c, getPieceType x == t, getPos x /= (-1,-1) ])
@@ -34,30 +29,41 @@ pieceTypes :: [PieceType]
 pieceTypes = [Pawn, Knight, Bishop, Rook, Queen, King]
 
 totalMobility :: Colour -> AllPieces -> Float
---totalMobility c ps = if moves==0 then mate else moves
 totalMobility c ps = sum [ evalPiece x ps | x <- ps, getColour x == c, getPos x /= (-1,-1) ]
-                     --where
-                      --   moves = sum [ evalPiece x ps | x <- ps, getColour x == c, getPos x /= (-1,-1) ]
-                       --  mate = -1000000
 
 totalOpeningVal :: AllPieces -> Float
---totalOpeningVal ps = (totalMobility White ps - totalMobility Black ps) + totalMaterial ps + (kingSafety White ps - kingSafety Black ps)
---totalOpeningVal ps = (movePieceBonus White ps - movePieceBonus Black ps) + totalMaterial ps + (kingSafety White ps - kingSafety Black ps)
 totalOpeningVal ps = totalOpeningValColour White ps - totalOpeningValColour Black ps
 
 totalOpeningValColour :: Colour -> AllPieces -> Float
---totalOpeningValColour c ps = movePieceBonus c ps + totalMobility c ps + totalMaterial c ps + kingSafety c ps
-totalOpeningValColour c ps = totalMobility c ps + totalMaterial c ps + kingSafety c ps
+totalOpeningValColour c ps = totalMobility c ps + totalMaterial c ps + kingSafety c ps + queenSafety c ps + blockedPawns c ps + centralPawns c ps
 
---queenSafety :: Colour -> AllPieces -> Float
---queenSafety c =
+centralPawns :: Colour -> AllPieces -> Float
+centralPawns c ps = 40.0 * (fromIntegral (length [x | x <- ps, getColour x == c, getPieceType x == Pawn, any (==getPos x) squares]))
+                    where
+                        squares = [(3,3),(3,4),(4,3),(4,4)]
+
+blockedPawns :: Colour -> AllPieces -> Float
+blockedPawns c ps = fromIntegral (length [x | x <- ps, getColour x == c, (getColumn (getPos x) == 3 || getColumn (getPos x) == 4), length (legalMoves x ps) == 0]) * (-40)
+
+queenSafety :: Colour -> AllPieces -> Float
+queenSafety c ps | q == (-1,-1) = 0.0
+                 | otherwise = movedLessThan c queen ps
+                   where
+                       queen = head (findPiece q ps)
+                       q = findQueen c ps
+
+movedLessThan :: Colour -> Piece -> AllPieces -> Float
+movedLessThan c p ps | mc == 0 = 0.0
+                     | otherwise = fromIntegral (length [x | x <- ps, getColour x == c, getMovecount x == 0, (getPieceType x == Knight || getPieceType x == Bishop)]) * (-10)
+                       where
+                           mc = getMovecount p
 
 castleMotive :: Colour -> AllPieces -> Float
-castleMotive c ps | any (==getColumn (findKing c ps)) [3..5] = (-3)
+castleMotive c ps | any (==getColumn (findKing c ps)) [3..5] = (-40)
                   | otherwise = 0
 
 staticKingMotive :: Colour -> AllPieces -> Float
-staticKingMotive c ps | getRow (findKing c ps) /= r = (-3)
+staticKingMotive c ps | getRow (findKing c ps) /= r = (-40)
                       | otherwise = 0
                         where r = if c == White then 7 else 0
 
