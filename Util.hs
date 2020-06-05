@@ -257,6 +257,13 @@ findKing colour ps | null l = (-1,-1)
                    where
                      l = [(x,y) | (t, c, (x,y), m) <- ps, t == King, c == colour, x > -1, y > -1, x < 8, y < 8 ]
 
+findQueen :: Colour -> AllPieces -> Pos
+findQueen colour ps | null l = (-1,-1)
+                    | otherwise = head l
+                    where
+                      l = [(x,y) | (t, c, (x,y), m) <- ps, t == Queen, c == colour, x > -1, y > -1, x < 8, y < 8 ]
+
+
 
 -- returns whether a king move is valid WORKING
 validKingMove :: Piece -> Move -> AllPieces -> Bool

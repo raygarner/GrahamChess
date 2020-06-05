@@ -27,11 +27,22 @@ openingMoveWrapper d c ps = findStrongestMoveFromAll c (par s4 (par s3 (par s2 (
                                 s4 = findMostEpicMove (-2000000,2000000) d c ps r2
 
 
+--findMostEpicMove :: (Float,Float) -> Int -> Colour -> AllPieces -> [(Piece,Move,Float)] -> (Piece,Move,Float)
+--findMostEpicMove (a,b) 0 c ps xs = ((King,White,(0,0),0),(0,0),totalOpeningVal ps)
+--findMostEpicMove (a,b) d c ps xs = findStrongestMoveFromAll c (addEvals (a,b) d c ps moves)
+--                             where
+--                                 moves = if null xs then makeEvalList c ps else xs
+
+
 findMostEpicMove :: (Float,Float) -> Int -> Colour -> AllPieces -> [(Piece,Move,Float)] -> (Piece,Move,Float)
 findMostEpicMove (a,b) 0 c ps xs = ((King,White,(0,0),0),(0,0),totalOpeningVal ps)
-findMostEpicMove (a,b) d c ps xs = findStrongestMoveFromAll c (addEvals (a,b) d c ps moves)
-                             where
-                                 moves = if null xs then makeEvalList c ps else xs
+findMostEpicMove (a,b) d c ps xs | isCheckmate White ps = ((King,White,(0,0),0),(0,0), (checkmate White))
+                                 | isCheckmate Black ps = ((King,White,(0,0),0), (0,0), (checkmate Black))
+                                 | otherwise = findStrongestMoveFromAll c (addEvals (a,b) d c ps moves)
+                                             where
+                                               moves = if null xs then makeEvalList c ps else xs
+
+
 
 addEvals :: (Float,Float) -> Int -> Colour -> AllPieces -> [(Piece,Move,Float)] -> [(Piece,Move,Float)]
 addEvals (a,b) d c ps [] = []
@@ -68,7 +79,7 @@ updateAB (a,b) c f = if c==White then
 -- returns the stronget move from a list of moves with evaluations
 findStrongestMoveFromAll :: Colour -> [(Piece,Move,Float)] -> (Piece,Move,Float)
 findStrongestMoveFromAll c xs | not (null xs) = head list
-                              | otherwise = ((King, White, (7,4), 0), (0,0), checkmate c)
+                              | otherwise = ((King, White, (7,4), 0), (0,0), 0) -- if stalemate
                                 where
                                     list = if c==White then [ x | x <- xs, all (\y -> (getMoveEval y) <= (getMoveEval x)) xs ] else [ x | x <- xs, all (\y -> (getMoveEval y) >= (getMoveEval x)) xs ]
 
