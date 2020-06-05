@@ -36,11 +36,6 @@ totalColourBonus c ps = isKingOnEdges c ps + getPawnPromotion c ps
 allPawns :: Colour -> AllPieces -> Float
 allPawns c ps = (sum [passPawnScore x ps | x <- ps, getColour x == c, getPieceType x == Pawn])
 
-checkMateScore :: AllPieces -> Float
-checkMateScore ps | isCheckmate White ps = -10000
-                  | isCheckmate Black ps = 10000
-                  | otherwise = 0
-
 totalEndVal :: AllPieces -> Float
 totalEndVal ps =  totalMaterial ps + (totalColourBonus White ps - totalColourBonus Black ps) + (allPawns White ps - allPawns Black ps)
 
@@ -108,8 +103,3 @@ isOpposingKingInCheck :: Colour -> AllPieces -> Float
 isOpposingKingInCheck c ps | isKingInCheck king ps = 3.0
                            | otherwise = 0.0
                              where king = head (findPiece (findKing (invertColour c) ps) ps)
-
-isCheckmate :: Colour -> AllPieces -> Bool
-isCheckmate c ps = null (allLegalMoves c ps) && isKingInCheck king ps
-                   where
-                     king = head (findPiece (findKing c ps) ps)
