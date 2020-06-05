@@ -35,7 +35,7 @@ openingMoveWrapper d c ps = findStrongestMoveFromAll c (par s4 (par s3 (par s2 (
 
 
 findMostEpicMove :: (Float,Float) -> Int -> Colour -> AllPieces -> [(Piece,Move,Float)] -> (Piece,Move,Float)
-findMostEpicMove (a,b) 0 c ps xs = ((King,White,(0,0),0),(0,0),totalOpeningVal ps)
+findMostEpicMove (a,b) 0 c ps xs = ((King,White,(0,0),0),(0,0),fromIntegral (totalOpeningVal ps))
 findMostEpicMove (a,b) d c ps xs | isCheckmate White ps = ((King,White,(0,0),0),(0,0), (checkmate White))
                                  | isCheckmate Black ps = ((King,White,(0,0),0), (0,0), (checkmate Black))
                                  | otherwise = findStrongestMoveFromAll c (addEvals (a,b) d c ps moves)
