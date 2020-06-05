@@ -106,8 +106,8 @@ evalPiece :: Piece -> AllPieces -> Int
 --evalPiece a ps = 3 * length (legalMoves a [a])
 --evalPiece a ps = length (legalMoves a ps)
 evalPiece (Pawn,c,(m,n),mc) ps = evalPawn c (m,n)
-evalPiece (Knight,c,(m,n),mc) ps = evalKnight c (m,n)
-evalPiece (Bishop,c,(m,n),mc) ps = evalBishop c (m,n)
+evalPiece (Knight,c,(m,n),mc) ps = evalKnight c (m,n) -- + length (legalMoves (Knight,c,(m,n),mc) ps)
+evalPiece (Bishop,c,(m,n),mc) ps = evalBishop c (m,n) -- + length (legalMoves (Bishop,c,(m,n),mc) ps)
 evalPiece (Rook,c,(m,n),mc) ps = evalRook c (m,n)
 evalPiece (Queen,c,(m,n),mc) ps = evalQueen c (m,n)
 evalPiece (King,c,(m,n),mc) ps = evalKing c (m,n)
@@ -119,7 +119,7 @@ evalPiece (King,c,(m,n),mc) ps = evalKing c (m,n)
 --pieceMobMult (Bishop,_,_,_) = 1.0
 
 totalMaterial :: Colour -> AllPieces -> Int
-totalMaterial c ps = 2 * sum [pieceVal (y,White,(0,0),0) * countPieceType c y ps  | y <- pieceTypes]
+totalMaterial c ps = 10 * sum [pieceVal (y,White,(0,0),0) * countPieceType c y ps  | y <- pieceTypes]
 
 countPieceType :: Colour -> PieceType -> AllPieces -> Int
 countPieceType c t ps = length [ x | x <- ps, getColour x == c, getPieceType x == t, getPos x /= (-1,-1) ]
@@ -137,7 +137,7 @@ totalOpeningValColour :: Colour -> AllPieces -> Int
 --totalOpeningValColour c ps = totalMaterial c ps + totalMobility c ps + centralPawns c ps + blockedPawns c ps + kingSafety c ps + queenSafety c ps
 --totalOpeningValColour c ps = totalMaterial c ps + totalMobility c ps + kingSafety c ps + queenSafety c ps + centralPawns c ps + blockedPawns c ps
 --totalOpeningValColour c ps = movePieceBonus c ps + totalMaterial c ps + kingSafety c ps + queenSafety c ps + centralPawns c ps + blockedPawns c ps
-totalOpeningValColour c ps = totalMaterial c ps + totalMobility c ps + queenSafety c ps
+totalOpeningValColour c ps = totalMaterial c ps + totalMobility c ps -- + queenSafety c ps
 
 centralPawns :: Colour -> AllPieces -> Int
 centralPawns c ps = 1 * fromIntegral (length [x | x <- ps, getColour x == c, getPieceType x == Pawn, any (==getPos x) squares])
@@ -145,7 +145,7 @@ centralPawns c ps = 1 * fromIntegral (length [x | x <- ps, getColour x == c, get
                         squares = [(3,3),(3,4),(4,3),(4,4)]
 
 blockedPawns :: Colour -> AllPieces -> Int
-blockedPawns c ps = length [x | x <- ps, getColour x == c, (getColumn (getPos x) == 3 || getColumn (getPos x) == 4), length (legalMoves x ps) == 0] * (-60)
+blockedPawns c ps = length [x | x <- ps, getColour x == c, (getColumn (getPos x) == 3 || getColumn (getPos x) == 4), length (legalMoves x ps) == 0] * (-20)
 
 queenSafety :: Colour -> AllPieces -> Int
 queenSafety c ps | q == (-1,-1) = 0
