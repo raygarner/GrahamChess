@@ -11,7 +11,9 @@ import           Control.Parallel
 evalPiece :: Piece -> AllPieces -> Float
 evalPiece (King,_,_,_) ps = 0.0
 evalPiece (Pawn,_,_,_) ps = 0.0
-evalPiece a ps = fromIntegral (length (legalMoves a ps)) * pieceMobMult a
+evalPiece (Rook,_,_,_) ps = 0.0
+evalPiece (Queen,_,_,_) ps = 0.0
+evalPiece a ps = fromIntegral (length (legalMoves a ps)) -- * pieceMobMult a
 
 pieceMobMult :: Piece -> Float
 pieceMobMult (Knight,_,_,_) = 1
@@ -29,7 +31,7 @@ pieceTypes :: [PieceType]
 pieceTypes = [Pawn, Knight, Bishop, Rook, Queen, King]
 
 totalMobility :: Colour -> AllPieces -> Float
-totalMobility c ps = 0.01 * sum [ evalPiece x ps | x <- ps, getColour x == c, getPos x /= (-1,-1) ]
+totalMobility c ps = 1 * sum [ evalPiece x ps | x <- ps, getColour x == c, getPos x /= (-1,-1) ]
 
 totalOpeningVal :: AllPieces -> Float
 totalOpeningVal ps = totalOpeningValColour White ps - totalOpeningValColour Black ps
@@ -42,15 +44,16 @@ totalOpeningValColour :: Colour -> AllPieces -> Float
 --totalOpeningValColour c ps = movePieceBonus c ps + centralPawns c ps + totalMaterial c ps + kingSafety c ps + queenSafety c ps + blockedPawns c ps
 --totalOpeningValColour c ps = movePieceBonus c ps + centralPawns c ps + totalMaterial c ps + kingSafety c ps + queenSafety c ps + blockedPawns c ps
 --totalOpeningValColour c ps = totalMaterial c ps + movePieceBonus c ps
-totalOpeningValColour c ps = totalMaterial c ps + totalMobility c ps + blockedPawns c ps + kingSafety c ps + queenSafety c ps
+totalOpeningValColour c ps = totalMaterial c ps + totalMobility c ps + blockedPawns c ps + kingSafety c ps + queenSafety c ps + centralPawns c ps
+--totalOpeningValColour c ps = totalMaterial c ps + kingSafety c ps + queenSafety c ps
 
 centralPawns :: Colour -> AllPieces -> Float
-centralPawns c ps = 40.0 * (fromIntegral (length [x | x <- ps, getColour x == c, getPieceType x == Pawn, any (==getPos x) squares]))
+centralPawns c ps = 1.0 * (fromIntegral (length [x | x <- ps, getColour x == c, getPieceType x == Pawn, any (==getPos x) squares]))
                     where
                         squares = [(3,3),(3,4),(4,3),(4,4)]
 
 blockedPawns :: Colour -> AllPieces -> Float
-blockedPawns c ps = fromIntegral (length [x | x <- ps, getColour x == c, (getColumn (getPos x) == 3 || getColumn (getPos x) == 4), length (legalMoves x ps) == 0]) * (-40)
+blockedPawns c ps = fromIntegral (length [x | x <- ps, getColour x == c, (getColumn (getPos x) == 3 || getColumn (getPos x) == 4), length (legalMoves x ps) == 0]) * (-60)
 
 queenSafety :: Colour -> AllPieces -> Float
 queenSafety c ps | q == (-1,-1) = 0.0
@@ -61,7 +64,7 @@ queenSafety c ps | q == (-1,-1) = 0.0
 
 movedLessThan :: Colour -> Piece -> AllPieces -> Float
 movedLessThan c p ps | mc == 0 = 0.0
-                     | otherwise = if null [x | x <- ps, getColour x == c, getMovecount x == 0, (getPieceType x == Knight || getPieceType x == Bishop)] then 0.0 else (-40)
+                     | otherwise = if null [x | x <- ps, getColour x == c, getMovecount x == 0, (getPieceType x == Knight || getPieceType x == Bishop)] then 0.0 else (-50)
                        where
                            mc = getMovecount p
 
