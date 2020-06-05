@@ -66,11 +66,11 @@ movedLessThan c p ps | mc == 0 = 0.0
                            mc = getMovecount p
 
 castleMotive :: Colour -> AllPieces -> Float
-castleMotive c ps | any (==getColumn (findKing c ps)) [3..5] = (-20)
+castleMotive c ps | any (==getColumn (findKing c ps)) [3..5] = (-60)
                   | otherwise = 0
 
 staticKingMotive :: Colour -> AllPieces -> Float
-staticKingMotive c ps | getRow (findKing c ps) /= r = (-20)
+staticKingMotive c ps | getRow (findKing c ps) /= r = (-60)
                       | otherwise = 0
                         where r = if c == White then 7 else 0
 
