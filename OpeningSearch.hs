@@ -86,6 +86,7 @@ findStrongestMoveFromAll c xs | not (null xs) = head list
 
 -- generates a list of all legal moves for one side with evaluations
 makeEvalList :: Colour -> AllPieces -> [(Piece, Move, Float)]
+--makeEvalList c ps = [ (x,y,fromIntegral (totalOpeningVal (executeMove x y ps))) | x <- ps, getPos x /= (-1,-1), getColour x == c, y <- legalMoves x ps ]
 makeEvalList c ps = [ (x,y,0) | x <- ps, getPos x /= (-1,-1), getColour x == c, y <- legalMoves x ps ]
 
 -- makes a move which is stored using the format with eval
@@ -100,3 +101,16 @@ isCheckmate c ps = null (allLegalMoves c ps) && isKingInCheck king ps
 
 checkmate :: Colour -> Float
 checkmate c = if c==White then -1000000 else 1000000
+
+--takes the top n rated moves from evalList
+takeTopMoves :: Colour -> Int -> [(Piece,Move,Float)] -> [(Piece,Move,Float)]
+takeTopMoves c n [] = []
+takeTopMoves c 0 xs = []
+takeTopMoves c n xs = m : takeTopMoves c (n-1) (removeMove m xs)
+                  where
+                      m = findStrongestMoveFromAll c xs
+
+-- removes a move from a list
+removeMove :: (Piece,Move,Float) -> [(Piece,Move,Float)] -> [(Piece,Move,Float)]
+removeMove x [y] = []
+removeMove a bs = [x | x <- bs, x /= a]
