@@ -27,28 +27,29 @@ openingMoveWrapper d c ps = findStrongestMoveFromAll c (par s4 (par s3 (par s2 (
                                 s4 = findMostEpicMove (-2000000,2000000) d c ps r2
 
 
---findMostEpicMove :: (Float,Float) -> Int -> Colour -> AllPieces -> [(Piece,Move,Float)] -> (Piece,Move,Float)
---findMostEpicMove (a,b) 0 c ps xs = ((King,White,(0,0),0),(0,0),totalOpeningVal ps)
---findMostEpicMove (a,b) d c ps xs = findStrongestMoveFromAll c (addEvals (a,b) d c ps moves)
---                             where
---                                 moves = if null xs then makeEvalList c ps else xs
-
-
 findMostEpicMove :: (Float,Float) -> Int -> Colour -> AllPieces -> [(Piece,Move,Float)] -> (Piece,Move,Float)
 findMostEpicMove (a,b) 0 c ps xs = ((King,White,(0,0),0),(0,0),fromIntegral (totalOpeningVal ps))
-findMostEpicMove (a,b) d c ps xs | isCheckmate White ps = ((King,White,(0,0),0),(0,0), (checkmate White))
-                                 | isCheckmate Black ps = ((King,White,(0,0),0), (0,0), (checkmate Black))
-                                 | otherwise = findStrongestMoveFromAll c (addEvals (a,b) d c ps moves)
-                                             where
-                                               moves = if null xs then makeEvalList c ps else xs
+findMostEpicMove (a,b) d c ps xs = findStrongestMoveFromAll c (addEvals (a,b) d c ps moves)
+                             where
+                                 moves = if null xs then makeEvalList c ps else xs
+
+
+--findMostEpicMove :: (Float,Float) -> Int -> Colour -> AllPieces -> [(Piece,Move,Float)] -> (Piece,Move,Float)
+--findMostEpicMove (a,b) 0 c ps xs = ((King,White,(0,0),0),(0,0),fromIntegral (totalOpeningVal ps))
+--findMostEpicMove (a,b) d c ps xs | isCheckmate White ps = ((King,White,(0,0),0),(0,0), (checkmate White))
+--                                 | isCheckmate Black ps = ((King,White,(0,0),0), (0,0), (checkmate Black))
+--                                 | otherwise = findStrongestMoveFromAll c (addEvals (a,b) d c ps moves)
+--                                             where
+--                                               moves = if null xs then makeEvalList c ps else xs
 
 
 
 addEvals :: (Float,Float) -> Int -> Colour -> AllPieces -> [(Piece,Move,Float)] -> [(Piece,Move,Float)]
 addEvals (a,b) d c ps [] = []
 addEvals (a,b) d c ps ((p,m,f):xs) = if noex then [(p,m,shorteval)] else (p,m,eval) : next
+--addEvals (a,b) d c ps ((p,m,f):xs) = if (not (isCapture p m ps) && d > 3) then (p,m,fromIntegral (totalOpeningVal (executeMove p m ps))) : next else if noex then [(p,m,shorteval)] else (p,m,eval) : next
                                      where
-                                         eval = getMoveEval (findMostEpicMove (a,b) (d-1) (invertColour c) (makeSingleBestMove (p,m,f) ps) [])
+                                         eval = getMoveEval (findMostEpicMove (a,b) (d-1) (invertColour c) (executeMove p m ps) [])
                                          (noex,shorteval) = dontExplore (a,b) c eval
                                          next = addEvals (updateAB (a,b) c eval) d c ps xs
 
@@ -79,7 +80,7 @@ updateAB (a,b) c f = if c==White then
 -- returns the stronget move from a list of moves with evaluations
 findStrongestMoveFromAll :: Colour -> [(Piece,Move,Float)] -> (Piece,Move,Float)
 findStrongestMoveFromAll c xs | not (null xs) = head list
-                              | otherwise = ((King, White, (7,4), 0), (0,0), 0) -- if stalemate
+                              | otherwise = ((King, White, (7,4), 0), (0,0), checkmate c) -- if stalemate
                                 where
                                     list = if c==White then [ x | x <- xs, all (\y -> (getMoveEval y) <= (getMoveEval x)) xs ] else [ x | x <- xs, all (\y -> (getMoveEval y) >= (getMoveEval x)) xs ]
 
@@ -114,3 +115,21 @@ takeTopMoves c n xs = m : takeTopMoves c (n-1) (removeMove m xs)
 removeMove :: (Piece,Move,Float) -> [(Piece,Move,Float)] -> [(Piece,Move,Float)]
 removeMove x [y] = []
 removeMove a bs = [x | x <- bs, x /= a]
+
+-- returns whether a move means the piece is threatening to capture afterwards
+isThreat :: Piece -> Move -> AllPieces -> Bool
+isThreat p m ps = if (length (trulyThreatening p ps) < length (trulyThreatening newp newb)) then True else False
+                  where
+                      newb = executeMove p m ps
+                      newp = head (findPiece (getTarget (getPos p) m) newb)
+
+-- returns whether a move is a capture
+isCapture :: Piece -> Move -> AllPieces -> Bool
+isCapture p m ps = if (totalMaterial enemyCol ps) > (totalMaterial enemyCol newb) then True else False
+                   where
+                       enemyCol = invertColour (getColour p)
+                       newb = executeMove p m ps
+
+
+trulyThreatening :: Piece -> AllPieces -> [Piece]
+trulyThreatening p ps = [x | x <- threatening p ps, pieceMaterial x ps == 0]

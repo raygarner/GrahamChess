@@ -183,54 +183,55 @@ pieceVal (King,_,_,_)   = 0
 
 
 -- if a piece is going to be captured then it doesnt really have any material
---pieceMaterial :: Piece -> AllPieces -> Float
---pieceMaterial a ps   | (length t2 > length pr) && not (compareBackupVals t2 pr) = 0
---pieceMaterial a ps   | not (compareBackupVals t2 pr) = 0
---                     | getLowestVal t < v = 0
---                     | otherwise = v
---                       where t = threatenedBy a ps
---                             t2 = trulyThreatenedBy 4 a ps
---                             v = pieceVal a
---                             pr= trulyProtectedBy 4 a ps
+pieceMaterial :: Piece -> AllPieces -> Float
+pieceMaterial a ps | (length t2 > length pr) && not (compareBackupVals t2 pr) = 0
+--pieceMaterial a ps | not (compareBackupVals t2 pr) = 0
+                   | getLowestVal t < fromIntegral v = 0
+                   | otherwise = fromIntegral v
+                       where
+                             t = threatenedBy a ps
+                             t2 = trulyThreatenedBy 4 a ps
+                             v = pieceVal a
+                             pr= trulyProtectedBy 4 a ps
 
 
 --trulyThreatenedBy
---trulyThreatenedBy :: Int -> Piece -> AllPieces -> [Piece]
---trulyThreatenedBy 0 p ps = []
---trulyThreatenedBy i p ps = if null xs then [] else xs ++ trulyThreatenedBy (i-1) p newps
---                         where
---                             xs = sortPieces (threatenedBy p ps)
---                             newps = [n | n <- ps, all (/=n) xs]
+trulyThreatenedBy :: Int -> Piece -> AllPieces -> [Piece]
+trulyThreatenedBy 0 p ps = []
+trulyThreatenedBy i p ps = if null xs then [] else xs ++ trulyThreatenedBy (i-1) p newps
+                         where
+                             xs = sortPieces (threatenedBy p ps)
+                             newps = [n | n <- ps, all (/=n) xs]
 
 
 --trulyProtectedBy
---trulyProtectedBy :: Int -> Piece -> AllPieces -> [Piece]
---trulyProtectedBy i (p,c,pos,mc) ps = trulyThreatenedBy i newp (newp:removePiece (p,c,pos,mc) ps)
---                                     where
---                                         newp = (p,invertColour c, pos,mc)
+trulyProtectedBy :: Int -> Piece -> AllPieces -> [Piece]
+trulyProtectedBy i (p,c,pos,mc) ps = trulyThreatenedBy i newp (newp:removePiece (p,c,pos,mc) ps)
+                                     where
+                                         newp = (p,invertColour c, pos,mc)
 
 -- returns true if protection is sufficient (xs is threats and ys is protection)
---compareBackupVals :: [Piece] -> [Piece] -> Bool
---compareBackupVals [] [] = True
---compareBackupVals xs [] = False
---compareBackupVals [] ys = True
---compareBackupVals (x:xs) (y:ys) = if (pieceVal y > pieceVal x) && (length (x:xs) > length (y:ys)) then False else compareBackupVals xs ys
+compareBackupVals :: [Piece] -> [Piece] -> Bool
+compareBackupVals [] [] = True
+compareBackupVals xs [] = False
+compareBackupVals [] ys = True
+compareBackupVals (x:xs) (y:ys) = if (pieceVal y > pieceVal x) && (length (x:xs) > length (y:ys)) then False else compareBackupVals xs ys
 
 
 -- sort a list of pieces by value from lowest to highest
---sortPieces :: [Piece] -> [Piece]
---sortPieces []     = []
---sortPieces (p:xs) = (sortPieces lesser) ++ [p] ++ (sortPieces greater)
---    where
---        lesser  = filter (\y -> pieceVal y < pieceVal p) xs--filter (< p) xs
---        greater = filter (\y -> pieceVal y >= pieceVal p) xs--filter (>= p) xs
+sortPieces :: [Piece] -> [Piece]
+sortPieces []     = []
+sortPieces (p:xs) = (sortPieces lesser) ++ [p] ++ (sortPieces greater)
+    where
+        lesser  = filter (\y -> pieceVal y < pieceVal p) xs--filter (< p) xs
+        greater = filter (\y -> pieceVal y >= pieceVal p) xs--filter (>= p) xs
 
 -- returns the value of the lowest value piece in a list of pieces
---getLowestVal :: [Piece] -> Float
---getLowestVal ps | null a = 10.0 -- return a value greater than any piece
---                | otherwise = head a
---                  where
---                      a = [pieceVal x | x <- ps, all (\y -> (pieceVal y) >= pieceVal x) ps ]
+getLowestVal :: [Piece] -> Float
+getLowestVal ps | null a = 10.0 -- return a value greater than any piece
+                | otherwise = fromIntegral (head a)
+                  where
+                      a = [pieceVal x | x <- ps, all (\y -> (pieceVal y) >= pieceVal x) ps ]
 
 
 
