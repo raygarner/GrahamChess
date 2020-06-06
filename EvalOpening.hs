@@ -137,7 +137,8 @@ totalOpeningValColour :: Colour -> AllPieces -> Int
 --totalOpeningValColour c ps = totalMaterial c ps + totalMobility c ps + centralPawns c ps + blockedPawns c ps + kingSafety c ps + queenSafety c ps
 --totalOpeningValColour c ps = totalMaterial c ps + totalMobility c ps + kingSafety c ps + queenSafety c ps + centralPawns c ps + blockedPawns c ps
 --totalOpeningValColour c ps = movePieceBonus c ps + totalMaterial c ps + kingSafety c ps + queenSafety c ps + centralPawns c ps + blockedPawns c ps
-totalOpeningValColour c ps = totalMaterial c ps + totalMobility c ps -- + queenSafety c ps
+--totalOpeningValColour c ps = totalMaterial c ps + totalMobility c ps + queenSafety c ps -- + blockedPawns c ps
+totalOpeningValColour c ps = totalMobility c ps + totalMaterial c ps -- + queenSafety c ps + blockedPawns c ps
 
 centralPawns :: Colour -> AllPieces -> Int
 centralPawns c ps = 1 * fromIntegral (length [x | x <- ps, getColour x == c, getPieceType x == Pawn, any (==getPos x) squares])
