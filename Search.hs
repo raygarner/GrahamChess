@@ -13,5 +13,5 @@ import EndSearch
 
 findRealBestMove :: Colour -> AllPieces -> (Piece,Move,Float)
 findRealBestMove c ps | getGamePoint ps == Opening = openingMoveWrapper 6 c ps
-                      | getGamePoint ps == Middle = openingMoveWrapper 6 c ps --totalMiddleVal c ps (temporary to make testing easier)
+                      | getGamePoint ps == Middle = middleMoveWrapper 6 c ps --totalMiddleVal c ps (temporary to make testing easier)
                       | otherwise = endSearchWrapper 8 c ps
