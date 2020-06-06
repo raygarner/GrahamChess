@@ -70,15 +70,25 @@ evalQueen c (m,n) = (relboard !! i)
                      where
                          i = (m * 8) + n
                          board = [-20,-10,-10, -5, -5,-10,-10,-20,
-                                -10,  0,  0,  0,  0,  0,  0,-10,
-                                -10,  0,  5,  5,  5,  5,  0,-10,
-                                 -5,  0,  5,  5,  5,  5,  0, -5,
-                                  0,  0,  5,  5,  5,  5,  0, -5,
-                                -10,  5,  5,  5,  5,  5,  0,-10,
-                                -10,  0,  5,  0,  0,  0,  0,-10,
-                                -20,-10,-10, -5, -5,-10,-10,-20]
+                                -10, -5, -5, -5, -5, -5, -5,-10,
+                                -10, -5,  -5,  -5,  -5,  -5, -5,-10,
+                                 -5, -5,  -5,  -5,  -5,  -5, -5, -5,
+                                 -5, -5,  -5,  -5,  -5,  -5, -5, -5,
+                                -10,  -5,  -5,  -5,  -5,  -5, -5,-10,
+                                -10, -5, -5, -5, -5, -5, -5,-10,
+                                -20,-10,-10, -0, -0,-10,-10,-20]
                          relboard = if c==White then board else reverse board
-
+{--
+//queen
+-20,-10,-10, -5, -5,-10,-10,-20,
+-10,  0,  0,  0,  0,  0,  0,-10,
+-10,  0,  5,  5,  5,  5,  0,-10,
+ -5,  0,  5,  5,  5,  5,  0, -5,
+  0,  0,  5,  5,  5,  5,  0, -5,
+-10,  5,  5,  5,  5,  5,  0,-10,
+-10,  0,  5,  0,  0,  0,  0,-10,
+-20,-10,-10, -5, -5,-10,-10,-20
+--}
 evalKing :: Colour -> Pos -> Int
 evalKing c (m,n) = relboard !! i
                      where
@@ -119,7 +129,7 @@ evalPiece (King,c,(m,n),mc) ps = evalKing c (m,n)
 --pieceMobMult (Bishop,_,_,_) = 1.0
 
 totalMaterial :: Colour -> AllPieces -> Int
-totalMaterial c ps = 10 * sum [pieceVal (y,White,(0,0),0) * countPieceType c y ps  | y <- pieceTypes]
+totalMaterial c ps = 1 * sum [pieceVal (y,White,(0,0),0) * countPieceType c y ps  | y <- pieceTypes]
 
 countPieceType :: Colour -> PieceType -> AllPieces -> Int
 countPieceType c t ps = length [ x | x <- ps, getColour x == c, getPieceType x == t, getPos x /= (-1,-1) ]
