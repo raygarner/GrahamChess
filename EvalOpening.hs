@@ -9,14 +9,14 @@ import           Control.Parallel
 -- some crude evaluations
 
 evalPawn :: Colour -> Pos -> Int
-evalPawn c (m,n) = relboard !! i
+evalPawn c (m,n) = 0 -- relboard !! i
                where
                    i = (m * 8) + n
                    board = [ 0,  0,  0,  0,  0,  0,  0,  0,
                             50, 50, 50, 50, 50, 50, 50, 50,
                             10, 10, 20, 30, 30, 20, 10, 10,
-                             5,  5, 10, 25, 25, 10,  5,  5,
-                             0,  0,  0, 20, 20,-20,-20,  0,
+                             5,  5, 10, 20, 20, 10,  5,  5,
+                             0,  0,  0, 20, 20,-25,-20,  0,
                              5, -5,-10,  0,  0,-10, -5,  5,
                              5, 10, 10,-20,-20, 10, 10,  5,
                              0,  0,  0,  0,  0,  0,  0,  0]
