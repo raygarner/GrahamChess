@@ -32,7 +32,7 @@ endSearchWrapper d c ps = findStrongestMoveFromAll c (par s4 (par s3 (par s2 (s1
 findMostEpicMove :: (Float,Float) -> Int -> Colour -> AllPieces -> [(Piece,Move,Float)] -> (Piece,Move,Float)
 findMostEpicMove (a,b) 0 c ps xs = ((King,White,(0,0),0),(0,0),totalEndVal ps)
 findMostEpicMove (a,b) d c ps xs | isCheckmate c ps = if c == Black then ((King,White,(0,0),0),(0,0), (checkmate c) + (fromIntegral d)) else ((King,White,(0,0),0),(0,0), (checkmate c) - fromIntegral (d))
-                                 | isStaleMate c ps = ((King,White,(0,0),0),(0,0),0)
+                                 | isStaleMate c ps = ((King,White,(7,4),0),(0,0),0)
                                  | otherwise = findStrongestMoveFromAll c (addEvals (a,b) d c ps moves)
                                              where
                                                moves = if null xs then makeEvalList c ps else xs

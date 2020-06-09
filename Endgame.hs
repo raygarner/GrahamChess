@@ -12,7 +12,7 @@ import           Debug
 import           UI
 
 main :: IO ()
-main = gameLoop addEnd1Pieces
+main = gameLoop stalematePieces
 
 
 
@@ -40,13 +40,17 @@ gameLoop ps = do printBoard (-1) ps
                                do
                                  putStr "Graham is thinking of a move...\n"
                                  response <- return (findRealBestMove Black ps)
-                                 print response
-                                 putStr "Graham has made his move...\n"
-                                 move <- return (extractMove response)
-                                 print move
-                                 piece <- return (extractPiece response)
-                                 print piece
-                                 gameLoop (executeMove piece move ps)
+                                 if (response == ((King, White, (7,4), 0), (0,0), 0)) then
+                                   do putStr ("Stalemate.\n")
+                                 else
+                                   do
+                                   print response
+                                   putStr "Graham has made his move...\n"
+                                   move <- return (extractMove response)
+                                   print move
+                                   piece <- return (extractPiece response)
+                                   print piece
+                                   gameLoop (executeMove piece move ps)
                              else
                                do
                                  putStr ("Checkmate.\n")

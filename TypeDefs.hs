@@ -7,7 +7,7 @@ data PieceType = Pawn | Knight | Bishop | Rook | Queen | King
 data Colour = Black | White
               deriving (Read, Eq, Show)
 
-data GamePoint = Opening | Middle | End
+data GamePoint = Opening | Middle | End | VeryEnd
                  deriving (Eq, Ord, Show, Read)
 
 type Pos = (Int, Int) -- row, column

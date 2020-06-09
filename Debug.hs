@@ -83,6 +83,16 @@ addEnd3Pieces :: AllPieces
 addEnd3Pieces = addEnd3Kings ++ addEnd3Bishops ++ addEnd3Rooks ++ addEnd3WhitePawns ++ addEnd3BlackPawns
 
 
+-- pieces for a stalemate position
+addStaleMateKings :: AllPieces
+addStaleMateKings = [(King,c,(m,n),1) | (c,m,n) <- [(White,3,0), (Black,0,0)]]
+
+addStaleMatePawn :: AllPieces
+addStaleMatePawn = [(Pawn,White,(1,0),1)]
+
+stalematePieces :: AllPieces
+stalematePieces = addStaleMatePawn ++ addStaleMateKings
+
 -- pieces for testing castling
 addCastleTest :: AllPieces
 addCastleTest = addKings ++ addRooks
