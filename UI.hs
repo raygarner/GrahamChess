@@ -44,7 +44,11 @@ printBoard n ps = do if (getColumn (calcPos n) == 0) then
                        return ()
 
                      if isEmpty (calcPos n) ps then
-                         putChar '-'
+                         --if n `mod` 2 == 0 then putChar '-' else putChar ' '
+                         if getRow (calcPos n) `mod` 2 == 0 then
+                             if n `mod` 2 == 0 then putChar '■' else putChar '□'
+                         else
+                             if n `mod` 2 == 0 then putChar '□' else putChar '■'
                      else
                          putChar (pieceChar (head (findPiece (calcPos n) ps)))
 
