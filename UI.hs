@@ -38,7 +38,7 @@ printBoard (-1) ps = do printCapturedPieces White ps
                         printBoard 0 ps
 printBoard n ps = do if (getColumn (calcPos n) == 0) then
                          do
-                           putStr (show (getRow (calcPos n)))
+                           putStr (show (8 - getRow (calcPos n)))
                            putChar ' '
                      else
                        return ()
@@ -60,7 +60,7 @@ printBoard n ps = do if (getColumn (calcPos n) == 0) then
                      printBoard (n+1) ps
 
 printCols :: IO ()
-printCols = do putStr "  0 1 2 3 4 5 6 7\n"
+printCols = do putStr "  a b c d e f g h\n"
 
 printCapturedPieces :: Colour -> AllPieces -> IO ()
 printCapturedPieces White ps = do printPieceList (getCapturedPieces White ps)
