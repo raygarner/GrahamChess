@@ -6,7 +6,7 @@ import           TypeDefs
 import           Util
 
 totalMaterial :: AllPieces -> Float
-totalMaterial ps = 50 * sum [pieceVal (y,White,(0,0),0) * (countPieceType White y ps - countPieceType Black y ps) | y <- pieceTypes]
+totalMaterial ps = 5.0 * sum [pieceVal (y,White,(0,0),0) * (countPieceType White y ps - countPieceType Black y ps) | y <- pieceTypes]
 
 countPieceType :: Colour -> PieceType -> AllPieces -> Float
 countPieceType c t ps = fromIntegral (length [ x | x <- ps, getColour x == c, getPieceType x == t, getPos x /= (-1,-1) ])
@@ -28,16 +28,16 @@ getLowestVal ps | null a = 10.0
 
 
 perPieceBonus :: Colour -> AllPieces -> Float
-perPieceBonus c ps = (sum[threatenKingBonus x ps | x <- ps, getPos x /= (-1,-1), getColour x == c])
+perPieceBonus c ps = (sum[threatenKingBonus x ps + isPieceInPlay x ps | x <- ps, getPos x /= (-1,-1), getColour x == c])
 
 totalColourBonus :: Colour -> AllPieces -> Float
-totalColourBonus c ps = isKingOnEdges c ps + getPawnPromotion c ps
+totalColourBonus c ps = isKingOnEdges c ps
 
 allPawns :: Colour -> AllPieces -> Float
 allPawns c ps = (sum [passPawnScore x ps | x <- ps, getColour x == c, getPieceType x == Pawn])
 
 totalEndVal :: AllPieces -> Float
-totalEndVal ps =  totalMaterial ps + (totalColourBonus White ps - totalColourBonus Black ps) + (allPawns White ps - allPawns Black ps)
+totalEndVal ps =  totalMaterial ps + (totalColourBonus White ps - totalColourBonus Black ps) + (allPawns White ps - allPawns Black ps) + (perPieceBonus White ps - perPieceBonus Black ps)
 
 pieceVal :: Piece -> Float
 pieceVal (Pawn,_,_,_)   = 2.75
@@ -52,6 +52,13 @@ isPieceAimedAtEnemyKing p ps = isValidMove p (moveMade (getPos p) k) (p : [])
                                where
                                  k = findKing (invertColour (getColour p)) ps
 
+isPieceInPlay :: Piece -> AllPieces -> Float
+isPieceInPlay p ps | validPiece (getPieceType p) && getMovecount p > 0 = 0.1
+                   | otherwise = 0
+
+validPiece :: PieceType -> Bool
+validPiece p = any (==p) [Knight,Bishop,Rook]
+
 threatenKingBonus :: Piece -> AllPieces -> Float
 threatenKingBonus p ps | isPieceAimedAtEnemyKing p ps = 0.05
                        | otherwise = 0.0
@@ -61,11 +68,11 @@ isKingOnEdges c ps = isKingSideCol king + isKingSideRow king
                      where king = findKing (invertColour c) ps
 
 isKingSideCol :: Pos -> Float
-isKingSideCol p | getColumn p == 0 || getColumn p == 7 = 0.9
+isKingSideCol p | getColumn p == 0 || getColumn p == 7 = 0.25
                 | otherwise = 0
 
 isKingSideRow :: Pos -> Float
-isKingSideRow p | getRow p == 0 || getRow p == 7 = 0.9
+isKingSideRow p | getRow p == 0 || getRow p == 7 = 0.25
                 | otherwise = 0
 
 pawnsNearEnd :: Colour -> AllPieces -> [Piece]

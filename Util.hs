@@ -21,8 +21,8 @@ extractPiece (p,_,_) = p
 -- return what point the game is in
 getGamePoint :: AllPieces -> GamePoint
 --getGamePoint ps | (noQueens ps || lowMaterial ps) = End
-getGamePoint ps | lowMaterial ps = End
-                | veryLowMatierial ps = VeryEnd
+getGamePoint ps | veryLowMatierial ps = VeryEnd
+                | lowMaterial ps = End
                 | allPiecesMoved ps = Middle
                 | otherwise = Opening
 
@@ -98,7 +98,9 @@ noQueens ps = null [ x | x <- ps, getPieceType x == Queen, getPos x /= (-1,-1) ]
 
 -- returns whether there is a low ammount of material on the board
 lowMaterial :: AllPieces -> Bool
-lowMaterial ps = length [ x | x <- ps, getPos x /= (-1,-1), getPieceType x /= Pawn, getPieceType x /= King ] <= 8
+lowMaterial ps = length (pieces) <= 8 && length (pieces) > 4
+                 where
+                   pieces = [ x | x <- ps, getPos x /= (-1,-1), getPieceType x /= Pawn, getPieceType x /= King ]
 
 veryLowMatierial :: AllPieces -> Bool
 veryLowMatierial ps = length [ x | x <- ps, getPos x /= (-1,-1), getPieceType x /= Pawn, getPieceType x /= King ] <= 4

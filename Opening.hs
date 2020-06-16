@@ -10,6 +10,8 @@ import           Data.Char
 import           Search
 import           Debug
 import           UI
+import           Data.List
+import           Data.Maybe
 import           Data.Time.Clock
 
 main :: IO ()
@@ -26,11 +28,11 @@ gameLoop ps = do printBoard (-1) ps
                      n <- getLine
                      r <- getLine
                      c <- getLine
-                     piece <- return (findPiece (read m, read n) ps)
+                     piece <- return (findPiece (convertToPos (m,n)) ps)
                      if (not (null piece)) then
                        do
                          print (head piece)
-                         move <- return (buildMove (r,c))
+                         move <- return (buildMove (getPos (head piece)) (r,c))
                          print move
                          if (isMoveOk (head piece) move ps) then
                            do
@@ -42,15 +44,19 @@ gameLoop ps = do printBoard (-1) ps
                                  putStr "Graham is thinking of a move...\n"
                                  start <- getCurrentTime
                                  response <- return (findRealBestMove Black ps)
-                                 print response
-                                 putStr "Graham has made his move...\n"
-                                 move <- return (extractMove response)
-                                 print move
-                                 piece <- return (extractPiece response)
-                                 print piece
-                                 end <- getCurrentTime
-                                 putStrLn $ show (end `diffUTCTime` start)
-                                 gameLoop (executeMove piece move ps)
+                                 if (response == ((King, White, (7,4), 0), (0,0), 0)) then
+                                   do putStr ("Stalemate.\n")
+                                 else
+                                   do
+                                   print response
+                                   putStr "Graham has made his move...\n"
+                                   move <- return (extractMove response)
+                                   print move
+                                   piece <- return (extractPiece response)
+                                   print piece
+                                   end <- getCurrentTime
+                                   putStrLn $ show (end `diffUTCTime` start)
+                                   gameLoop (executeMove piece move ps)
                              else
                                do
                                  putStr ("Checkmate.\n")
@@ -66,8 +72,14 @@ gameLoop ps = do printBoard (-1) ps
                    do
                      putStr ("Checkmate.\n")
 
-buildMove :: (String, String) -> (Int,Int)
-buildMove (r,c) = (read r, read c)
+convertToPos :: (String,String) -> (Int,Int)
+convertToPos (m,n) = (8 - (read n) , fromMaybe (-1) (elemIndex m columns))
+
+columns :: [String]
+columns = ["a", "b","c","d","e","f","g","h"]
+
+buildMove :: (Int,Int) -> (String, String) -> (Int,Int)
+buildMove (m,n) (r,c) = moveMade (m,n) (convertToPos (r,c))
 
 isMoveOk :: Piece -> Move -> AllPieces -> Bool
 isMoveOk p m ps = isValidMove p m ps && not (willKingBeInCheck p m ps)
