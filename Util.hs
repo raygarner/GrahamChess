@@ -56,7 +56,7 @@ moveMade (a,b) (c,d) = (c - a, d - b)
 
 -- returns a piece with an updated position
 updatePosition :: Piece -> Move -> Piece
-updatePosition (p,colour,pos,mc) (m,n) = (p, colour, (getTarget pos (m,n)), mc+2)
+updatePosition (p,colour,pos,mc) (m,n) = (p, colour, (getTarget pos (m,n)), mc+x) -- plus 2
                                         where
                                             x = if p == Pawn && abs m == 2 then 2 else 1
 

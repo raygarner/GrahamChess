@@ -7,7 +7,7 @@
 
 #FLAGS=-threaded -O2 -fexcess-precision -optc-O3 -optc-ffast-math -fforce-recomp
 
-FLAGS=-threaded -O2
+FLAGS=-threaded -O2 -fexcess-precision
 
 all: remove clean
 
